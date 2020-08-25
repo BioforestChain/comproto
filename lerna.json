@@ -1,0 +1,17 @@
+{
+  "packages": [
+    "packages/*"
+  ],
+  "useWorkspaces": true,
+  "npmClient": "yarn",
+  "version": "1.0.0",
+  "publishConifg": {
+    "registry": "http://192.168.250.245:4873/"
+  },
+  "exact": true,
+  "command": {
+    "init": {
+      "exact": true
+    }
+  }
+}

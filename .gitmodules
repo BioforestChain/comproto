@@ -1,0 +1,3 @@
+[submodule "src/lib/comproto"]
+	path = src/lib/comproto
+	url = ssh://xmn-tfs-isn01.ifmchain.local:22/tfs/DefaultCollection/IFMChainEngine/_git/comproto

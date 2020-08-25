@@ -1,0 +1,19 @@
+{
+  "extends": "../../config/tsconfig_base/base.tsconfig.cjs",
+  "compilerOptions": {
+    "outDir": "./build/cjs",
+    "rootDir": "./src",
+    "lib": [
+      "dom"
+    ]
+  },
+  "references": [
+    {
+      "path": "../typings/tsconfig.json"
+    }
+  ],
+  "files": [
+    "src/CarryStorageRegister.ts",
+    "src/index.ts"
+  ]
+}
