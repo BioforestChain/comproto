@@ -48,12 +48,13 @@
     ]
   },
   "keywords": [
-    "worker"
+    "comproto"
   ],
   "author": "chenjianwei",
   "license": "ISC",
   "files": [
-    "build"
+    "build/cjs",
+    "build/esm"
   ],
   "devDependencies": {
     "@bfchain/devkit": "^0.8.19",
