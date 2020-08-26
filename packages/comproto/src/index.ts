@@ -1,5 +1,4 @@
 import "@bfchain/comproto-typings";
 
-import Comproto from '@bfchain/comproto-core';
+export * from '@bfchain/comproto-core';
 
-export default Comproto;

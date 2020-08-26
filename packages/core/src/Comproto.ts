@@ -2,37 +2,44 @@
 import v8 from 'v8';
 import { CarryStorageRegister } from '@bfchain/comproto-helps';
 
-const TRANSFER_SYMBOL = Symbol('TRANSFER_SYMBOL');
+export const TRANSFER_SYMBOL = Symbol('TRANSFER_SYMBOL');
 
 type ITransferState = {
     carryStorageRegister: CarryStorageRegister,
     transferProtoNameArray: string[],
 };
 
-export default class Comproto {
+export class Comproto {
     protected protoMap: Map<string, BFChainComproto.TransferHandler> = new Map();
-    public encode(value: any) {
+    public serialize(value: any): BFChainComproto.ComprotoBuffer {
         const transferState: ITransferState = {
             carryStorageRegister: new CarryStorageRegister(),
             transferProtoNameArray: [],
         };
-        const transferValue = this.encodeTransfer(value, transferState);
+        const transferValue = this.serializeTransfer(value, transferState);
         return v8.serialize([transferState.carryStorageRegister.getU8a(), transferValue, ...transferState.transferProtoNameArray]);
     }
-    public decode(buffer: BFChainComproto.AnyBuffer) {
+    public deserialize(buffer: BFChainComproto.ComprotoBuffer) {
         const [transferStateU8a, originData, ...transferProtoNameArray] = v8.deserialize(buffer) as BFChainComproto.TransferDataArray;
         const transferState: ITransferState = {
             carryStorageRegister: new CarryStorageRegister(transferStateU8a),
             transferProtoNameArray,
         };
-        const transferData =  this.decodeTransfer(originData, transferState);
+        const transferData =  this.deserializeTransfer(originData, transferState);
         return transferData;
+    }
+    public canHanlder(obj: any) {
+        if (typeof obj === 'string') {
+            return false;
+        }
+        return typeof obj[TRANSFER_SYMBOL] === 'string';
     }
     public addClassHandler<C = BFChainComproto.AnyClass>(
         protoName: string,
         registerClass: C & { prototype: any },
         handler: BFChainComproto.TransferHandler
     ) {
+        this.deleteClassHandler(protoName);
         handler.handlerObj = registerClass;
         Object.defineProperty(registerClass.prototype, TRANSFER_SYMBOL, {
             value: protoName,
@@ -43,6 +50,7 @@ export default class Comproto {
         this.protoMap.set(protoName, handler);
     }
     public addHandler<O = BFChainComproto.AnyObject>(protoName: string, handlerObj: O, handler: BFChainComproto.TransferHandler) {
+        this.deleteHandler(protoName);
         handler.handlerObj = handlerObj;
         Object.defineProperty(handlerObj, TRANSFER_SYMBOL, {
             value: protoName,
@@ -68,39 +76,39 @@ export default class Comproto {
         delete handler.handlerObj[TRANSFER_SYMBOL];
         this.protoMap.delete(protoName);
     }
-    private encodeTransfer(value: any, transferState: ITransferState): any {
+    private serializeTransfer(value: any, transferState: ITransferState): any {
         const valueType = Object.prototype.toString.call(value);
         if (valueType === '[object Object]' && !!value) {
-            const [isDecode, transferValue] = this.encodeTransferProto(value, transferState);
-            if (isDecode) {
+            const [isdeserialize, transferValue] = this.serializeTransferProto(value, transferState);
+            if (isdeserialize) {
                 return transferValue;
             }
             const obj: { [key: string]: any } = {};
             Object.keys(value).sort().forEach((attr: string) => {
-                obj[attr] = this.encodeTransfer(value[attr], transferState);
+                obj[attr] = this.serializeTransfer(value[attr], transferState);
             })
             return obj;
         }
         if (valueType === '[object Array]') {
-            const [isDecode, transferValue] = this.encodeTransferProto(value, transferState);
-            if (isDecode) {
+            const [isdeserialize, transferValue] = this.serializeTransferProto(value, transferState);
+            if (isdeserialize) {
                 return transferValue;
             }
             const valueArray = [...value];
             return valueArray.map((obj) => {
-                return this.encodeTransfer(obj, transferState);
+                return this.serializeTransfer(obj, transferState);
             });
         }
         if (valueType === '[object Function]') {
-            const [isDecode, transferValue] = this.encodeTransferProto(value, transferState);
-            if (isDecode) {
+            const [isdeserialize, transferValue] = this.serializeTransferProto(value, transferState);
+            if (isdeserialize) {
                 return transferValue;
             }
             return value;
         }
         if (valueType === '[object Promise]') {
-            const [isDecode, transferValue] = this.encodeTransferProto(value, transferState);
-            if (isDecode) {
+            const [isdeserialize, transferValue] = this.serializeTransferProto(value, transferState);
+            if (isdeserialize) {
                 return transferValue;
             }
             return value;
@@ -108,7 +116,7 @@ export default class Comproto {
         transferState.carryStorageRegister.carryBitZero();
         return value;
     }
-    private encodeTransferProto(value: any, transferState: ITransferState): [
+    private serializeTransferProto(value: any, transferState: ITransferState): [
         boolean,
         any?,
     ] {
@@ -120,20 +128,19 @@ export default class Comproto {
         transferState.transferProtoNameArray.push(protoName);
         transferState.carryStorageRegister.carryBitOne();
         const handler = this.protoMap.get(protoName);
-        if (handler && typeof handler.encode === 'function') {
-            return [true, handler.encode(value)];
+        if (handler && typeof handler.serialize === 'function') {
+            return [true, handler.serialize(value)];
         }
         return [false];
     }
-    private decodeTransfer(originData: any, transferState: ITransferState) {
-        const canencode = transferState.carryStorageRegister.readBit() === 1;
-        // console.log('decodeTransfer', originData, canencode);
-        if (canencode) {
+    private deserializeTransfer(originData: any, transferState: ITransferState) {
+        const canserialize = transferState.carryStorageRegister.readBit() === 1;
+        if (canserialize) {
             const protoName = transferState.transferProtoNameArray.shift();
             if (typeof protoName === 'string') {
                 const handler = this.protoMap.get(protoName);
-                if (handler && typeof handler.decode === 'function') {
-                    return handler.decode(originData);
+                if (handler && typeof handler.deserialize === 'function') {
+                    return handler.deserialize(originData);
                 }
             }
             return originData;
@@ -142,12 +149,12 @@ export default class Comproto {
         if (valueType === '[object Object]' && !!originData) {
             const obj: {[key: string]: any} = {};
             Object.keys(originData).forEach((attr: string) => {
-                obj[attr] = this.decodeTransfer(originData[attr], transferState);
+                obj[attr] = this.deserializeTransfer(originData[attr], transferState);
             });
             return obj;
         }
         if (valueType === '[object Array]') {
-            return originData.map((item: any) => this.decodeTransfer(item, transferState));
+            return originData.map((item: any) => this.deserializeTransfer(item, transferState));
         }
         return originData;
     }

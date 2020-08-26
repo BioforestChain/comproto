@@ -5,7 +5,8 @@
 > 对 v8.serialize 和 v8.deserialize 进行扩展和补充，实现自定义对象的传递
 
 ```js
-// example
+// example class handler
+import { Comproto } from '@bfchain/comproto'
 class B {
     public c: number = 0;
     constructor(c: number) {
@@ -13,47 +14,71 @@ class B {
     }
 }
 const bHandler = {
-    encode(obj: B) {
+    serialize(obj: B) {
         return obj.c;
     },
-    decode(c: number) {
+    deserialize(c: number) {
         return new B(c);
     }
 };
 const comproto = new Comproto();
-comproto.addClassHandler('class_b', B, bHandler);
-const encodeData = { a: 1, b: new B(6), c: { a: 1, d: { ww: 22 }, e: 'ee' } };
-const buffer = comproto.encode(encodeData);
-console.log(comproto.decode(buffer));
+comproto.addClassHandler('CLASS_HANDLER_B', B, bHandler);
+const serializeData = { a: 1, b: new B(6) };
+const buffer = comproto.serialize(serializeData);
+comproto.deserialize(buffer); // { a: 1, b: B { b: 6 } }
+```
+
+```js
+// example handler
+import { Comproto } from '@bfchain/comproto'
+class B {
+    public c: number = 0;
+    constructor(c: number) {
+        this.c = c;
+    }
+}
+const bHandler = {
+    serialize() {
+        return undefined;
+    },
+    deserialize() {
+        return B;
+    }
+};
+const comproto = new Comproto();
+comproto.addHandler('HANDLER_B', B, bHandler);
+const serializeData = { a: 1, b: B };
+const buffer = comproto.serialize(serializeData);
+comproto.deserialize(buffer); // { a: 1, b: [class B] }
 ```
 
 ## Download
 
 ```
-$ npm install --save @bfchain/comproto
+$ yarn add @bfchain/comproto
 ```
 
 ## API
 
-### `comproto.encode(data: any): UInt8Array`
+### `comproto.serialize(data: any): Buffer`
 
-> Returns data UInt8Array
+> Returns data Buffer
 
  实现自由数据编码，返回自定义buffer
 
-### `comproto.decode(buffer: UInt8Array): any`
+### `comproto.deserialize(buffer: Buffer): any`
 
-> Returns data of encode
+> Returns data of serialize
 
-对encode编码出来的数据进行解码
+对serialize编码出来的数据进行解码
 
 ### `comproto.addClassHandler(protoName: string, registerClass: AnyClass, handler: TransferHandler): void`
 
-注册类，基于 new 出来的 instalce 数据，都将会进入 encode 方法，实现自定义编码
+注册类，基于 new 出来的 instalce 数据，都将会进入 serialize 方法，实现自定义编码
 
 ### `comproto.addHandler(protoName: string, handlerObj: any, handler: TransferHandler): void`
 
-添加 handler，如果数据跟handlerObj一致，都将会进入 encode 方法，实现自定义编码
+添加 handler，如果数据跟handlerObj一致，都将会进入 serialize 方法，实现自定义编码
 
 ### `comproto.deleteClassHandler(protoName: string): void`
 

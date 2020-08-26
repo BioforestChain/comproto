@@ -2,8 +2,8 @@
 declare namespace BFChainComproto {
     interface TransferHandler {
         handlerObj?: any;
-        encode: (value: any) => any;
-        decode: (value: any) => any;
+        serialize: (value: any) => any;
+        deserialize: (value: any) => any;
     }
     type TransferDataArray = [ Uint8Array, any, ...string[] ];
 }
