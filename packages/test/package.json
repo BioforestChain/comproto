@@ -1,6 +1,6 @@
 {
   "name": "@bfchain/comproto-test",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "main": "build/cjs/index.js",
   "type": "build/cjs/index.d.ts",
@@ -8,8 +8,8 @@
     "build"
   ],
   "dependencies": {
-    "@bfchain/comproto": "1.0.0",
-    "@bfchain/comproto-typings": "1.0.0",
+    "@bfchain/comproto": "1.0.1",
+    "@bfchain/comproto-typings": "1.0.1",
     "ava": "^3.11.1",
     "conditional-type-checks": "^1.0.5",
     "lodash": "^4.17.20"
