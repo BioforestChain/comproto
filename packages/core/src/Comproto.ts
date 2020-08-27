@@ -36,12 +36,10 @@ export class Comproto {
     }
     public addClassHandler<C = BFChainComproto.AnyClass>(
         protoName: string,
-        registerClass: C & { prototype: any },
         handler: BFChainComproto.TransferHandler
     ) {
         this.deleteClassHandler(protoName);
-        handler.handlerObj = registerClass;
-        Object.defineProperty(registerClass.prototype, TRANSFER_SYMBOL, {
+        Object.defineProperty(handler.handlerObj.prototype, TRANSFER_SYMBOL, {
             value: protoName,
             enumerable: false,
             writable: false,
@@ -49,10 +47,9 @@ export class Comproto {
         });
         this.protoMap.set(protoName, handler);
     }
-    public addHandler<O = BFChainComproto.AnyObject>(protoName: string, handlerObj: O, handler: BFChainComproto.TransferHandler) {
+    public addHandler<O = BFChainComproto.AnyObject>(protoName: string, handler: BFChainComproto.TransferHandler) {
         this.deleteHandler(protoName);
-        handler.handlerObj = handlerObj;
-        Object.defineProperty(handlerObj, TRANSFER_SYMBOL, {
+        Object.defineProperty(handler.handlerObj, TRANSFER_SYMBOL, {
             value: protoName,
             enumerable: false,
             writable: false,

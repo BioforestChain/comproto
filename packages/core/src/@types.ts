@@ -1,7 +1,7 @@
 
 declare namespace BFChainComproto {
     interface TransferHandler {
-        handlerObj?: any;
+        handlerObj: any;
         serialize: (value: any) => any;
         deserialize: (value: any) => any;
     }

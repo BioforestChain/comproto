@@ -14,7 +14,8 @@ class A {
 
 
 test.beforeEach(() => {
-    comproto.addClassHandler('CLASS_HANDLER_A', A, {
+    comproto.addClassHandler('CLASS_HANDLER_A', {
+        handlerObj: A,
         serialize(obj: A) {
             return obj.a;
         },
@@ -90,7 +91,8 @@ test('test serialize class instalce of handler', async (t) => {
     const b = new B();
     t.is(_.isEqual(comproto.deserialize(comproto.serialize(b)), { b: 1}), true);
     t.is(_.isEqual(comproto.deserialize(comproto.serialize(b)), b), false);
-    comproto.addClassHandler('CLASS_HANDLER_B', B, {
+    comproto.addClassHandler('CLASS_HANDLER_B', {
+        handlerObj: B,
         serialize() {}, deserialize() { return new B() },
     });
     t.is(_.isEqual(comproto.deserialize(comproto.serialize(b)), { b: 1}), false);
@@ -102,7 +104,7 @@ test('test serialize class of handler', async (t) => {
     class B {
     }
     t.throws(comproto.serialize.bind(comproto, B));
-    comproto.addHandler('class_b', B, { serialize() {}, deserialize() { return B; } });
+    comproto.addHandler('class_b', { handlerObj: B, serialize() {}, deserialize() { return B; } });
     t.notThrows(comproto.serialize.bind(comproto, B));
     const dataBuf = comproto.serialize(B);
     const transferClass = comproto.deserialize(dataBuf) as B;
@@ -121,7 +123,7 @@ test('test serialize array', async (t) => {
 test('test serialize function', async (t) => {
     function a() {}
     t.throws(comproto.serialize.bind(comproto, a));
-    comproto.addHandler('function_a', a, { serialize() {}, deserialize() { return a; } });
+    comproto.addHandler('function_a', { handlerObj: a, serialize() {}, deserialize() { return a; } });
     t.notThrows(comproto.serialize.bind(comproto, a));
     const dataBuf = comproto.serialize(a);
     const transferFunction = comproto.deserialize(dataBuf) as () => void;
@@ -132,7 +134,7 @@ test('test serialize function', async (t) => {
 test('test serialize promise', async (t) => {
     const promise = new Promise(resolve => {});
     t.throws(comproto.serialize.bind(comproto, promise));
-    comproto.addHandler('promise_a', promise, { serialize() {}, deserialize() { return promise; } });
+    comproto.addHandler('promise_a', { handlerObj: promise, serialize() {}, deserialize() { return promise; } });
     t.notThrows(comproto.serialize.bind(comproto, promise));
     const dataBuf = comproto.serialize(promise);
     const transferPromise = comproto.deserialize(dataBuf) as Promise<any>;
@@ -156,7 +158,7 @@ test('test serialize proxy', async (t) => {
     } });
     const transferProxyBuf3 = comproto.serialize(proxy3);
     t.is(_.isEqual(comproto.deserialize(transferProxyBuf3), {a: 1}), true);
-    comproto.addHandler('proxy_a', proxy3, { serialize() {}, deserialize() { return proxy3; } });
+    comproto.addHandler('proxy_a', { handlerObj: proxy3, serialize() {}, deserialize() { return proxy3; } });
     const dataBuf = comproto.serialize(proxy3);
     const transferProxy = comproto.deserialize(dataBuf) as Object;
     t.is(_.isEqual(transferProxy, proxy3), true);
@@ -207,7 +209,8 @@ test('test serialize class instace with no deserialize', async (t) => {
         add() {}
     }
     const b = new B(1);
-    comproto.addClassHandler('CLASS_HANDLER_B', B, {
+    comproto.addClassHandler('CLASS_HANDLER_B', {
+        handlerObj: B,
         serialize(b: B) { return b.b; }, deserialize() { },
     });
     t.is(comproto.deserialize(comproto.serialize(b)), undefined);
@@ -223,7 +226,8 @@ test('test deserialize class instace with no serialize', async (t) => {
         add() {}
     }
     const b = new C(1);
-    comproto.addClassHandler('CLASS_HANDLER_C', C, {
+    comproto.addClassHandler('CLASS_HANDLER_C', {
+        handlerObj: C,
         serialize() { }, deserialize(b: number) { return new C(b) },
     });
     t.is(_.isEqual(comproto.deserialize(comproto.serialize(b)), b), false);
@@ -248,10 +252,12 @@ test('test deserialize same name class instace handler', async (t) => {
     }
     const b = new B(1);
     const c = new C(1);
-    comproto.addClassHandler('CLASS_HANDLER_SAME_NAME', B, {
+    comproto.addClassHandler('CLASS_HANDLER_SAME_NAME', {
+        handlerObj: B,
         serialize(obj: B) { return obj.b; }, deserialize(b: number) { return new B(b); },
     });
-    comproto.addClassHandler('CLASS_HANDLER_SAME_NAME', C, {
+    comproto.addClassHandler('CLASS_HANDLER_SAME_NAME', {
+        handlerObj: C,
         serialize(obj: C) { return obj.b; }, deserialize(b: number) { return new C(b) },
     });
     t.is(comproto.canHanlder(b), false);
@@ -276,10 +282,12 @@ test('test deserialize same name handler', async (t) => {
         }
         add() {}
     }
-    comproto.addHandler('CLASS_HANDLER_SAME_NAME', B, {
+    comproto.addHandler('CLASS_HANDLER_SAME_NAME', {
+        handlerObj: B,
         serialize() { return undefined; }, deserialize() { return B; },
     });
-    comproto.addHandler('CLASS_HANDLER_SAME_NAME', C, {
+    comproto.addHandler('CLASS_HANDLER_SAME_NAME', {
+        handlerObj: C,
         serialize() { return undefined; }, deserialize() { return C },
     });
     t.is(comproto.canHanlder(B), false);

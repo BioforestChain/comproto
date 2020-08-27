@@ -14,6 +14,7 @@ class B {
     }
 }
 const bHandler = {
+    handlerObj: B,
     serialize(obj: B) {
         return obj.c;
     },
@@ -22,7 +23,7 @@ const bHandler = {
     }
 };
 const comproto = new Comproto();
-comproto.addClassHandler('CLASS_HANDLER_B', B, bHandler);
+comproto.addClassHandler('CLASS_HANDLER_B', bHandler);
 const serializeData = { a: 1, b: new B(6) };
 const buffer = comproto.serialize(serializeData);
 comproto.deserialize(buffer); // { a: 1, b: B { b: 6 } }
@@ -38,6 +39,7 @@ class B {
     }
 }
 const bHandler = {
+    handlerObj: B,
     serialize() {
         return undefined;
     },
@@ -46,7 +48,7 @@ const bHandler = {
     }
 };
 const comproto = new Comproto();
-comproto.addHandler('HANDLER_B', B, bHandler);
+comproto.addHandler('HANDLER_B', bHandler);
 const serializeData = { a: 1, b: B };
 const buffer = comproto.serialize(serializeData);
 comproto.deserialize(buffer); // { a: 1, b: [class B] }
