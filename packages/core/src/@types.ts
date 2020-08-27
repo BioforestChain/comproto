@@ -5,5 +5,5 @@ declare namespace BFChainComproto {
         serialize: (value: any) => any;
         deserialize: (value: any) => any;
     }
-    type TransferDataArray = [ Uint8Array, any, ...string[] ];
+    type TransferDataArray = [ any, number[] ,string[] ];
 }

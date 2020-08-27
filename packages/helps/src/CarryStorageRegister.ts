@@ -27,4 +27,7 @@ export class CarryStorageRegister {
     getU8a() {
         return Uint8Array.from(this.stateNumberArray);
     }
+    public getStateNumberArray() {
+        return this.stateNumberArray;
+    }
 }
