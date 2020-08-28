@@ -17,12 +17,12 @@ export class Comproto {
             transferProtoNameArray: [],
         };
         const transferValue = this.serializeTransfer(value, transferState);
-        return v8.serialize([transferState.carryStorageRegister.getU8a(), transferValue, ...transferState.transferProtoNameArray]);
+        return v8.serialize([transferValue, transferState.carryStorageRegister.getStateNumberArray(), transferState.transferProtoNameArray]);
     }
     public deserialize(buffer: BFChainComproto.ComprotoBuffer) {
-        const [transferStateU8a, originData, ...transferProtoNameArray] = v8.deserialize(buffer) as BFChainComproto.TransferDataArray;
+        const [originData, transferStateNumberArray, transferProtoNameArray] = v8.deserialize(buffer) as BFChainComproto.TransferDataArray;
         const transferState: ITransferState = {
-            carryStorageRegister: new CarryStorageRegister(transferStateU8a),
+            carryStorageRegister: new CarryStorageRegister(Uint8Array.from(transferStateNumberArray)),
             transferProtoNameArray,
         };
         const transferData =  this.deserializeTransfer(originData, transferState);
