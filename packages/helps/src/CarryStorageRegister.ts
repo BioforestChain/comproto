@@ -9,22 +9,25 @@ export class CarryStorageRegister {
         }
         this.stateNumberArray = Array.prototype.slice.call(stateU8a);
     }
-    carryBitOne() {
+    public carryBitOne() {
         this.curCount ++;
         const arrayPointer = Math.floor(this.curCount / CarryStorageRegister.STATE_NUMBER_DIGIT_HEX);
         const curCarryNumber = this.stateNumberArray[arrayPointer] | 0;
         this.stateNumberArray[arrayPointer] = curCarryNumber | (1 << (this.curCount % CarryStorageRegister.STATE_NUMBER_DIGIT_HEX));
     }
-    carryBitZero() {
+    public carryBitZero() {
         this.curCount ++;
     }
-    readBit() {
+    public readBit() {
         this.curCount ++;
         const arrayPointer = Math.floor(this.curCount/ CarryStorageRegister.STATE_NUMBER_DIGIT_HEX);
         const curCarryNumber = this.stateNumberArray[arrayPointer] | 0;
         return (curCarryNumber >> (this.curCount % CarryStorageRegister.STATE_NUMBER_DIGIT_HEX)) & 1;
     }
-    getU8a() {
+    public getU8a() {
         return Uint8Array.from(this.stateNumberArray);
+    }
+    public getStateNumberArray() {
+        return this.stateNumberArray;
     }
 }
