@@ -6,13 +6,10 @@
   },
   "references": [
     {
-      "path": "../comproto/tsconfig.json"
-    },
-    {
       "path": "../typings/tsconfig.json"
     }
   ],
   "files": [
-    "src/comproto.test.ts"
+    "src/index.ts"
   ]
 }
