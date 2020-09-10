@@ -24,6 +24,8 @@
   "files": [
     "src/@types.ts",
     "src/Comproto.ts",
-    "src/index.ts"
+    "src/ComprotoFactory.ts",
+    "src/index.ts",
+    "src/jsDataTypeEnum.ts"
   ]
 }

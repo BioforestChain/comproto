@@ -1,9 +1,7 @@
 import test from 'ava';
 
-import { Comproto } from '@bfchain/comproto';
-import v8 from 'v8';
-import msgpack from 'msgpack-lite';
-const comproto  = new Comproto();
+import { ComprotoFactroy } from '@bfchain/comproto';
+const comproto  = ComprotoFactroy.getComproto();
 
 class A {
     constructor(a: number) {
@@ -66,6 +64,11 @@ test('test serialize float only', async (t) => {
 
 test('test serialize big double only', async (t) => {
     t.is(comproto.deserialize(comproto.serialize(3.123456123456123456123456)),3.123456123456123456123456);
+});
+
+test('test serialize date', async (t) => {
+    const date = new Date();
+    t.deepEqual(comproto.deserialize(comproto.serialize(date)), date);
 });
 
 test('test deep object with class instance handler', async (t) => {
@@ -178,6 +181,7 @@ test('test serialize Error', async (t) => {
     t.is(transferError.message, error.message);
     t.is(transferError.name, error.name);
     t.is(transferError.stack, error.stack);
+    t.deepEqual(error, transferError);
 });
 
 // RegExp
@@ -299,6 +303,7 @@ test('test serialize Map', async (t) => {
     const compareMap = comproto.deserialize(comproto.serialize(map));
     t.deepEqual(map, compareMap);
 });
+
 
 
 /***

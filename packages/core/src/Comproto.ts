@@ -2,64 +2,11 @@
 import { CarryStorageRegister } from '@bfchain/comproto-helps';
 import { pack, unpack } from '@bfchain/comproto-json-pack';
 
+import { jsDataTypeEnum } from './jsDataTypeEnum'
 export const TRANSFER_SYMBOL = Symbol('TRANSFER_SYMBOL');
-
-const jsDataTypeEnum = {
-    SET: 's',
-    MAP: 'm',
-    BigInt: 'b',
-    NaN: 'n',
-    Undefined: 'u',
-};
 
 export class Comproto {
     protected protoMap: Map<string, BFChainComproto.TransferHandler> = new Map();
-    constructor() {
-        this.initClassHandler();
-    }
-    protected initClassHandler() {
-        const self = this;
-        const setHandler = {
-            handlerObj: Set,
-            serialize(set: Set<any>, transferState: BFChainComproto.TransferState) {
-                const arr =  [...set];
-                return arr.map(item => self.serializeTransfer(item, transferState));
-            },
-            deserialize(objArray: any[], transferState: BFChainComproto.TransferState) {
-                const arr = objArray.map(item => self.deserializeTransfer(item, transferState))
-                return new Set(arr);
-            },
-        };
-        this.addClassHandler(jsDataTypeEnum.SET, setHandler);
-        const mapHandler = {
-            handlerObj: Map,
-            serialize(map: Map<any, any>, transferState: BFChainComproto.TransferState) {
-                const arr = [...map];
-                return arr.map((itemArr) => {
-                    const [key, value] = itemArr;
-                    return [ self.serializeTransfer(key, transferState), self.serializeTransfer(value, transferState) ]
-                });
-            },
-            deserialize(arr: [any, any][], transferState: BFChainComproto.TransferState) {
-                const objArray: [any, any][] = arr.map((itemArr) => {
-                    const [key, value] = itemArr;
-                    return [ self.deserializeTransfer(key, transferState), self.deserializeTransfer(value, transferState) ]
-                });
-                return new Map(objArray);
-            },
-        };
-        this.addClassHandler(jsDataTypeEnum.MAP, mapHandler);
-        const bitIntHandler = {
-            handlerObj: BigInt,
-            serialize(number: BigInt) {
-                return String(number);
-            },
-            deserialize(numberString: string) {
-                return BigInt(numberString);
-            },
-        };
-        this.addClassHandler(jsDataTypeEnum.BigInt, bitIntHandler);
-    }
     public serialize(value: any): BFChainComproto.ComprotoBuffer {
         const transferState: BFChainComproto.TransferState = {
             carryStorageRegister: new CarryStorageRegister(),
@@ -202,6 +149,11 @@ export class Comproto {
         }
         if (valueType === '[object Array]') {
             return originData.map((item: any) => this.deserializeTransfer(item, transferState));
+        }
+        if (valueType === '[object Error]') {
+            delete originData['columnNumber'];
+            delete originData['fileName'];
+            delete originData['lineNumber'];
         }
         return originData;
     }

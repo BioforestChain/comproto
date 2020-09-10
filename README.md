@@ -6,7 +6,7 @@
 
 ```js
 // example class handler
-import { Comproto } from '@bfchain/comproto'
+import { ComprotoFactroy } from '@bfchain/comproto'
 class B {
     public c: number = 0;
     constructor(c: number) {
@@ -22,7 +22,7 @@ const bHandler = {
         return new B(c);
     }
 };
-const comproto = new Comproto();
+const comproto = ComprotoFactroy.getComproto();
 comproto.addClassHandler('CLASS_HANDLER_B', bHandler);
 const serializeData = { a: 1, b: new B(6) };
 const buffer = comproto.serialize(serializeData);
@@ -31,7 +31,7 @@ comproto.deserialize(buffer); // { a: 1, b: B { b: 6 } }
 
 ```js
 // example handler
-import { Comproto } from '@bfchain/comproto'
+import { ComprotoFactroy } from '@bfchain/comproto'
 class B {
     public c: number = 0;
     constructor(c: number) {
@@ -47,7 +47,7 @@ const bHandler = {
         return B;
     }
 };
-const comproto = new Comproto();
+const comproto = ComprotoFactroy.getComproto();
 comproto.addHandler('HANDLER_B', bHandler);
 const serializeData = { a: 1, b: B };
 const buffer = comproto.serialize(serializeData);
