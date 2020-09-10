@@ -74,11 +74,11 @@ $ yarn add @bfchain/comproto
 
 对serialize编码出来的数据进行解码
 
-### `comproto.addClassHandler(protoName: string, registerClass: AnyClass, handler: TransferHandler): void`
+### `comproto.addClassHandler(protoName: string, handler: TransferHandler): void`
 
 注册类，基于 new 出来的 instalce 数据，都将会进入 serialize 方法，实现自定义编码
 
-### `comproto.addHandler(protoName: string, handlerObj: any, handler: TransferHandler): void`
+### `comproto.addHandler(protoName: string, handler: TransferHandler): void`
 
 添加 handler，如果数据跟handlerObj一致，都将会进入 serialize 方法，实现自定义编码
 
