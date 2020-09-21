@@ -2,12 +2,22 @@
 declare namespace BFChainComproto {
     type TransferState = {
         carryStorageRegister: CarryStorageRegister,
-        transferProtoNameArray: string[],
+        transferHandlerNameArray: string[],
     };
-    interface TransferHandler {
+
+    interface Handler {
+        handlerName: string;
+        serialize?: (value: any, transferState: TransferState) => any;
+        deserialize?: (value: any, transferState: TransferState) => any;
+    }
+    interface TransferHandler extends Handler {
+        canHandler: (obj: any) => boolean;
+    }
+    interface TransferClassHandler extends Handler {
+        handlerObj: AnyClass & BigInt;
+    }
+    interface TransferProtoHandler extends Handler  {
         handlerObj: any;
-        serialize: (value: any, transferState: TransferState) => any;
-        deserialize: (value: any, transferState: TransferState) => any;
     }
     type TransferDataArray = [ any, number[] ,string[] ];
 

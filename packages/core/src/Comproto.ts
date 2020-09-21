@@ -6,70 +6,100 @@ import { jsDataTypeEnum } from './jsDataTypeEnum'
 export const TRANSFER_SYMBOL = Symbol('TRANSFER_SYMBOL');
 
 export class Comproto {
-    protected protoMap: Map<string, BFChainComproto.TransferHandler> = new Map();
+    protected handlerMap: Map<string, BFChainComproto.Handler> = new Map();
+    protected handlerListMap: Map<string, BFChainComproto.TransferHandler> = new Map();
     public serialize(value: any): BFChainComproto.ComprotoBuffer {
         const transferState: BFChainComproto.TransferState = {
             carryStorageRegister: new CarryStorageRegister(),
-            transferProtoNameArray: [],
+            transferHandlerNameArray: [],
         };
         const transferValue = this.serializeTransfer(value, transferState);
-        const bufferData = pack([transferValue, transferState.carryStorageRegister.getStateNumberArray(), transferState.transferProtoNameArray]);
+        const bufferData = pack([transferValue, transferState.carryStorageRegister.getStateNumberArray(), transferState.transferHandlerNameArray]);
         return bufferData;
     }
     public deserialize(buffer: BFChainComproto.ComprotoBuffer) {
-        const [originData, transferStateNumberArray, transferProtoNameArray] = unpack(buffer) as BFChainComproto.TransferDataArray;
+        const [originData, transferStateNumberArray, transferHandlerNameArray] = unpack(buffer) as BFChainComproto.TransferDataArray;
         const transferState: BFChainComproto.TransferState = {
             carryStorageRegister: new CarryStorageRegister(Uint8Array.from(transferStateNumberArray)),
-            transferProtoNameArray,
+            transferHandlerNameArray,
         };
         const transferData =  this.deserializeTransfer(originData, transferState);
         return transferData;
     }
-    public canHanlder(obj: any) {
+    public getHanlder(obj: any): BFChainComproto.Handler | undefined {
         try {
-            return typeof obj[TRANSFER_SYMBOL] === 'string';
-        } catch (err) {
-            return false;
-        }
+            const handlerName = obj[TRANSFER_SYMBOL];
+            if (typeof handlerName === 'string') {
+                return this.getHandlerByhandlerName(handlerName);
+            }
+        } catch (err) {}
+        let returnHandler: BFChainComproto.Handler | undefined = undefined;
+        this.handlerListMap.forEach((handler, key) => {
+            if (handler.canHandler(obj)) {
+                returnHandler = handler;
+                return;
+            }
+        });
+        return returnHandler;
     }
-    public addClassHandler<C = BFChainComproto.AnyClass>(
-        protoName: string,
-        handler: BFChainComproto.TransferHandler
+    public canHanlder(obj: any): boolean {
+        return !!this.getHanlder(obj);
+    }
+    public addClassHandler(
+        handler: BFChainComproto.TransferClassHandler
     ) {
-        this.deleteClassHandler(protoName);
+        this.canAddHandler(handler);
+        const handlerName = handler.handlerName;
         Object.defineProperty(handler.handlerObj.prototype, TRANSFER_SYMBOL, {
-            value: protoName,
+            value: handlerName,
             enumerable: false,
             writable: false,
             configurable: true,
         });
-        this.protoMap.set(protoName, handler);
+        this.handlerMap.set(handlerName, handler);
     }
-    public addHandler<O = BFChainComproto.AnyObject>(protoName: string, handler: BFChainComproto.TransferHandler) {
-        this.deleteHandler(protoName);
+    public deleteClassHandler(handlerName: string) {
+        const handler = this.handlerMap.get(handlerName);
+        if (handler == undefined) {
+            return;
+        }
+        delete (handler as BFChainComproto.TransferClassHandler).handlerObj.prototype[TRANSFER_SYMBOL];
+        this.handlerMap.delete(handlerName);
+    }
+    public addHandler(handler: BFChainComproto.TransferHandler) {
+        this.canAddHandler(handler);
+        this.handlerListMap.set(handler.handlerName, handler);
+        this.handlerMap.set(handler.handlerName, handler);
+    }
+    protected canAddHandler(handler: BFChainComproto.Handler) {
+        const handlerName = handler.handlerName;
+        const mHandler = this.handlerMap.get(handlerName);
+        if (mHandler) {
+            throw new Error('add a exist handler, please delete it before add');
+        }
+    }
+    public deleteHandler(handlerName: string) {
+        this.handlerListMap.delete(handlerName);
+        this.handlerMap.delete(handlerName);
+    }
+    public addProtoHandler(handler: BFChainComproto.TransferProtoHandler) {
+        this.canAddHandler(handler);
+        const handlerName = handler.handlerName;
         Object.defineProperty(handler.handlerObj, TRANSFER_SYMBOL, {
-            value: protoName,
+            value: handlerName,
             enumerable: false,
             writable: false,
             configurable: true,
         });
-        this.protoMap.set(protoName, handler);
+        this.handlerMap.set(handlerName, handler);
     }
-    public deleteClassHandler(protoName: string) {
-        const handler = this.protoMap.get(protoName);
+    public deleteProtoHandler(handlerName: string) {
+        const handler = this.handlerMap.get(handlerName);
         if (handler == undefined) {
             return;
         }
-        delete handler.handlerObj.prototype[TRANSFER_SYMBOL];
-        this.protoMap.delete(protoName);
-    }
-    public deleteHandler(protoName: string) {
-        const handler = this.protoMap.get(protoName);
-        if (handler == undefined) {
-            return;
-        }
-        delete handler.handlerObj[TRANSFER_SYMBOL];
-        this.protoMap.delete(protoName);
+        delete (handler as BFChainComproto.TransferProtoHandler).handlerObj[TRANSFER_SYMBOL];
+        this.handlerMap.delete(handlerName);
     }
     public serializeTransfer(value: any, transferState: BFChainComproto.TransferState): any {
         const [isdeserialize, transferValue] = this.serializeTransferProto(value, transferState);
@@ -99,40 +129,41 @@ export class Comproto {
         const valueType = Object.prototype.toString.call(value);
         if (valueType === '[object Number]' && isNaN(value)) {
             transferState.carryStorageRegister.carryBitOne();
-            transferState.transferProtoNameArray.push(jsDataTypeEnum.NaN);
+            transferState.transferHandlerNameArray.push(jsDataTypeEnum.NaN);
             return [true, ''];
         }
         if (valueType === '[object Undefined]') {
             transferState.carryStorageRegister.carryBitOne();
-            transferState.transferProtoNameArray.push(jsDataTypeEnum.Undefined);
+            transferState.transferHandlerNameArray.push(jsDataTypeEnum.Undefined);
             return [true, ''];
         }
-        const canHandler = this.canHanlder(value);
-        if (!canHandler) {
+        const handler = this.getHanlder(value);
+        if (!handler) {
             transferState.carryStorageRegister.carryBitZero();
             return [false];
         }
-        const protoName = value[TRANSFER_SYMBOL];
-        transferState.transferProtoNameArray.push(protoName);
+        transferState.transferHandlerNameArray.push(handler.handlerName);
         transferState.carryStorageRegister.carryBitOne();
-        const handler = this.protoMap.get(protoName);
         if (handler && typeof handler.serialize === 'function') {
             return [true, handler.serialize(value, transferState)];
         }
-        return [false];
+        return [true, undefined];
+    }
+    public getHandlerByhandlerName(handlerName: string): BFChainComproto.Handler | undefined {
+        return this.handlerMap.get(handlerName);
     }
     public deserializeTransfer(originData: any, transferState: BFChainComproto.TransferState) {
         const canserialize = transferState.carryStorageRegister.readBit() === 1;
         if (canserialize) {
-            const protoName = transferState.transferProtoNameArray.shift();
-            if (typeof protoName === 'string') {
-                if (protoName === jsDataTypeEnum.NaN) {
+            const handlerName = transferState.transferHandlerNameArray.shift();
+            if (typeof handlerName === 'string') {
+                if (handlerName === jsDataTypeEnum.NaN) {
                     return NaN;
                 }
-                if (protoName === jsDataTypeEnum.Undefined) {
+                if (handlerName === jsDataTypeEnum.Undefined) {
                     return undefined;
                 }
-                const handler = this.protoMap.get(protoName);
+                const handler = this.getHandlerByhandlerName(handlerName);
                 if (handler && typeof handler.deserialize === 'function') {
                     return handler.deserialize(originData, transferState);
                 }

@@ -1,6 +1,7 @@
 declare namespace BFChainComproto {
 
-    type AnyClass<P = any> = new (...args: any) => P;
+    // TODO: not any type
+    type AnyClass = any; // type AnyClass<P = any> = new (...args: any) => P;
 
     type ComprotoBuffer = NodeJS.TypedArray | Buffer;
 

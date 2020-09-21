@@ -8,9 +8,19 @@ export class ComprotoFactroy {
         this.initClassHandler(comproto);
         return comproto;
     }
+    public static _singleton: Comproto | undefined;
+    public static getSingleton(): Comproto {
+        if (!this._singleton) {
+            const comproto = new Comproto();
+            this.initClassHandler(comproto);
+            this._singleton = comproto;
+        }
+        return this._singleton;
+    }
     public static initClassHandler(comproto: Comproto) {
         const self = comproto;
         const setHandler = {
+            handlerName: jsDataTypeEnum.SET,
             handlerObj: Set,
             serialize(set: Set<any>, transferState: BFChainComproto.TransferState) {
                 const arr =  [...set];
@@ -21,8 +31,9 @@ export class ComprotoFactroy {
                 return new Set(arr);
             },
         };
-        comproto.addClassHandler(jsDataTypeEnum.SET, setHandler);
+        comproto.addClassHandler(setHandler);
         const mapHandler = {
+            handlerName: jsDataTypeEnum.MAP,
             handlerObj: Map,
             serialize(map: Map<any, any>, transferState: BFChainComproto.TransferState) {
                 const arr = [...map];
@@ -39,8 +50,9 @@ export class ComprotoFactroy {
                 return new Map(objArray);
             },
         };
-        comproto.addClassHandler(jsDataTypeEnum.MAP, mapHandler);
+        comproto.addClassHandler(mapHandler);
         const bitIntHandler = {
+            handlerName: jsDataTypeEnum.BigInt,
             handlerObj: BigInt,
             serialize(number: BigInt) {
                 return String(number);
@@ -49,7 +61,7 @@ export class ComprotoFactroy {
                 return BigInt(numberString);
             },
         };
-        comproto.addClassHandler(jsDataTypeEnum.BigInt, bitIntHandler);
+        comproto.addClassHandler(bitIntHandler);
     }
 }
 
