@@ -1,13 +1,13 @@
 {
   "name": "@bfchain/comproto-json-pack",
-  "version": "1.1.2",
+  "version": "1.1.4",
   "main": "build/cjs/index.js",
   "type": "build/cjs/index.d.ts",
   "files": [
     "build"
   ],
   "dependencies": {
-    "@bfchain/comproto-typings": "1.1.2",
+    "@bfchain/comproto-typings": "1.1.4",
     "msgpack-lite": "0.1.26"
   },
   "module": "build/esm/index.js",
