@@ -10,6 +10,8 @@ declare namespace BFChainComproto {
         serialize?: (value: any, transferState: TransferState) => any;
         deserialize?: (value: any, transferState: TransferState) => any;
     }
+    interface TransferCustomHandler extends Handler {
+    }
     interface TransferHandler extends Handler {
         canHandler: (obj: any) => boolean;
     }

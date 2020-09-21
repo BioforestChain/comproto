@@ -8,6 +8,7 @@ export const TRANSFER_SYMBOL = Symbol('TRANSFER_SYMBOL');
 export class Comproto {
     protected handlerMap: Map<string, BFChainComproto.Handler> = new Map();
     protected handlerListMap: Map<string, BFChainComproto.TransferHandler> = new Map();
+    protected customHandlerMapList: Map<string, Set<any>> = new Map();
     public serialize(value: any): BFChainComproto.ComprotoBuffer {
         const transferState: BFChainComproto.TransferState = {
             carryStorageRegister: new CarryStorageRegister(),
@@ -26,7 +27,7 @@ export class Comproto {
         const transferData =  this.deserializeTransfer(originData, transferState);
         return transferData;
     }
-    public getHanlder(obj: any): BFChainComproto.Handler | undefined {
+    public getHandler(obj: any): BFChainComproto.Handler | undefined {
         try {
             const handlerName = obj[TRANSFER_SYMBOL];
             if (typeof handlerName === 'string') {
@@ -42,8 +43,50 @@ export class Comproto {
         });
         return returnHandler;
     }
-    public canHanlder(obj: any): boolean {
-        return !!this.getHanlder(obj);
+    public canHandler(obj: any): boolean {
+        return !!this.getHandler(obj);
+    }
+    public addCustomHandler(
+        handler: BFChainComproto.TransferCustomHandler
+    ) {
+        this.canAddHandler(handler);
+        this.handlerMap.set(handler.handlerName, handler);
+    }
+    public setCustomHandler(
+        obj: any,
+        handlerName: string,
+    ) {
+        let handlerList = this.customHandlerMapList.get(handlerName);
+        if  (handlerList == undefined) {
+            handlerList = new Set();
+            this.customHandlerMapList.set(handlerName, handlerList);
+        }
+        handlerList.add(obj);
+        Object.defineProperty(obj, TRANSFER_SYMBOL, {
+            value: handlerName,
+            writable: true,
+            configurable: true,
+            enumerable: false
+        });
+    }
+    public deleteCustomHandler(handlerName?: string) {
+        if (!handlerName) {
+            this.customHandlerMapList.forEach((handlerList, mHandlerName) => {
+                handlerList.forEach(obj => {
+                    delete obj[TRANSFER_SYMBOL];
+                });
+                this.handlerMap.delete(mHandlerName);
+            });
+            this.customHandlerMapList = new Map();
+        } else {
+            const handlerList = this.customHandlerMapList.get(handlerName);
+            if (handlerList) {
+                handlerList.forEach(obj => {
+                    delete obj[TRANSFER_SYMBOL];
+                });
+            }
+            this.handlerMap.delete(handlerName);
+        }
     }
     public addClassHandler(
         handler: BFChainComproto.TransferClassHandler
@@ -52,9 +95,9 @@ export class Comproto {
         const handlerName = handler.handlerName;
         Object.defineProperty(handler.handlerObj.prototype, TRANSFER_SYMBOL, {
             value: handlerName,
-            enumerable: false,
-            writable: false,
+            writable: true,
             configurable: true,
+            enumerable: false
         });
         this.handlerMap.set(handlerName, handler);
     }
@@ -87,9 +130,9 @@ export class Comproto {
         const handlerName = handler.handlerName;
         Object.defineProperty(handler.handlerObj, TRANSFER_SYMBOL, {
             value: handlerName,
-            enumerable: false,
-            writable: false,
+            writable: true,
             configurable: true,
+            enumerable: false
         });
         this.handlerMap.set(handlerName, handler);
     }
@@ -137,7 +180,7 @@ export class Comproto {
             transferState.transferHandlerNameArray.push(jsDataTypeEnum.Undefined);
             return [true, ''];
         }
-        const handler = this.getHanlder(value);
+        const handler = this.getHandler(value);
         if (!handler) {
             transferState.carryStorageRegister.carryBitZero();
             return [false];

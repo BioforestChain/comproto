@@ -328,6 +328,29 @@ test('test handler', async (t) => {
     t.deepEqual(b, compareMap);
 });
 
+test('custom handler', async (t) => {
+    class B {
+        public a = 1;
+    }
+    const b = new B();
+    comproto.addCustomHandler({
+        handlerName: 'customHandler',
+        serialize(obj: { b: B }) {
+            return obj.b.a;
+        },
+        deserialize(a: number) {
+            return 'customHandler deserialize' + a;
+        },
+    });
+    const a = { b };
+    comproto.setCustomHandler(a, 'customHandler');
+    const compareObj = comproto.deserialize(comproto.serialize(a));
+    t.is('customHandler deserialize1', compareObj);
+    t.is(comproto.canHandler(a), true);
+    comproto.deleteCustomHandler('customHandler');
+    t.is(comproto.canHandler(a), false);
+});
+
 
 /***
  *  v8 vs comproto
