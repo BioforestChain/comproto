@@ -18,16 +18,15 @@ export class ComprotoFactroy {
         return this._singleton;
     }
     public static initClassHandler(comproto: Comproto) {
-        const self = comproto;
         const setHandler = {
             handlerName: jsDataTypeEnum.SET,
             handlerObj: Set,
             serialize(set: Set<any>, transferState: BFChainComproto.TransferState) {
                 const arr =  [...set];
-                return arr.map(item => self.serializeTransfer(item, transferState));
+                return arr.map(item => comproto.serializeTransfer(item, transferState));
             },
             deserialize(objArray: any[], transferState: BFChainComproto.TransferState) {
-                const arr = objArray.map(item => self.deserializeTransfer(item, transferState))
+                const arr = objArray.map(item => comproto.deserializeTransfer(item, transferState))
                 return new Set(arr);
             },
         };
@@ -39,13 +38,13 @@ export class ComprotoFactroy {
                 const arr = [...map];
                 return arr.map((itemArr) => {
                     const [key, value] = itemArr;
-                    return [ self.serializeTransfer(key, transferState), self.serializeTransfer(value, transferState) ]
+                    return [ comproto.serializeTransfer(key, transferState), comproto.serializeTransfer(value, transferState) ]
                 });
             },
             deserialize(arr: [any, any][], transferState: BFChainComproto.TransferState) {
                 const objArray: [any, any][] = arr.map((itemArr) => {
                     const [key, value] = itemArr;
-                    return [ self.deserializeTransfer(key, transferState), self.deserializeTransfer(value, transferState) ]
+                    return [ comproto.deserializeTransfer(key, transferState), comproto.deserializeTransfer(value, transferState) ]
                 });
                 return new Map(objArray);
             },

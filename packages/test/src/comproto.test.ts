@@ -313,7 +313,7 @@ test('test handler', async (t) => {
     const b = new B();
     comproto.addHandler({
         handlerName: 'bHandler',
-        canHandler(obj: any) {
+        canHandle(obj: any) {
             return obj instanceof B;
         },
         serialize(obj: B) {
@@ -346,9 +346,9 @@ test('custom handler', async (t) => {
     comproto.setCustomHandler(a, 'customHandler');
     const compareObj = comproto.deserialize(comproto.serialize(a));
     t.is('customHandler deserialize1', compareObj);
-    t.is(comproto.canHandler(a), true);
+    t.is(comproto.canHandle(a), true);
     comproto.deleteCustomHandler('customHandler');
-    t.is(comproto.canHandler(a), false);
+    t.is(comproto.canHandle(a), false);
 });
 
 

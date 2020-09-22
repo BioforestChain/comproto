@@ -62,7 +62,7 @@ class B {
 }
 const bHandler = {
     handlerName: 'HANDLER_B',
-    canHanler(b: any) {
+    canHandle(b: any) {
         return b instanceof B;
     },
     deserialize() {
@@ -122,9 +122,21 @@ $ yarn add @bfchain/comproto
 
 ### `comproto.addHandler(handler: TransferHandler): void`
 
-添加 handler，如果数据能被 `canHandler` 处理并返回 `true`，都将会进入 serialize 方法，实现自定义编码
+添加 handler，如果数据能被 `canHandle` 处理并返回 `true`，都将会进入 serialize 方法，实现自定义编码
 
 ### `comproto.deleteHandler(handlerName: string): void`
 
 删除 handler
+
+### `comproto.addCustomHandler(handler: BFChainComproto.TransferCustomHandler): void`
+
+添加自定义 handler, 配合 setCustomHandler 使用
+
+### `comproto.setCustomHandler(obj: any, handlerName: string): void`
+
+设置对象自定义 handler key， 当处理此数据调用自定义 serailize。
+
+### `comproto.deleteCustomHandler(handlerName?: string): void`
+
+删除自定义 handler, 当 handlerName 不传默认删除所有
 

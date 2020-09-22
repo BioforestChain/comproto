@@ -27,23 +27,23 @@ export class Comproto {
         const transferData =  this.deserializeTransfer(originData, transferState);
         return transferData;
     }
-    public getHandler(obj: any): BFChainComproto.Handler | undefined {
+    public getHandler<T = BFChainComproto.Handler>(obj: any): T | undefined {
         try {
             const handlerName = obj[TRANSFER_SYMBOL];
             if (typeof handlerName === 'string') {
-                return this.getHandlerByhandlerName(handlerName);
+                return this.getHandlerByhandlerName<T>(handlerName);
             }
         } catch (err) {}
         let returnHandler: BFChainComproto.Handler | undefined = undefined;
         this.handlerListMap.forEach((handler, key) => {
-            if (handler.canHandler(obj)) {
+            if (handler.canHandle(obj)) {
                 returnHandler = handler;
                 return;
             }
         });
         return returnHandler;
     }
-    public canHandler(obj: any): boolean {
+    public canHandle(obj: any): boolean {
         return !!this.getHandler(obj);
     }
     public addCustomHandler(
@@ -192,8 +192,12 @@ export class Comproto {
         }
         return [true, undefined];
     }
-    public getHandlerByhandlerName(handlerName: string): BFChainComproto.Handler | undefined {
-        return this.handlerMap.get(handlerName);
+    public getHandlerByhandlerName<T = BFChainComproto.Handler>(handlerName: string): T | undefined {
+        const handler = this.handlerMap.get(handlerName);
+        if (!handler) {
+            return handler;
+        }
+        return handler as unknown as T;
     }
     public deserializeTransfer(originData: any, transferState: BFChainComproto.TransferState) {
         const canserialize = transferState.carryStorageRegister.readBit() === 1;

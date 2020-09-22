@@ -13,7 +13,7 @@ declare namespace BFChainComproto {
     interface TransferCustomHandler extends Handler {
     }
     interface TransferHandler extends Handler {
-        canHandler: (obj: any) => boolean;
+        canHandle: (obj: any) => boolean;
     }
     interface TransferClassHandler extends Handler {
         handlerObj: AnyClass & BigInt;
