@@ -92,13 +92,13 @@ $ yarn add @bfchain/comproto
 
 > 返回 Comproto 的一个普通实例
 
-### `comproto.serialize(data: any): Buffer`
+### `comproto.serialize(data: any): BFChainComproto.ComprotoBuffer`
 
 > Returns data Buffer
 
  实现自由数据编码，返回自定义buffer
 
-### `comproto.deserialize(buffer: Buffer): any`
+### `comproto.deserialize(buffer: BFChainComproto.ComprotoBuffer): any`
 
 > Returns data of serialize
 
@@ -130,13 +130,21 @@ $ yarn add @bfchain/comproto
 
 ### `comproto.addCustomHandler(handler: BFChainComproto.TransferCustomHandler): void`
 
-添加自定义 handler, 配合 setCustomHandler 使用
+添加自定义 handler
 
 ### `comproto.setCustomHandler(obj: any, handlerName: string): void`
 
-设置对象自定义 handler key， 当处理此数据调用自定义 serailize。
+设置对象上的 handler 标记
 
-### `comproto.deleteCustomHandler(handlerName?: string): void`
+### `comproto.deleteCustomHandler(handlerName: string): void`
 
-删除自定义 handler, 当 handlerName 不传默认删除所有
+删除自定义 handler
+
+### `comproto.setHandlerRemark(handlerObj: any): void`
+
+设置对象上的 handler 标记
+
+### `comproto.deleteHandlerRemark(handlerObj: any): void`
+
+删除对象上的 handler 标记
 

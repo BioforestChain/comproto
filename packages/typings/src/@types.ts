@@ -10,4 +10,8 @@ declare namespace BFChainComproto {
 
     type AnyObject = object;
 
+    const HANDLER_SYMBOL: unique symbol;
+
+    type HandlerSymbol = typeof HANDLER_SYMBOL;
+
 }
