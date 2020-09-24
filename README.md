@@ -112,14 +112,6 @@ $ yarn add @bfchain/comproto
 
 删除 classHandler
 
-### `comproto.addProtoHandler(handler: TransferProtoHandler): void`
-
-添加 protoHandler，如果数据跟handlerObj一致，都将会进入 serialize 方法，实现自定义编码
-
-### `comproto.deleteProtoHandler(handlerName: string): void`
-
-删除 protoHandler
-
 ### `comproto.addHandler(handler: TransferHandler): void`
 
 添加 handler，如果数据能被 `canHandle` 处理并返回 `true`，都将会进入 serialize 方法，实现自定义编码
@@ -130,21 +122,17 @@ $ yarn add @bfchain/comproto
 
 ### `comproto.addCustomHandler(handler: BFChainComproto.TransferCustomHandler): void`
 
-添加自定义 handler
-
-### `comproto.setCustomHandler(obj: any, handlerName: string): void`
-
-设置对象上的 handler 标记
+添加自定义 handler, 配合 setHandlerMarker 使用
 
 ### `comproto.deleteCustomHandler(handlerName: string): void`
 
 删除自定义 handler
 
-### `comproto.setHandlerRemark(handlerObj: any): void`
+### `comproto.setHandlerMarker(handlerObj: any, handlerName: string): void`
 
 设置对象上的 handler 标记
 
-### `comproto.deleteHandlerRemark(handlerObj: any): void`
+### `comproto.deleteHandlerMarker(handlerObj: any): void`
 
 删除对象上的 handler 标记
 
