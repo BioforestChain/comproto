@@ -1,3 +1,3 @@
 import "@bfchain/comproto-typings";
 
-export * from '@bfchain/comproto-core';
+export * from "@bfchain/comproto-core";

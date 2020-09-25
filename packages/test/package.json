@@ -8,8 +8,8 @@
     "build"
   ],
   "dependencies": {
-    "@bfchain/comproto": "1.1.5",
-    "@bfchain/comproto-typings": "1.1.5",
+    "@bfchain/comproto": "1.2.0",
+    "@bfchain/comproto-typings": "1.2.0",
     "ava": "^3.11.1",
     "conditional-type-checks": "^1.0.5"
   },

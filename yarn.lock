@@ -1026,11 +1026,6 @@
   resolved "http://192.168.250.245:4873/@types%2fjson5/-/json5-0.0.30.tgz#44cb52f32a809734ca562e685c6473b5754a7818"
   integrity sha512-sqm9g7mHlPY/43fcSNrCYfOeX9zkTTK+euO5E6+CVijSMm5tTjkVdwdqRkY3ljjIAf8679vps5jKUoJBCLsMDA==
 
-"@types/lodash@^4.14.159":
-  version "4.14.160"
-  resolved "http://192.168.250.245:4873/@types%2flodash/-/lodash-4.14.160.tgz#2f1bba6500bc3cb9a732c6d66a083378fb0b0b29"
-  integrity sha1-Lxu6ZQC8PLmnMsbWaggzePsLCyk=
-
 "@types/microsoft__typescript-etw@^0.1.0":
   version "0.1.0"
   resolved "http://192.168.250.245:4873/@types%2fmicrosoft__typescript-etw/-/microsoft__typescript-etw-0.1.0.tgz#0806c7c278ccafb943d2165e6c4465cc876c5187"

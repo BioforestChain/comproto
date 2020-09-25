@@ -1,14 +1,11 @@
 {
   "name": "@bfchain/comproto",
-  "version": "1.0.0",
+  "version": "mono",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "description": "worker-thread",
-  "main": "./build/src/index.js",
-  "module": "./build/esm/index.js",
-  "typings": "./build/src/index.d.ts",
   "scripts": {
     "up": "yarn upgrade-interactive --latest",
     "mono": "bdk-mono ./",
@@ -16,7 +13,8 @@
     "dev:all": "bdk-tsc --build tsconfig.all.json -w",
     "test": "node ./node_modules/ava/cli.js",
     "test:debug": "ndb ./node_modules/ava/cli.js",
-    "p1": "bdk-p1 & npm publ",
+    "format":"bdk-format",
+    "format:all":"bdk-format -m=all",
     "publ": "lerna publish",
     "publ:force": "lerna publish --force-publish",
     "lsts": "bdk-lsts --path tsconfig.json",
