@@ -204,7 +204,7 @@ test("test deserialize class instace with no serialize", async (t) => {
   }
   const b = new C(1);
   const cHandler: BFChainComproto.TransferClassHandler<
-    typeof C, C, number | undefined
+    typeof C, number | undefined
   > = {
     handlerName: "CLASS_HANDLER_C",
     handlerObj: C,
