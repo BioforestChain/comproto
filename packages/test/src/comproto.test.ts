@@ -106,7 +106,7 @@ test("test serialize array", async (t) => {
   const trasferData1 = transfer([1, 2, 3]) as number[];
   t.deepEqual(trasferData1, [1, 2, 3]);
 
-  const trasferData2 = transfer([{ a: new A(2), b: 2 }, new A(1)]) as any[];
+  const trasferData2 = transfer([{ a: new A(2), b: 2 }, new A(1)]) as unknown[];
   t.deepEqual(trasferData2, [{ a: new A(2), b: 2 }, new A(1)]);
 });
 
@@ -129,7 +129,7 @@ test("test serialize proxy", async (t) => {
   const proxy = new Proxy(
     { a: 1 },
     {
-      get(target: any, key: string) {
+      get(target: unknown, key: string) {
         return 2;
       },
     },
@@ -203,13 +203,16 @@ test("test deserialize class instace with no serialize", async (t) => {
     add() {}
   }
   const b = new C(1);
-  comproto.addClassHandler({
+  const cHandler: BFChainComproto.TransferClassHandler<
+    typeof C, C, number | undefined
+  > = {
     handlerName: "CLASS_HANDLER_C",
     handlerObj: C,
-    deserialize(b: number) {
+    deserialize(b) {
       return new C(b);
     },
-  });
+  };
+  comproto.addClassHandler(cHandler);
   t.deepEqual(transfer(b), new C());
   comproto.deleteClassHandler("CLASS_HANDLER_C");
 });
@@ -327,18 +330,21 @@ test("test handler", async (t) => {
     public a = 1;
   }
   const b = new B();
-  comproto.addHandler({
+  const bHandler: BFChainComproto.TransferHandler<
+  B, number
+  > = {
     handlerName: "bHandler",
-    canHandle(obj: any) {
+    canHandle(obj) {
       return obj instanceof B;
     },
-    serialize(obj: B) {
+    serialize(obj) {
       return obj.a;
     },
     deserialize(a: number) {
       return new B();
     },
-  });
+  }
+  comproto.addHandler(bHandler);
   t.deepEqual(transfer(b), b);
   comproto.deleteHandler("bHandler");
 });
@@ -348,15 +354,18 @@ test("test set custom handler", async (t) => {
     public a = 1;
   }
   const b = new B();
-  comproto.addCustomHandler({
+  const customHandler: BFChainComproto.TransferCustomHandler<
+  { b: B }, number, string
+  > = {
     handlerName: "customHandler",
-    serialize(obj: { b: B }) {
+    serialize(obj) {
       return obj.b.a;
     },
     deserialize(a: number) {
       return "customHandler deserialize" + a;
     },
-  });
+  };
+  comproto.addCustomHandler(customHandler);
   const a = { b };
   comproto.setHandlerMarker(a, "customHandler");
   const compareObj = transfer(a);
@@ -376,7 +385,7 @@ test("test delete custom handler", async (t) => {
   comproto.deleteCustomHandler("customHandler1");
 });
 
-function transfer(data: any) {
+function transfer(data: unknown) {
   return comproto.deserialize(comproto.serialize(data));
 }
 

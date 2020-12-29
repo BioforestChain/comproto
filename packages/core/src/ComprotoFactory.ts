@@ -18,23 +18,22 @@ export class ComprotoFactroy {
     return this._singleton;
   }
   public static initClassHandler(comproto: Comproto) {
-    const setHandler = {
+    comproto.addClassHandler<typeof Set, unknown[]>({
       handlerName: jsDataTypeEnum.SET,
       handlerObj: Set,
-      serialize(set: Set<any>, transferState: BFChainComproto.TransferState) {
+      serialize(set, transferState) {
         const arr = [...set];
         return arr.map((item) => comproto.serializeTransfer(item, transferState));
       },
-      deserialize(objArray: any[], transferState: BFChainComproto.TransferState) {
+      deserialize(objArray, transferState) {
         const arr = objArray.map((item) => comproto.deserializeTransfer(item, transferState));
         return new Set(arr);
       },
-    };
-    comproto.addClassHandler(setHandler);
-    const mapHandler = {
+    });
+    comproto.addClassHandler<typeof Map, [unknown, unknown][]>({
       handlerName: jsDataTypeEnum.MAP,
       handlerObj: Map,
-      serialize(map: Map<any, any>, transferState: BFChainComproto.TransferState) {
+      serialize(map, transferState) {
         const arr = [...map];
         return arr.map((itemArr) => {
           const [key, value] = itemArr;
@@ -44,28 +43,26 @@ export class ComprotoFactroy {
           ];
         });
       },
-      deserialize(arr: [any, any][], transferState: BFChainComproto.TransferState) {
-        const objArray: [any, any][] = arr.map((itemArr) => {
+      deserialize(arr, transferState) {
+        const objArray = arr.map((itemArr) => {
           const [key, value] = itemArr;
           return [
             comproto.deserializeTransfer(key, transferState),
             comproto.deserializeTransfer(value, transferState),
-          ];
+          ] as [unknown, unknown];
         });
         return new Map(objArray);
       },
-    };
-    comproto.addClassHandler(mapHandler);
-    const bitIntHandler = {
+    });
+    comproto.addClassHandler<typeof BigInt, string>({
       handlerName: jsDataTypeEnum.BigInt,
       handlerObj: BigInt,
-      serialize(number: BigInt) {
+      serialize(number) {
         return String(number);
       },
-      deserialize(numberString: string) {
+      deserialize(numberString) {
         return BigInt(numberString);
       },
-    };
-    comproto.addClassHandler(bitIntHandler);
+    });
   }
 }

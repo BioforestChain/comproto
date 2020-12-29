@@ -6,7 +6,8 @@
 
 ```js
 // example class handler
-import { ComprotoFactroy } from '@bfchain/comproto'
+import { ComprotoFactroy } from '@bfchain/comproto';
+const comproto = ComprotoFactroy.getSingleton();
 class B {
     public c: number = 0;
     constructor(c: number) {
@@ -23,7 +24,17 @@ const bHandler = {
         return new B(c);
     }
 };
-const comproto = ComprotoFactroy.getSingleton();
+// 或
+comproto.addClassHandler<typeof B, number>({
+    handlerName: 'CLASS_HANDLER_B',
+    handlerObj: B,
+    serialize(obj) {
+        return obj.c;
+    },
+    deserialize(c) {
+        return new B(c);
+    }
+});
 comproto.addClassHandler(bHandler);
 const serializeData = { a: 1, b: new B(6) };
 const buffer = comproto.serialize(serializeData);
@@ -31,46 +42,44 @@ comproto.deserialize(buffer); // { a: 1, b: B { b: 6 } }
 ```
 
 ```js
-import { ComprotoFactroy } from '@bfchain/comproto'
+import { ComprotoFactroy } from '@bfchain/comproto';
+const comproto = ComprotoFactroy.getSingleton();
 class B {
     public c: number = 0;
     constructor(c: number) {
         this.c = c;
     }
 }
-const bHandler = {
+comproto.setHandlerMarker(B, 'HANDLER_B');
+comproto.addCustomHandler({
     handlerName: 'HANDLER_B',
-    handlerObj: B,
     deserialize() {
         return B;
     }
-};
-const comproto = ComprotoFactroy.getSingleton();
-comproto.addProtoHandler(bHandler);
+});
 const serializeData = { a: 1, b: B };
 const buffer = comproto.serialize(serializeData);
 comproto.deserialize(buffer); // { a: 1, b: [class B] }
 ```
 
 ```js
-import { ComprotoFactroy } from '@bfchain/comproto'
+import { ComprotoFactroy } from '@bfchain/comproto';
+const comproto = ComprotoFactroy.getSingleton();
 class B {
     public c: number = 0;
     constructor(c: number) {
         this.c = c;
     }
 }
-const bHandler = {
+comproto.addHandler<typeof B>({
     handlerName: 'HANDLER_B',
-    canHandle(b: any) {
+    canHandle(b) {
         return b instanceof B;
     },
     deserialize() {
         return B;
     }
-};
-const comproto = ComprotoFactroy.getSingleton();
-comproto.addHandler(bHandler);
+});
 const serializeData = { a: 1, b: new B(3) };
 const buffer = comproto.serialize(serializeData);
 comproto.deserialize(buffer); // { a: 1, b: B { c: 3 } }
@@ -92,13 +101,13 @@ $ yarn add @bfchain/comproto
 
 > 返回 Comproto 的一个普通实例
 
-### `comproto.serialize(data: any): BFChainComproto.ComprotoBuffer`
+### `comproto.serialize(data: unknown): BFChainComproto.ComprotoBuffer`
 
 > Returns data Buffer
 
  实现自由数据编码，返回自定义buffer
 
-### `comproto.deserialize(buffer: BFChainComproto.ComprotoBuffer): any`
+### `comproto.deserialize(buffer: BFChainComproto.ComprotoBuffer): unknown`
 
 > Returns data of serialize
 
@@ -128,11 +137,11 @@ $ yarn add @bfchain/comproto
 
 删除自定义 handler
 
-### `comproto.setHandlerMarker(handlerObj: any, handlerName: string): void`
+### `comproto.setHandlerMarker(handlerObj: unknown, handlerName: string): void`
 
 设置对象上的 handler 标记
 
-### `comproto.deleteHandlerMarker(handlerObj: any): void`
+### `comproto.deleteHandlerMarker(handlerObj: unknown): void`
 
 删除对象上的 handler 标记
 
