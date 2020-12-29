@@ -4,22 +4,40 @@ declare namespace BFChainComproto {
     transferHandlerNameArray: string[];
   };
 
-  interface Handler {
+  interface IHanlder {
     handlerName: string;
-    serialize?: (value: any, transferState: TransferState) => any;
-    deserialize?: (value: any, transferState: TransferState) => any;
+    serialize?: (...arg: any[]) => unknown;
+    deserialize?: (...arg: any[]) => unknown;
   }
-  interface TransferCustomHandler extends Handler {}
-  interface TransferHandler extends Handler {
-    canHandle: (obj: any) => boolean;
+  type ITransferHandler = IHanlder & {
+    canHandle: (...arg: any[]) => boolean;
+  };
+
+  type HandlerObject = unknown & { [HANDLER_SYMBOL]?: string };
+
+  interface Handler<I = unknown, O = unknown, D = I> extends IHanlder {
+    handlerName: string;
+    serialize?: (value: I, transferState: TransferState) => O;
+    deserialize?: (value: O, transferState: TransferState) => D;
   }
-  interface TransferClassHandler extends Handler {
-    handlerObj: AnyClass & BigInt;
+  interface TransferCustomHandler<I = unknown, O = unknown, D = I> extends Handler<I, O, D> {}
+  interface TransferHandler<I = unknown, O = unknown, D = I> extends Handler<I, O, D> {
+    canHandle: (obj: I) => boolean;
+  }
+  type HanlderClass = AnyClass | BigIntConstructor;
+  // type TransferClass<T> = T extends (arg: infer BigIntConstructor) => void ? BigIntConstructor : AnyClass;
+  type GetTransferClassInstance<T> = T extends AnyClass ? InstanceType<T> : BigInt;
+  interface TransferClassHandler<
+    H extends HanlderClass = HanlderClass,
+    O = GetTransferClassInstance<H>,
+    D = GetTransferClassInstance<H>
+  > extends Handler<GetTransferClassInstance<H>, O, D> {
+    handlerObj: H & { [HANDLER_SYMBOL]?: string };
   }
   interface TransferProtoHandler extends Handler {
-    handlerObj: any;
+    handlerObj: unknown;
   }
-  type TransferDataArray = [any, number[], string[]];
+  type TransferDataArray = [unknown, number[], string[]];
 
   interface CarryStorageRegister {
     carryBitOne: () => void;

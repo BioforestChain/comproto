@@ -2,7 +2,7 @@ import "@bfchain/comproto-typings";
 
 import msgPack from "msgpack-lite";
 
-export const pack = (data: any): BFChainComproto.ComprotoBuffer => {
+export const pack = (data: unknown): BFChainComproto.ComprotoBuffer => {
   return msgPack.encode(data);
 };
 
