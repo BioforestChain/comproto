@@ -10,6 +10,10 @@ export class Comproto<H extends BFChainComproto.Handler = BFChainComproto.Handle
   get handlerMarker(): BFChainComproto.HandlerSymbol {
     return HANDLER_SYMBOL;
   }
+  /**
+   * 序列化一个对象
+   * @param value
+   */
   public serialize(value: any): BFChainComproto.ComprotoBuffer {
     const transferState: BFChainComproto.TransferState = {
       carryStorageRegister: new CarryStorageRegister(),
@@ -131,13 +135,12 @@ export class Comproto<H extends BFChainComproto.Handler = BFChainComproto.Handle
     value: any,
     transferState: BFChainComproto.TransferState,
   ): [boolean, any?] {
-    const valueType = Object.prototype.toString.call(value);
-    if (valueType === "[object Number]" && isNaN(value)) {
+    if (Number.isNaN(value)) {
       transferState.carryStorageRegister.carryBitOne();
       transferState.transferHandlerNameArray.push(jsDataTypeEnum.NaN);
       return [true, ""];
     }
-    if (valueType === "[object Undefined]") {
+    if (undefined === value) {
       transferState.carryStorageRegister.carryBitOne();
       transferState.transferHandlerNameArray.push(jsDataTypeEnum.Undefined);
       return [true, ""];
@@ -155,9 +158,10 @@ export class Comproto<H extends BFChainComproto.Handler = BFChainComproto.Handle
     return [true, undefined];
   }
   public getHandlerByhandlerName(handlerName: string): (BFChainComproto.Handler & H) | undefined {
+    type z = CallableFunction
     return this.handlerMap.get(handlerName) as BFChainComproto.Handler & H;
   }
-  public deserializeTransfer(originData: any, transferState: BFChainComproto.TransferState) {
+  public deserializeTransfer(originData: any, transferState: BFChainComproto.TransferState): any {
     const canserialize = transferState.carryStorageRegister.readBit() === 1;
     if (canserialize) {
       const handlerName = transferState.transferHandlerNameArray.shift();
@@ -176,7 +180,7 @@ export class Comproto<H extends BFChainComproto.Handler = BFChainComproto.Handle
       return originData;
     }
     const valueType = Object.prototype.toString.call(originData);
-    if (valueType === "[object Object]" && !!originData) {
+    if (typeof originData === "object" && originData !== null) {
       const obj: { [key: string]: any } = {};
       Object.keys(originData)
         .sort()
@@ -185,7 +189,7 @@ export class Comproto<H extends BFChainComproto.Handler = BFChainComproto.Handle
         });
       return obj;
     }
-    if (valueType === "[object Array]") {
+    if (originData instanceof Array) {
       return originData.map((item: any) => this.deserializeTransfer(item, transferState));
     }
     if (valueType === "[object Error]") {
