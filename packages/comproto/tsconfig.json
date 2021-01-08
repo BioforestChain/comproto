@@ -12,9 +12,6 @@
       "path": "../helps/tsconfig.json"
     },
     {
-      "path": "../jsonPack/tsconfig.json"
-    },
-    {
       "path": "../typings/tsconfig.json"
     }
   ],

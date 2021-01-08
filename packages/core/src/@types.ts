@@ -1,8 +1,4 @@
 declare namespace BFChainComproto {
-  type TransferState = {
-    carryStorageRegister: CarryStorageRegister;
-    transferHandlerNameArray: string[];
-  };
 
   interface IHanlder {
     handlerName: string;
@@ -17,18 +13,21 @@ declare namespace BFChainComproto {
 
   interface Handler<I = unknown, O = unknown, D = I> extends IHanlder {
     handlerName: string;
-    serialize?: (value: I, transferState: TransferState) => O;
-    deserialize?: (value: O, transferState: TransferState) => D;
+    serialize?: (value: I) => O;
+    deserialize?: (value: O) => D;
   }
+  /** 自定义handler */
   interface TransferCustomHandler<I = unknown, O = unknown, D = I> extends Handler<I, O, D> {}
+
+  /** canHandler 的handler */
   interface TransferHandler<I = unknown, O = unknown, D = I> extends Handler<I, O, D> {
     canHandle: (obj: I) => boolean;
   }
-  type HanlderClass = AnyClass | BigIntConstructor;
+  type HandlerClass = AnyClass | BigIntConstructor;
   // type TransferClass<T> = T extends (arg: infer BigIntConstructor) => void ? BigIntConstructor : AnyClass;
   type GetTransferClassInstance<T> = T extends AnyClass ? InstanceType<T> : BigInt;
   interface TransferClassHandler<
-    H extends HanlderClass = HanlderClass,
+    H extends HandlerClass = HandlerClass,
     O = GetTransferClassInstance<H>,
     D = GetTransferClassInstance<H>
   > extends Handler<GetTransferClassInstance<H>, O, D> {
@@ -38,6 +37,20 @@ declare namespace BFChainComproto {
     handlerObj: unknown;
   }
   type TransferDataArray = [unknown, number[], string[]];
+
+  type typeTransferHandler<T extends BFChainComproto.HandlerClass = BFChainComproto.HandlerClass> = {
+    typeName: string, // 可控
+    typeClass: T, // 可控类
+    serialize: (data: BFChainComproto.GetTransferClassInstance<T>, comproto: import('./Comproto').Comproto) => Uint8Array;
+    deserialize: (buf: Uint8Array, comproto: import('./Comproto').Comproto) => BFChainComproto.GetTransferClassInstance<T>;
+  };
+  
+  type typeHandler = {
+    typeName: string,
+    typeClass: BFChainComproto.HandlerClass,
+    serialize: (...arg: any[]) => Uint8Array;
+    deserialize: (...arg: any[]) => unknown;
+  };
 
   interface CarryStorageRegister {
     carryBitOne: () => void;

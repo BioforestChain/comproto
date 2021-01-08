@@ -22,7 +22,15 @@
     "src/@types.ts",
     "src/Comproto.ts",
     "src/ComprotoFactory.ts",
-    "src/index.ts",
-    "src/jsDataTypeEnum.ts"
+    "src/const.ts",
+    "src/dataParse/Array.ts",
+    "src/dataParse/BigInt.ts",
+    "src/dataParse/index.ts",
+    "src/dataParse/Map.ts",
+    "src/dataParse/Number.ts",
+    "src/dataParse/Object.ts",
+    "src/dataParse/Set.ts",
+    "src/dataParse/String.ts",
+    "src/index.ts"
   ]
 }

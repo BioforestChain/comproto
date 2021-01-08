@@ -1,41 +1,33 @@
-import { CarryStorageRegister } from "@bfchain/comproto-helps";
-import { pack, unpack } from "@bfchain/comproto-json-pack";
+import { getDataType } from "@bfchain/comproto-helps";
 import { HANDLER_SYMBOL } from "@bfchain/comproto-typings";
 
-import { jsDataTypeEnum } from "./jsDataTypeEnum";
+
+
+
+type serializeTransferResult = { isSerialize: false } | { isSerialize: true, data: Uint8Array };
 
 export class Comproto {
   protected handlerMap: Map<string, BFChainComproto.IHanlder> = new Map();
+  protected typeHandlerMap: Map<string, BFChainComproto.typeHandler> = new Map();
   protected handlerListMap: Map<string, BFChainComproto.ITransferHandler> = new Map();
   get handlerMarker(): BFChainComproto.HandlerSymbol {
     return HANDLER_SYMBOL;
   }
-  public serialize(value: unknown): BFChainComproto.ComprotoBuffer {
-    const transferState: BFChainComproto.TransferState = {
-      carryStorageRegister: new CarryStorageRegister(),
-      transferHandlerNameArray: [],
-    };
-    const transferValue = this.serializeTransfer(value, transferState);
-    const bufferData = pack([
-      transferValue,
-      transferState.carryStorageRegister.getStateNumberArray(),
-      transferState.transferHandlerNameArray,
-    ]);
-    return bufferData;
+  public serialize(value: unknown): Uint8Array {
+    const transferValue = this.serializeTransfer(value);
+    return transferValue;
   }
-  public deserialize(buffer: BFChainComproto.ComprotoBuffer) {
-    const [originData, transferStateNumberArray, transferHandlerNameArray] = unpack(
-      buffer,
-    ) as BFChainComproto.TransferDataArray;
-    const transferState: BFChainComproto.TransferState = {
-      carryStorageRegister: new CarryStorageRegister(Uint8Array.from(transferStateNumberArray)),
-      transferHandlerNameArray,
-    };
-    const transferData = this.deserializeTransfer(originData, transferState);
-    return transferData;
+  public deserialize<T = unknown>(buffer: Uint8Array) {
+    const transferData = this.deserializeTransfer(buffer);
+    return transferData as T;
   }
+  /**
+   * 获取handler
+   * @param obj 
+   */
   public getHandler(obj: unknown) {
     let returnHandler: BFChainComproto.Handler | undefined = undefined;
+    // 先尝试查看属性是否有解析标签
     try {
       const handlerName = (obj as BFChainComproto.HandlerObject)[HANDLER_SYMBOL];
       if (typeof handlerName === "string") {
@@ -45,6 +37,7 @@ export class Comproto {
     if (returnHandler) {
       return returnHandler;
     }
+    // 再看看有没有可以处理此对象的handler
     this.handlerListMap.forEach((handler) => {
       if (handler.canHandle(obj)) {
         returnHandler = handler;
@@ -56,17 +49,32 @@ export class Comproto {
   public canHandle(obj: unknown) {
     return !!this.getHandler(obj);
   }
+  /**
+   * @name 添加自定义handler
+   * @description 主要针对开发者有设置标签的对象 setHandlerMarker
+   * @param handler 
+   */
   public addCustomHandler<
     I = unknown, O = unknown, D = I
   >(handler: BFChainComproto.TransferCustomHandler<I, O, D>) {
     this.canAddHandler(handler);
     this.handlerMap.set(handler.handlerName, handler);
   }
+  /**
+   * @name 删除自定义handler
+   * @param handlerName 
+   */
   public deleteCustomHandler(handlerName: string) {
     this.handlerMap.delete(handlerName);
   }
+  /**
+   * @name 添加类handler
+   * @description 在原型链的prototype属性添加解析标签
+   *  这样基于这个类创建出来的实例会被处理
+   * @param handler 
+   */
   public addClassHandler<
-    H extends BFChainComproto.HanlderClass,
+    H extends BFChainComproto.HandlerClass,
     O,
     D = BFChainComproto.GetTransferClassInstance<H>
   > (handler: BFChainComproto.TransferClassHandler<H, O, D>) {
@@ -75,6 +83,10 @@ export class Comproto {
     this.setHandlerMarker(handler.handlerObj.prototype, handler.handlerName);
     this.handlerMap.set(handlerName, handler);
   }
+  /**
+   * @name 删除类handler
+   * @param handlerName 
+   */
   public deleteClassHandler(handlerName: string) {
     const handler = this.handlerMap.get(handlerName) as BFChainComproto.TransferClassHandler;
     if (handler == undefined) {
@@ -85,6 +97,11 @@ export class Comproto {
       this.deleteHandlerMarker(handler.handlerObj);
     }
   }
+  /**
+   * @name 添加handler
+   * @description 在 canHandler 方法判断是否可以解析对象
+   * @param handler 
+   */
   public addHandler<
     I = unknown, O = unknown, D = I
   >(handler: BFChainComproto.TransferHandler<I, O, D>) {
@@ -92,13 +109,27 @@ export class Comproto {
     this.handlerListMap.set(handler.handlerName, handler);
     this.handlerMap.set(handler.handlerName, handler);
   }
+  /**
+   * @name 删除handler
+   * @param handler 
+   */
   public deleteHandler(handlerName: string) {
     this.handlerListMap.delete(handlerName);
     this.handlerMap.delete(handlerName);
   }
+  /**
+   * @name 删除解析标签
+   * @param handlerObj 
+   */
   public deleteHandlerMarker(handlerObj: BFChainComproto.HandlerObject) {
-    delete handlerObj[HANDLER_SYMBOL];
+    if (HANDLER_SYMBOL in handlerObj) {
+      delete handlerObj[HANDLER_SYMBOL];
+    }
   }
+  /**
+   * @name 设置解析标签
+   * @description 是否可以解析对象的主要判断依据
+   */
   public setHandlerMarker(handlerObj: unknown, handlerName: string) {
     Object.defineProperty(handlerObj, HANDLER_SYMBOL, {
       value: handlerName,
@@ -107,6 +138,9 @@ export class Comproto {
       enumerable: false,
     });
   }
+  /**
+   * @name 是否可以添加handler
+   */
   protected canAddHandler(handler: BFChainComproto.IHanlder) {
     const handlerName = handler.handlerName;
     const mHandler = this.handlerMap.get(handlerName);
@@ -114,100 +148,65 @@ export class Comproto {
       throw new Error("add a exist handler, please delete it before add");
     }
   }
-  public serializeTransfer(value: unknown, transferState: BFChainComproto.TransferState): unknown {
-    const [isdeserialize, transferValue] = this.serializeTransferProto(value, transferState);
-    if (isdeserialize) {
-      return transferValue;
+  /** 
+   * @name 解析外部对象
+   * @description 内部可以循环调用解析
+   */
+  serializeTransfer(value: unknown): Uint8Array {
+    const serializeResult = this.serializeTransferProto(value);
+    if (serializeResult.isSerialize) {
+      return serializeResult.data;
     }
-    const valueType = Object.prototype.toString.call(value);
-    if (value instanceof Object && valueType === "[object Object]" && !!value) {
-      const obj: { [key: string]: unknown } = {};
-      const val = value as { [key: string]: unknown };
-      Object.keys(val)
-        .sort()
-        .forEach((attr: string) => {
-          obj[attr] = this.serializeTransfer(val[attr], transferState);
-        });
-      return obj;
-    }
-    if (value instanceof Array && valueType === "[object Array]") {
-      const valueArray = [...value];
-      return valueArray.map((obj) => {
-        return this.serializeTransfer(obj, transferState);
-      });
-    }
-    return value;
+    return this.serializeTransferType(value);
   }
-  private serializeTransferProto(
-    value: unknown,
-    transferState: BFChainComproto.TransferState,
-  ): [boolean, unknown?] {
-    const valueType = Object.prototype.toString.call(value);
-    if (valueType === "[object Number]" && isNaN(value as number)) {
-      transferState.carryStorageRegister.carryBitOne();
-      transferState.transferHandlerNameArray.push(jsDataTypeEnum.NaN);
-      return [true, ""];
+  /**
+   * 设置类型handler
+   * @param handler 
+   */
+  setTypeHandler<T extends BFChainComproto.HandlerClass>(handler: BFChainComproto.typeTransferHandler<T>) {
+    if (this.typeHandlerMap.has(handler.typeName)) throw `typeName:${handler.typeName} is exsist`;
+    this.typeHandlerMap.set(handler.typeName, handler);
+  }
+  /**
+   * @name 通过判断对象类型进行解析
+   * @description 主要处理一些js类型对象，转换成u8a(开发者尽量不管这层)
+   * @param value 
+   */
+  serializeTransferType(value: unknown) {
+    const valueType = getDataType(value);
+    const typeHandler = this.typeHandlerMap.get(valueType);
+    if (!typeHandler) {
+      return new Uint8Array();
     }
-    if (valueType === "[object Undefined]") {
-      transferState.carryStorageRegister.carryBitOne();
-      transferState.transferHandlerNameArray.push(jsDataTypeEnum.Undefined);
-      return [true, ""];
+    if (typeHandler.typeName === valueType && value instanceof typeHandler.typeClass) {
+      return typeHandler.serialize(value, this);
     }
+    return new Uint8Array();
+  }
+  /**
+   * 尝试自定义编译
+   * @param value 
+   * @returns isSerialize 是否可以被自定义解析
+   * @returns data 被解析完之后的数据
+   */
+  private serializeTransferProto(value: unknown): serializeTransferResult {
     const handler = this.getHandler(value);
     if (!handler) {
-      transferState.carryStorageRegister.carryBitZero();
-      return [false];
+      return { isSerialize: false };
     }
-    transferState.transferHandlerNameArray.push(handler.handlerName);
-    transferState.carryStorageRegister.carryBitOne();
-    if (handler && typeof handler.serialize === "function") {
-      return [true, handler.serialize(value, transferState)];
+    if (typeof handler.serialize === 'function') {
+      const serializeData = handler.serialize(value);
+      return { isSerialize: true, data: this.serializeTransferType(serializeData) };
     }
-    return [true, undefined];
+    return { isSerialize: true, data: new Uint8Array() };
   }
+  /** 获取自定义handler */
   public getHandlerByhandlerName(handlerName: string) {
     return this.handlerMap.get(handlerName);
   }
-  public deserializeTransfer(originData: unknown, transferState: BFChainComproto.TransferState): unknown {
-    const canserialize = transferState.carryStorageRegister.readBit() === 1;
-    if (canserialize) {
-      const handlerName = transferState.transferHandlerNameArray.shift();
-      if (typeof handlerName === "string") {
-        if (handlerName === jsDataTypeEnum.NaN) {
-          return NaN;
-        }
-        if (handlerName === jsDataTypeEnum.Undefined) {
-          return undefined;
-        }
-        const handler = this.getHandlerByhandlerName(handlerName);
-        if (handler && typeof handler.deserialize === "function") {
-          return handler.deserialize(originData, transferState);
-        }
-      }
-      return originData;
-    }
-    const valueType = Object.prototype.toString.call(originData);
-    if (valueType === "[object Object]" && !!originData) {
-      const obj: { [key: string]: unknown } = {};
-      const oData = originData as { [key: string]: unknown };
-      Object.keys(oData)
-        .sort()
-        .forEach((attr: string) => {
-          obj[attr] = this.deserializeTransfer(oData[attr], transferState);
-        });
-      return obj;
-    }
-    if (valueType === "[object Array]" && originData instanceof Array) {
-      return originData.map((item: unknown) => this.deserializeTransfer(item, transferState));
-    }
-    if (valueType === "[object Error]"  && originData instanceof Error) {
-      /// 针对 msg-lite 的bug
-      const oData = originData as any;
-      delete oData["columnNumber"];
-      delete oData["fileName"];
-      delete oData["lineNumber"];
-      return oData;
-    }
-    return originData;
+  /** 解析buffer */
+  public deserializeTransfer(buf: Uint8Array): unknown {
+    let offset = 0; // buffer 指针
+    return {} as unknown;
   }
 }

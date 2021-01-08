@@ -1,6 +1,6 @@
 declare namespace BFChainComproto {
   type AnyClass<P = any> = new (...args: any) => P;
-  type ComprotoBuffer = ArrayBufferView;
+  type ComprotoBuffer = Uint8Array;
 
 
   type AnyObject = object;
