@@ -23,9 +23,9 @@ declare namespace BFChainComproto {
   interface TransferHandler<I = unknown, O = unknown, D = I> extends Handler<I, O, D> {
     canHandle: (obj: I) => boolean;
   }
-  type HandlerClass = AnyClass | BigIntConstructor;
-  // type TransferClass<T> = T extends (arg: infer BigIntConstructor) => void ? BigIntConstructor : AnyClass;
-  type GetTransferClassInstance<T> = T extends AnyClass ? InstanceType<T> : BigInt;
+  type HandlerTypeObject = undefined | null | BigIntConstructor;
+  type HandlerClass = AnyClass;
+  type GetTransferClassInstance<T> = T extends AnyClass ? InstanceType<T> : (T extends BigIntConstructor ? bigint : T);
   interface TransferClassHandler<
     H extends HandlerClass = HandlerClass,
     O = GetTransferClassInstance<H>,
@@ -38,19 +38,21 @@ declare namespace BFChainComproto {
   }
   type TransferDataArray = [unknown, number[], string[]];
 
-  type typeTransferHandler<T extends BFChainComproto.HandlerClass = BFChainComproto.HandlerClass> = {
-    typeName: string, // 可控
-    typeClass: T, // 可控类
+  type TransferType = AnyClass | HandlerTypeObject;
+
+  interface typeTransferHandler<T extends BFChainComproto.TransferType = BFChainComproto.TransferType> {
+    typeName: import('./const').dataTypeEnum,
+    typeClass: T,
     serialize: (data: BFChainComproto.GetTransferClassInstance<T>, comproto: import('./Comproto').Comproto) => Uint8Array;
-    deserialize: (buf: Uint8Array, comproto: import('./Comproto').Comproto) => BFChainComproto.GetTransferClassInstance<T>;
-  };
+    deserialize: (buf: Uint8Array, tagOffset: number, comproto: import('./Comproto').Comproto) => BFChainComproto.GetTransferClassInstance<T>;
+  }
   
   type typeHandler = {
-    typeName: string,
-    typeClass: BFChainComproto.HandlerClass,
-    serialize: (...arg: any[]) => Uint8Array;
-    deserialize: (...arg: any[]) => unknown;
-  };
+    typeName: import('./const').dataTypeEnum,
+    typeClass: BFChainComproto.TransferType,
+    serialize: (data: BFChainComproto.GetTransferClassInstance<BFChainComproto.TransferType>, comproto: import('./Comproto').Comproto) => Uint8Array;
+    deserialize: (buf: Uint8Array, tagOffset: number, comproto: import('./Comproto').Comproto) => unknown;
+  }
 
   interface CarryStorageRegister {
     carryBitOne: () => void;

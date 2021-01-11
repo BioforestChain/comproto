@@ -1,15 +1,14 @@
 import { getDataType } from "@bfchain/comproto-helps";
 import { HANDLER_SYMBOL } from "@bfchain/comproto-typings";
-
-
-
+import type { dataTypeEnum } from "./const";
 
 type serializeTransferResult = { isSerialize: false } | { isSerialize: true, data: Uint8Array };
 
 export class Comproto {
   protected handlerMap: Map<string, BFChainComproto.IHanlder> = new Map();
-  protected typeHandlerMap: Map<string, BFChainComproto.typeHandler> = new Map();
   protected handlerListMap: Map<string, BFChainComproto.ITransferHandler> = new Map();
+  protected tagTypeMap: Map<number, dataTypeEnum> = new Map();
+  protected typeHandlerMap: Map<dataTypeEnum, BFChainComproto.typeHandler> = new Map();
   get handlerMarker(): BFChainComproto.HandlerSymbol {
     return HANDLER_SYMBOL;
   }
@@ -18,8 +17,12 @@ export class Comproto {
     return transferValue;
   }
   public deserialize<T = unknown>(buffer: Uint8Array) {
-    const transferData = this.deserializeTransfer(buffer);
+    const transferData = this.deserializeTransfer(buffer, 0);
     return transferData as T;
+  }
+  public setTagType(tag: number, type: dataTypeEnum) {
+    if (this.tagTypeMap.has(tag)) throw `tag::${tag} is exist`;
+    this.tagTypeMap.set(tag, type);
   }
   /**
    * 获取handler
@@ -163,7 +166,9 @@ export class Comproto {
    * 设置类型handler
    * @param handler 
    */
-  setTypeHandler<T extends BFChainComproto.HandlerClass>(handler: BFChainComproto.typeTransferHandler<T>) {
+  setTypeHandler<
+    T extends BFChainComproto.TransferType = BFChainComproto.TransferType
+  >(handler: BFChainComproto.typeTransferHandler<T>) {
     if (this.typeHandlerMap.has(handler.typeName)) throw `typeName:${handler.typeName} is exsist`;
     this.typeHandlerMap.set(handler.typeName, handler);
   }
@@ -173,12 +178,12 @@ export class Comproto {
    * @param value 
    */
   serializeTransferType(value: unknown) {
-    const valueType = getDataType(value);
+    const valueType = getDataType(value) as dataTypeEnum;
     const typeHandler = this.typeHandlerMap.get(valueType);
     if (!typeHandler) {
       return new Uint8Array();
     }
-    if (typeHandler.typeName === valueType && value instanceof typeHandler.typeClass) {
+    if (typeHandler.typeName === valueType) {
       return typeHandler.serialize(value, this);
     }
     return new Uint8Array();
@@ -205,8 +210,14 @@ export class Comproto {
     return this.handlerMap.get(handlerName);
   }
   /** 解析buffer */
-  public deserializeTransfer(buf: Uint8Array): unknown {
-    let offset = 0; // buffer 指针
-    return {} as unknown;
+  public deserializeTransfer(buf: Uint8Array, offset: number) {
+    const tag = buf[offset];
+    if (tag === undefined) return;
+    // 通过tag获取type,再交由type serialize解析
+    const type = this.tagTypeMap.get(tag);
+    if (!type) throw `can not resolve tag::${tag}`;
+    const handler = this.typeHandlerMap.get(type);
+    if (!handler) throw `can not find type handler::${type}`;
+    return handler.deserialize(buf, offset, this);
   }
 }

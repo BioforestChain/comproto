@@ -1,19 +1,26 @@
 import type { Comproto } from '../Comproto';
-import ArrayParseHandler from './Array';
-import BigIntParseHandler from './BigInt';
-import MapParseHandler from './Map';
-import NumberParseHandler from './Number';
-import ObjectParseHandler from './Object';
-import SetParseHandler from './Set';
-import StringParseHandler from './String';
+import ArrayParseHandler from './ArrayParseHandler';
+import BigIntParseHandler from './BigIntParseHandler';
+import MapParseHandler from './MapParseHandler';
+import NumberParseHandler from './NumberParseHandler';
+import ObjectParseHandler from './ObjectParseHandler';
+import SetParseHandler from './SetParseHandler';
+import StringParseHandler from './StringParseHandler';
+import UndefinedgParseHandler from './UndefinedParseHandler';
+import NullParseHandler from './NullParseHandler';
+import BooleanParseHandler from './BooleanParseHandler';
 
 
 export const initDataParse = (comproto: Comproto) => {
-    comproto.setTypeHandler(ArrayParseHandler);
-    comproto.setTypeHandler(BigIntParseHandler);
-    comproto.setTypeHandler(MapParseHandler);
-    comproto.setTypeHandler(NumberParseHandler);
-    comproto.setTypeHandler(ObjectParseHandler);
-    comproto.setTypeHandler(SetParseHandler);
-    comproto.setTypeHandler(StringParseHandler);
+    new ArrayParseHandler(comproto);
+    new BigIntParseHandler(comproto);
+    new MapParseHandler(comproto);
+    new NumberParseHandler(comproto);
+    new ObjectParseHandler(comproto);
+    new SetParseHandler(comproto);
+    new StringParseHandler(comproto);
+    new UndefinedgParseHandler(comproto);
+    new NullParseHandler(comproto);
+    new BooleanParseHandler(comproto);
+    // TODO: error, typearray
 };

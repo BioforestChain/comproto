@@ -24,15 +24,19 @@
   //   });
 
 import { dataTypeEnum } from '../const';
-
-export default {
-    typeName: dataTypeEnum.Map,
-    typeClass: Map,
-    serialize(data, comproto) {
+import type { Comproto } from '../Comproto';
+export default class MapParseHandler implements BFChainComproto.typeTransferHandler<typeof Map> {
+    constructor(comproto: Comproto) {
+        comproto.setTypeHandler(this);
+    }
+    typeName = dataTypeEnum.Map;
+    typeClass = Map;
+    serialize(data: Map<unknown, unknown>, comproto: Comproto) {
         return new Uint8Array();
-    },
-    deserialize(buf) {
+    }
+    deserialize(buf: Uint8Array) {
         return new Map();
-    },
-} as BFChainComproto.typeTransferHandler<typeof Map>;
+    }
+}
+
 

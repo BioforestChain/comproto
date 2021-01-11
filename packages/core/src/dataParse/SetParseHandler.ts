@@ -11,16 +11,22 @@
   //     },
   //   });
 
-  import { dataTypeEnum } from '../const';
 
-  export default {
-      typeName: dataTypeEnum.Set,
-      typeClass: Set,
-      serialize(data, comproto) {
+  import { dataTypeEnum } from '../const';
+  import type { Comproto } from '../Comproto';
+  export default class SetParseHandler implements BFChainComproto.typeTransferHandler<typeof Set> {
+      constructor(comproto: Comproto) {
+          comproto.setTypeHandler(this);
+      }
+      typeName = dataTypeEnum.Set;
+      typeClass = Set;
+      serialize(data: Set<unknown>, comproto: Comproto) {
           return new Uint8Array();
-      },
-      deserialize(buf) {
+      }
+      deserialize(buf: Uint8Array) {
           return new Set();
-      },
-  } as BFChainComproto.typeTransferHandler<typeof Set>;
+      }
+  }
+  
+  
   
