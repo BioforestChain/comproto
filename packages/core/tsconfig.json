@@ -27,6 +27,7 @@
     "src/dataParse/BaseParseHandler.ts",
     "src/dataParse/BigIntParseHandler.ts",
     "src/dataParse/BooleanParseHandler.ts",
+    "src/dataParse/ExtParseHandler.ts",
     "src/dataParse/index.ts",
     "src/dataParse/MapParseHandler.ts",
     "src/dataParse/NullParseHandler.ts",

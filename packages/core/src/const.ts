@@ -9,6 +9,7 @@ export enum dataTypeEnum {
     Set = 'Set',
     Null = 'Null',
     Boolean = 'Boolean',
+    Ext = 'Ext',
 };
 
 export enum SerializationTag {

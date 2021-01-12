@@ -3,13 +3,28 @@
 
 import { ComprotoFactroy } from "@bfchain/comproto";
 const comproto = ComprotoFactroy.getComproto();
+import { BBuffer } from '@bfchain/util-buffer';
 
 // test("test number of int", async (t) => {
-  const trasferData = comproto.serialize(999n);
+  // (globalThis as any).console.log(new Uint8Array().buffer instanceof ArrayBuffer);
+  // (globalThis as any).console.log(new Uint16Array().buffer instanceof ArrayBuffer);
+  // (globalThis as any).console.log(new Buffer('').buffer  instanceof ArrayBuffer);
+  const a = { a: 1 };
+  comproto.setHandlerMarker(a, 'a');
+  comproto.addCustomHandler({
+    handlerName: 'a',
+    serialize() {
+      return 1;
+    },
+    deserialize() {
+      return { a : 1 };
+    }
+  })
+  const trasferData = comproto.serialize(a);
   (globalThis as any).console.log('serialize buf', trasferData);
   const data = comproto.deserialize(trasferData);
   (globalThis as any).console.log('serialize data', data);
-  // t.is(1, 1);
+//   t.is(1, 1);
 // });
 
 // class A {

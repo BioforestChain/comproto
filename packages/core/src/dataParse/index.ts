@@ -9,6 +9,7 @@ import StringParseHandler from './StringParseHandler';
 import UndefinedgParseHandler from './UndefinedParseHandler';
 import NullParseHandler from './NullParseHandler';
 import BooleanParseHandler from './BooleanParseHandler';
+import ExtParseHandler from './ExtParseHandler';
 
 
 export const initDataParse = (comproto: Comproto) => {
@@ -22,5 +23,6 @@ export const initDataParse = (comproto: Comproto) => {
     new UndefinedgParseHandler(comproto);
     new NullParseHandler(comproto);
     new BooleanParseHandler(comproto);
+    new ExtParseHandler(comproto);
     // TODO: error, typearray
 };

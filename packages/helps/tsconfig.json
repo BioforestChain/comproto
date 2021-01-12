@@ -12,6 +12,8 @@
   "files": [
     "src/CarryStorageRegister.ts",
     "src/getType.ts",
-    "src/index.ts"
+    "src/index.ts",
+    "src/str2U8a.ts",
+    "src/u8a2Str.ts"
   ]
 }

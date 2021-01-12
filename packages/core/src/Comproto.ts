@@ -1,6 +1,6 @@
 import { getDataType } from "@bfchain/comproto-helps";
 import { HANDLER_SYMBOL } from "@bfchain/comproto-typings";
-import type { dataTypeEnum } from "./const";
+import { dataTypeEnum } from "./const";
 
 type serializeTransferResult = { isSerialize: false } | { isSerialize: true, data: Uint8Array };
 
@@ -202,8 +202,12 @@ export class Comproto {
       return { isSerialize: false };
     }
     if (typeof handler.serialize === 'function') {
-      const serializeData = handler.serialize(value);
-      return { isSerialize: true, data: this.serializeTransferType(serializeData) };
+      // const serializeData = handler.serialize(value);
+      const typeHandler = this.typeHandlerMap.get(dataTypeEnum.Ext);
+      if (!typeHandler) {
+        throw 'ext handler not exitst'
+      }
+      return { isSerialize: true, data: typeHandler.serialize(value, this) };
     }
     return { isSerialize: true, data: new Uint8Array() };
   }
