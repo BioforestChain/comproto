@@ -3,7 +3,7 @@ type handler = (val: unknown) => Uint8Array;
 
 export default class BaseParseHandler {
     /** immediate values */
-    protected tokenMap: Map<number, handler>;
+    protected tokenMap!: Map<number, handler>;
     constructor() {
     }
     len2Buf(length: number) {

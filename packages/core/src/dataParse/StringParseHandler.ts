@@ -52,28 +52,29 @@ export default class StringParseHandler
         }
         const byteLen = arrayBuf.length;
         const headLenArr = this.strByteLen2buf(byteLen);
-        return new Uint8Array([SerializationTag.kStringObject, ...headLenArr, ...arrayBuf]);
+        return new Uint8Array([...headLenArr, ...arrayBuf]);
     }
     deserialize(buffer: Uint8Array, tagOffset: number) {
         const tag = buffer[tagOffset ++];
         let byteLen = 0;
         if (tag > 0xa0 && tag < 0xbf) {
             byteLen = tag - 0xa0;
-        }
-        switch (tag) {
-            case 0xd9:
-            byteLen = this.read1(buffer, tagOffset);
-            tagOffset += 1;
-            break;
-            case 0xda:
-            byteLen = this.read2(buffer, tagOffset);
-            tagOffset += 2;
-            break;
-            case 0xdb:
-            byteLen = this.read4(buffer, tagOffset);
-            tagOffset += 4;
-            break;
-            default: throw `string handler not tag::${tag}`;
+        } else {
+            switch (tag) {
+                case 0xd9:
+                byteLen = this.read1(buffer, tagOffset);
+                tagOffset += 1;
+                break;
+                case 0xda:
+                byteLen = this.read2(buffer, tagOffset);
+                tagOffset += 2;
+                break;
+                case 0xdb:
+                byteLen = this.read4(buffer, tagOffset);
+                tagOffset += 4;
+                break;
+                default: throw `string handler not tag::${tag}`;
+            }
         }
         let index = tagOffset | 0;
         const end = tagOffset + byteLen;
