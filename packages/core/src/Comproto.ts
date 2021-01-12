@@ -166,11 +166,9 @@ export class Comproto {
    * 设置类型handler
    * @param handler 
    */
-  setTypeHandler<
-    T extends BFChainComproto.TransferType = BFChainComproto.TransferType
-  >(handler: BFChainComproto.typeTransferHandler<T>) {
+  setTypeHandler<T, O = T>(handler: BFChainComproto.typeTransferHandler<T, O>) {
     if (this.typeHandlerMap.has(handler.typeName)) throw `typeName:${handler.typeName} is exsist`;
-    this.typeHandlerMap.set(handler.typeName, handler);
+    this.typeHandlerMap.set(handler.typeName, handler as BFChainComproto.typeHandler);
   }
   /**
    * @name 通过判断对象类型进行解析

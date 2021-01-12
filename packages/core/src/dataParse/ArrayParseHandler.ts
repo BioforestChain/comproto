@@ -1,7 +1,7 @@
 
 import { dataTypeEnum } from '../const';
 import type { Comproto } from '../Comproto';
-export default class ArrayParseHandler implements BFChainComproto.typeTransferHandler<typeof Array> {
+export default class ArrayParseHandler implements BFChainComproto.typeTransferHandler<unknown[]> {
     constructor(comproto: Comproto) {
         comproto.setTypeHandler(this);
     }

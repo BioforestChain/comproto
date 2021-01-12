@@ -25,7 +25,7 @@
 
 import { dataTypeEnum } from '../const';
 import type { Comproto } from '../Comproto';
-export default class MapParseHandler implements BFChainComproto.typeTransferHandler<typeof Map> {
+export default class MapParseHandler implements BFChainComproto.typeTransferHandler<Map<unknown, unknown>> {
     constructor(comproto: Comproto) {
         comproto.setTypeHandler(this);
     }

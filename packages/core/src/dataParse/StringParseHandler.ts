@@ -3,7 +3,7 @@ import type { Comproto } from '../Comproto';
 import BaseParseHandler from './BaseParseHandler';
 export default class StringParseHandler
     extends BaseParseHandler
-    implements BFChainComproto.typeTransferHandler<typeof String> {
+    implements BFChainComproto.typeTransferHandler<string> {
     /**
      *  fixstr -- 0xa0 - 0xbf
      *  str 8 -- 0xd9
@@ -21,8 +21,7 @@ export default class StringParseHandler
         comproto.setTagType(0xdb, dataTypeEnum.String);
     }
     typeName = dataTypeEnum.String;
-    typeClass = String;
-    serialize(data: String, comproto: Comproto) {
+    serialize(data: string) {
         const arrayBuf = [];
         let index = 0;
         const length = data.length;
@@ -62,15 +61,15 @@ export default class StringParseHandler
         } else {
             switch (tag) {
                 case 0xd9:
-                byteLen = this.read1(buffer, tagOffset);
+                byteLen = this.readUint8(buffer, tagOffset);
                 tagOffset += 1;
                 break;
                 case 0xda:
-                byteLen = this.read2(buffer, tagOffset);
+                byteLen = this.readUint16(buffer, tagOffset);
                 tagOffset += 2;
                 break;
                 case 0xdb:
-                byteLen = this.read4(buffer, tagOffset);
+                byteLen = this.readUint32(buffer, tagOffset);
                 tagOffset += 4;
                 break;
                 default: throw `string handler not tag::${tag}`;
@@ -116,16 +115,17 @@ export default class StringParseHandler
 
         return string;
     }
+    /** 通过字符串占用的数据大小判断存储tag */
     strByteLen2buf(byteLen: number) {
         if (byteLen < 32) {
-            return [0xa0 + byteLen];
+            return new Uint8Array([0xa0 + byteLen]);
         }
         if (byteLen <= 0xFF) {
-            return this.write1(0xd9, byteLen);
+            return this.writeUint8(0xd9, byteLen);
         }
         if (byteLen <= 0xFFFF) {
-            return this.write2(0xda, byteLen);
+            return this.writeUint16(0xda, byteLen);
         }
-        return this.write4(0xdb, byteLen);
+        return this.writeUint32(0xdb, byteLen);
     }
 }

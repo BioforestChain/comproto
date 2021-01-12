@@ -20,10 +20,10 @@ export enum SerializationTag {
 //     kVerifyObjectCount = '?',
 //     // Oddballs (no data).
 //     kTheHole = '-',
-    kUndefined = 0x5f,
-    kNull = 0x30,
-    kTrue = 0x54,
-    kFalse = 0x46,
+    kUndefined = 0xc1,
+    kNull = 0xc0,
+    kTrue = 0xc3,
+    kFalse = 0xc2,
 //     // Number represented as 32-bit integer, ZigZag-encoded
 //     // (like sint32 in protobuf)
 //     kInt32 = 'I',

@@ -40,17 +40,15 @@ declare namespace BFChainComproto {
 
   type TransferType = AnyClass | HandlerTypeObject;
 
-  interface typeTransferHandler<T extends BFChainComproto.TransferType = BFChainComproto.TransferType> {
+  interface typeTransferHandler<T = unknown, O = T> {
     typeName: import('./const').dataTypeEnum,
-    typeClass: T,
-    serialize: (data: BFChainComproto.GetTransferClassInstance<T>, comproto: import('./Comproto').Comproto) => Uint8Array;
-    deserialize: (buf: Uint8Array, tagOffset: number, comproto: import('./Comproto').Comproto) => BFChainComproto.GetTransferClassInstance<T>;
+    serialize: (data: T, comproto: import('./Comproto').Comproto) => Uint8Array;
+    deserialize: (buf: Uint8Array, tagOffset: number, comproto: import('./Comproto').Comproto) => O;
   }
   
   type typeHandler = {
     typeName: import('./const').dataTypeEnum,
-    typeClass: BFChainComproto.TransferType,
-    serialize: (data: BFChainComproto.GetTransferClassInstance<BFChainComproto.TransferType>, comproto: import('./Comproto').Comproto) => Uint8Array;
+    serialize: (data: unknown, comproto: import('./Comproto').Comproto) => Uint8Array;
     deserialize: (buf: Uint8Array, tagOffset: number, comproto: import('./Comproto').Comproto) => unknown;
   }
 

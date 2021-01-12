@@ -14,12 +14,11 @@
 
   import { dataTypeEnum } from '../const';
   import type { Comproto } from '../Comproto';
-  export default class SetParseHandler implements BFChainComproto.typeTransferHandler<typeof Set> {
+  export default class SetParseHandler implements BFChainComproto.typeTransferHandler<Set<unknown>> {
       constructor(comproto: Comproto) {
           comproto.setTypeHandler(this);
       }
       typeName = dataTypeEnum.Set;
-      typeClass = Set;
       serialize(data: Set<unknown>, comproto: Comproto) {
           return new Uint8Array();
       }

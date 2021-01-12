@@ -5,7 +5,7 @@ import { ComprotoFactroy } from "@bfchain/comproto";
 const comproto = ComprotoFactroy.getComproto();
 
 // test("test number of int", async (t) => {
-  const trasferData = comproto.serialize('a');
+  const trasferData = comproto.serialize(-32);
   (globalThis as any).console.log('serialize buf', trasferData);
   const data = comproto.deserialize(trasferData);
   (globalThis as any).console.log('serialize data', data);
