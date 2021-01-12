@@ -25,7 +25,7 @@ implements BFChainComproto.typeTransferHandler<Object> {
         const oData = data as { [key: string]: unknown };
         const dataMap = Object.keys(oData);
         const dataKeyLen = dataMap.length;
-        const headU8a = this.keyLen2Buf(dataKeyLen);
+        const headU8a = this.len2Buf(dataKeyLen);
         const dataBuf: number[] = [];
         dataMap.forEach((key) => {
             const keyBuf = comproto.serializeTransferType(key);
@@ -54,22 +54,22 @@ implements BFChainComproto.typeTransferHandler<Object> {
                 return this.readUint16(decoderState);
             break;
             case 0xdf:
-                return [4, this.readUint32(decoderState)];
+                return this.readUint32(decoderState);
             break;
         }
         throw `can not handler tag::${tag}`
     }
-    keyLen2Buf(len: number) {
+    len2Buf(len: number) {
         if (len < 16) {
             // 0x80
             const tag = len + 0x80;
             return new Uint8Array([tag]);
         } else if (len <= 0xFFFF) {
             // 0xde
-            return this.writeUint8(0xde, len);
+            return this.writeUint16(0xde, len);
         } else {
             // 0xdf
-            return this.writeUint16(0xde, len);
+            return this.writeUint32(0xde, len);
         }
     }
 }

@@ -54,24 +54,7 @@ export default class StringParseHandler
         return new Uint8Array([...headLenArr, ...arrayBuf]);
     }
     deserialize(decoderState: BFChainComproto.decoderState) {
-        const tag = decoderState.buffer[decoderState.offset ++];
-        let byteLen = 0;
-        if (tag > 0xa0 && tag < 0xbf) {
-            byteLen = tag - 0xa0;
-        } else {
-            switch (tag) {
-                case 0xd9:
-                byteLen = this.readUint8(decoderState);
-                break;
-                case 0xda:
-                byteLen = this.readUint16(decoderState);
-                break;
-                case 0xdb:
-                byteLen = this.readUint32(decoderState);
-                break;
-                default: throw `string handler not tag::${tag}`;
-            }
-        }
+        let byteLen = this.getLen(decoderState);
         let index = decoderState.offset | 0;
         decoderState.offset += byteLen;
         const end = decoderState.offset;
@@ -82,7 +65,7 @@ export default class StringParseHandler
             chr = buffer[index++];
             if (chr < 128) {
                 string += String.fromCharCode(chr);
-            continue;
+                continue;
             }
 
             if ((chr & 0xE0) === 0xC0) {
@@ -126,5 +109,23 @@ export default class StringParseHandler
             return this.writeUint16(0xda, byteLen);
         }
         return this.writeUint32(0xdb, byteLen);
+    }
+    getLen(decoderState: BFChainComproto.decoderState) {
+        const tag = decoderState.buffer[decoderState.offset ++];
+        if (tag > 0xa0 && tag < 0xbf) {
+            return tag - 0xa0;
+        }
+        switch (tag) {
+            case 0xd9:
+                return this.readUint8(decoderState);
+            break;
+            case 0xda:
+                return this.readUint16(decoderState);
+            break;
+            case 0xdb:
+                return this.readUint32(decoderState);
+            break;
+        }
+        throw `string handler not tag::${tag}`;
     }
 }

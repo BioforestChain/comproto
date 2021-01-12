@@ -8,7 +8,6 @@ import { BBuffer } from '@bfchain/util-buffer';
  * 
  * 
  * float 64 -- 0xcb
- * float 32 -- 0xca
  * 
  * 小于0整数
  * int 8 -- 0xd0
@@ -45,8 +44,7 @@ export default class NumberParseHandler
         comproto.setTagType(0xd1, dataTypeEnum.Number);
         comproto.setTagType(0xd2, dataTypeEnum.Number);
         comproto.setTagType(0xd3, dataTypeEnum.Number);
-        // float 32 64
-        comproto.setTagType(0xca, dataTypeEnum.Number);
+        // float 64
         comproto.setTagType(0xcb, dataTypeEnum.Number);
     }
     typeName = dataTypeEnum.Number;
@@ -137,10 +135,6 @@ export default class NumberParseHandler
             case 0xcf:
                 return Number(this.readUint64(decoderState));
             break;
-            // float32
-            case 0xca:
-                return this.readFloat32(decoderState);
-            // float64
             case 0xcb:
                 return this.readFloat64(decoderState);
             break;
