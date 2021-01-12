@@ -2,52 +2,55 @@
 import { BBuffer } from '@bfchain/util-buffer';
 
 export default class BaseParseHandler {
-    constructor() {
+    readUint8(decoderState: BFChainComproto.decoderState) {
+        return decoderState.buffer[decoderState.offset ++];
     }
-    len2Buf(length: number) {
-        const type = (length < 16)
-        ? (0x80 + length)
-        :(length <= 0xFFFF)
-        ? 0xde
-        : 0xdf;
-    }
-    // writeInt8(buf: Uint8Array, start: number) {
-    //     const value = buf[start];
-    //     return (value & 0x80) ? value - 0x100 : value;
-    // }
-    readUint8(buf: Uint8Array, start: number) {
-        return buf[start];
-    }
-    readInt8(buffer: Uint8Array, start: number) {
-        const value = buffer[start];
+    readInt8(decoderState: BFChainComproto.decoderState) {
+        const value = decoderState.buffer[decoderState.offset ++];
         return (value & 0x80) ? value - 0x100 : value;
     }
-    readUint16(buffer: Uint8Array, start: number) {
-        return (buffer[start++] << 8) | buffer[start]
+    readUint16(decoderState: BFChainComproto.decoderState) {
+        let { buffer, offset } = decoderState;
+        decoderState.offset += 2;
+        return (buffer[offset ++] << 8) | buffer[offset];
     }
-    readInt16(buffer: Uint8Array, start: number) {
-        const value = (buffer[start++] << 8) | buffer[start];
+    readInt16(decoderState: BFChainComproto.decoderState) {
+        let { buffer, offset } = decoderState;
+        decoderState.offset += 2;
+        const value = (buffer[offset++] << 8) | buffer[offset];
         return (value & 0x8000) ? value - 0x10000 : value;
     }
-    readUint32(buffer: Uint8Array, start: number) {
-        return (buffer[start++] * 16777216) + (buffer[start++] << 16)
-        + (buffer[start++] << 8) + buffer[start];
+    readUint32(decoderState: BFChainComproto.decoderState) {
+        let { buffer, offset } = decoderState;
+        decoderState.offset += 4;
+        return (buffer[offset++] * 16777216) + (buffer[offset++] << 16)
+        + (buffer[offset++] << 8) + buffer[offset];
     }
-    readInt32(buffer: Uint8Array, start: number) {
-        return (buffer[start++] << 24) | (buffer[start++] << 16)
-        | (buffer[start++] << 8) | buffer[start];
+    readInt32(decoderState: BFChainComproto.decoderState) {
+        let { buffer, offset } = decoderState;
+        decoderState.offset += 4;
+        return (buffer[offset++] << 24) | (buffer[offset++] << 16)
+        | (buffer[offset++] << 8) | buffer[offset];
     }
-    readUint64(buffer: Uint8Array, start: number) {
-        return BBuffer.prototype.readBigUInt64BE.call(buffer, start);
+    readUint64(decoderState: BFChainComproto.decoderState) {
+        const { buffer, offset } = decoderState;
+        decoderState.offset += 8;
+        return BBuffer.prototype.readBigUInt64BE.call(buffer, offset);
     }
-    readInt64(buffer: Uint8Array, start: number) {
-        return BBuffer.prototype.readBigInt64BE.call(buffer, start);
+    readInt64(decoderState: BFChainComproto.decoderState) {
+        const { buffer, offset } = decoderState;
+        decoderState.offset += 8;
+        return BBuffer.prototype.readBigInt64BE.call(buffer, offset);
     }
-    readFloat32(buffer: Uint8Array, start: number) {
-        return BBuffer.prototype.readFloatBE.call(buffer, start);
+    readFloat32(decoderState: BFChainComproto.decoderState) {
+        const { buffer, offset } = decoderState;
+        decoderState.offset += 4;
+        return BBuffer.prototype.readFloatBE.call(buffer, offset);
     }
-    readFloat64(buffer: Uint8Array, start: number) {
-        return BBuffer.prototype.readDoubleBE.call(buffer, start);
+    readFloat64(decoderState: BFChainComproto.decoderState) {
+        const { buffer, offset } = decoderState;
+        decoderState.offset += 8;
+        return BBuffer.prototype.readDoubleBE.call(buffer, offset);
     }
     writeUint8(type: number, value: number) {
         const byteLength = 1;

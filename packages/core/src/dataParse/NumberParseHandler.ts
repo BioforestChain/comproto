@@ -94,8 +94,8 @@ export default class NumberParseHandler
         }
         // return new Uint8Array();
     }
-    deserialize(buf: Uint8Array, tagOffset: number) {
-        const tag = buf[tagOffset ++];
+    deserialize(decoderState: BFChainComproto.decoderState) {
+        const tag = decoderState.buffer[decoderState.offset ++];
         // positive fixint -- 0x00 - 0x7f
         if (tag >= 0x00 && tag <= 0x7F) {
             return tag;
@@ -108,41 +108,41 @@ export default class NumberParseHandler
         switch (tag) {
             // int8
             case 0xd0:
-                return this.readInt8(buf, tagOffset);
+                return this.readInt8(decoderState);
             // int16
             case 0xd1:
-                return this.readInt16(buf, tagOffset);
+                return this.readInt16(decoderState);
             break;
             // int32
             case 0xd2:
-                return this.readInt32(buf, tagOffset);
+                return this.readInt32(decoderState);
             break;
             // int64
             case 0xd3:
-                return Number(this.readInt64(buf, tagOffset));
+                return Number(this.readInt64(decoderState));
             break;
             // uint8
             case 0xcc:
-                return this.readUint8(buf, tagOffset);
+                return this.readUint8(decoderState);
             break;
             // uint16
             case 0xcd:
-                return this.readUint16(buf, tagOffset);
+                return this.readUint16(decoderState);
             break;
             // uint32
             case 0xce:
-                return this.readUint32(buf, tagOffset);
+                return this.readUint32(decoderState);
             break;
             // uint64
             case 0xcf:
-                return Number(this.readUint64(buf, tagOffset));
+                return Number(this.readUint64(decoderState));
             break;
             // float32
             case 0xca:
-                return this.readFloat32(buf, tagOffset);
+                return this.readFloat32(decoderState);
             // float64
             case 0xcb:
-                return this.readFloat64(buf, tagOffset);
+                return this.readFloat64(decoderState);
             break;
         }
         throw `number handler can not handler tag::${tag}`

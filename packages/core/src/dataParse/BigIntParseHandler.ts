@@ -9,7 +9,7 @@ export default class BigIntParseHandler implements BFChainComproto.typeTransferH
     serialize(data: BigInt, comproto: Comproto) {
         return new Uint8Array();
     }
-    deserialize(buf: Uint8Array) {
+    deserialize(decoderState: BFChainComproto.decoderState) {
         return 1n;
     }
 }

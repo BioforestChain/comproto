@@ -14,7 +14,7 @@ export default class ArrayParseHandler implements BFChainComproto.typeTransferHa
         // });
         return new Uint8Array();
     }
-    deserialize(buf: Uint8Array) {
+    deserialize(decoderState: BFChainComproto.decoderState) {
         return [];
     }
 }

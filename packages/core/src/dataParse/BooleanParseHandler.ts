@@ -13,8 +13,8 @@ export default class BooleanParseHandler implements BFChainComproto.typeTransfer
         const tag = data ? SerializationTag.kTrue : SerializationTag.kFalse;
         return new Uint8Array([tag]);
     }
-    deserialize(buf: Uint8Array, tagOffset: number) {
-        const tag = buf[tagOffset];
+    deserialize(decoderState: BFChainComproto.decoderState) {
+        const tag = decoderState.buffer[decoderState.offset++];
         return tag === SerializationTag.kTrue;
     }
 }

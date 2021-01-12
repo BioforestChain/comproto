@@ -34,7 +34,7 @@ export default class MapParseHandler implements BFChainComproto.typeTransferHand
     serialize(data: Map<unknown, unknown>, comproto: Comproto) {
         return new Uint8Array();
     }
-    deserialize(buf: Uint8Array) {
+    deserialize(decoderState: BFChainComproto.decoderState) {
         return new Map();
     }
 }

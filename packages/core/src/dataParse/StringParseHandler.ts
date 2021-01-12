@@ -53,36 +53,35 @@ export default class StringParseHandler
         const headLenArr = this.strByteLen2buf(byteLen);
         return new Uint8Array([...headLenArr, ...arrayBuf]);
     }
-    deserialize(buffer: Uint8Array, tagOffset: number) {
-        const tag = buffer[tagOffset ++];
+    deserialize(decoderState: BFChainComproto.decoderState) {
+        const tag = decoderState.buffer[decoderState.offset ++];
         let byteLen = 0;
         if (tag > 0xa0 && tag < 0xbf) {
             byteLen = tag - 0xa0;
         } else {
             switch (tag) {
                 case 0xd9:
-                byteLen = this.readUint8(buffer, tagOffset);
-                tagOffset += 1;
+                byteLen = this.readUint8(decoderState);
                 break;
                 case 0xda:
-                byteLen = this.readUint16(buffer, tagOffset);
-                tagOffset += 2;
+                byteLen = this.readUint16(decoderState);
                 break;
                 case 0xdb:
-                byteLen = this.readUint32(buffer, tagOffset);
-                tagOffset += 4;
+                byteLen = this.readUint32(decoderState);
                 break;
                 default: throw `string handler not tag::${tag}`;
             }
         }
-        let index = tagOffset | 0;
-        const end = tagOffset + byteLen;
+        let index = decoderState.offset | 0;
+        decoderState.offset += byteLen;
+        const end = decoderState.offset;
         let chr = 0;
         let string = '';
+        const { buffer } = decoderState;
         while (index < end) {
             chr = buffer[index++];
             if (chr < 128) {
-            string += String.fromCharCode(chr);
+                string += String.fromCharCode(chr);
             continue;
             }
 

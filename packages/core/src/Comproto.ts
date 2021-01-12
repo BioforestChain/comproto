@@ -17,7 +17,11 @@ export class Comproto {
     return transferValue;
   }
   public deserialize<T = unknown>(buffer: Uint8Array) {
-    const transferData = this.deserializeTransfer(buffer, 0);
+    const decoderState: BFChainComproto.decoderState = {
+      buffer: buffer,
+      offset: 0,
+    };
+    const transferData = this.deserializeTransfer(decoderState);
     return transferData as T;
   }
   public setTagType(tag: number, type: dataTypeEnum) {
@@ -208,14 +212,14 @@ export class Comproto {
     return this.handlerMap.get(handlerName);
   }
   /** 解析buffer */
-  public deserializeTransfer(buf: Uint8Array, offset: number) {
-    const tag = buf[offset];
+  public deserializeTransfer(decoderState: BFChainComproto.decoderState) {
+    const tag = decoderState.buffer[decoderState.offset];
     if (tag === undefined) return;
     // 通过tag获取type,再交由type serialize解析
     const type = this.tagTypeMap.get(tag);
     if (!type) throw `can not resolve tag::${tag}`;
     const handler = this.typeHandlerMap.get(type);
     if (!handler) throw `can not find type handler::${type}`;
-    return handler.deserialize(buf, offset, this);
+    return handler.deserialize(decoderState, this);
   }
 }

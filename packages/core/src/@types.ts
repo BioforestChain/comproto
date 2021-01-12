@@ -1,5 +1,10 @@
 declare namespace BFChainComproto {
 
+  type decoderState = {
+    buffer: Uint8Array,
+    offset: number,
+  };
+
   interface IHanlder {
     handlerName: string;
     serialize?: (...arg: any[]) => unknown;
@@ -43,13 +48,13 @@ declare namespace BFChainComproto {
   interface typeTransferHandler<T = unknown, O = T> {
     typeName: import('./const').dataTypeEnum,
     serialize: (data: T, comproto: import('./Comproto').Comproto) => Uint8Array;
-    deserialize: (buf: Uint8Array, tagOffset: number, comproto: import('./Comproto').Comproto) => O;
+    deserialize: (decoderState: decoderState, comproto: import('./Comproto').Comproto) => O;
   }
   
   type typeHandler = {
     typeName: import('./const').dataTypeEnum,
     serialize: (data: unknown, comproto: import('./Comproto').Comproto) => Uint8Array;
-    deserialize: (buf: Uint8Array, tagOffset: number, comproto: import('./Comproto').Comproto) => unknown;
+    deserialize: (decoderState: decoderState, comproto: import('./Comproto').Comproto) => unknown;
   }
 
   interface CarryStorageRegister {

@@ -22,7 +22,7 @@
       serialize(data: Set<unknown>, comproto: Comproto) {
           return new Uint8Array();
       }
-      deserialize(buf: Uint8Array) {
+      deserialize(decoderState: BFChainComproto.decoderState) {
           return new Set();
       }
   }
