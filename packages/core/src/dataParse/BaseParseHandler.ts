@@ -1,6 +1,6 @@
 
 import { BBuffer } from '@bfchain/util-buffer';
-// ArrayBuffer.isView(new Buffer())
+
 export default class BaseParseHandler {
     readUint8(decoderState: BFChainComproto.decoderState) {
         return decoderState.buffer[decoderState.offset ++];

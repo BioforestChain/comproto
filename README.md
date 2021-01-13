@@ -144,4 +144,3 @@ $ yarn add @bfchain/comproto
 ### `comproto.deleteHandlerMarker(handlerObj: unknown): void`
 
 删除对象上的 handler 标记
-

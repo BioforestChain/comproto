@@ -19,6 +19,7 @@ import { BBuffer } from '@bfchain/util-buffer';
  * uint 8 -- 0xcc
  * uint 16 -- 0xcd
  * uint 32 -- 0xce
+ * uint 64 -- 0xcf
  */
 export default class NumberParseHandler
     extends BaseParseHandler

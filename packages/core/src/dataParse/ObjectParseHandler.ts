@@ -29,7 +29,7 @@ implements BFChainComproto.typeTransferHandler<Object> {
         const dataBuf: number[] = [];
         dataMap.forEach((key) => {
             const keyBuf = comproto.serializeTransferType(key);
-            const valBuf = comproto.serializeTransferType(oData[key]);
+            const valBuf = comproto.serializeTransfer(oData[key]);
             dataBuf.push(...keyBuf, ...valBuf);
         });
         return new Uint8Array([...headU8a, ...dataBuf]);

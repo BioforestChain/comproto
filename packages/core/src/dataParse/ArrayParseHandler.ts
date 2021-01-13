@@ -3,6 +3,7 @@ import { dataTypeEnum } from '../const';
 import type { Comproto } from '../Comproto';
 import BaseParseHandler from './BaseParseHandler';
 /**
+ * fixarray -- 0x90 - 0x9f
  * array 16 -- 0xdc
  * array 32 -- 0xdd
  */
@@ -26,7 +27,7 @@ implements BFChainComproto.typeTransferHandler<unknown[]> {
         const headU8a = this.len2Buf(dataLen);
         let dataBuf: number[] = [];
         dataArray.forEach((value) => {
-            dataBuf = dataBuf.concat(...comproto.serializeTransferType(value));
+            dataBuf = dataBuf.concat(...comproto.serializeTransfer(value));
         });
         return new Uint8Array([...headU8a, ...dataBuf]);
     }
