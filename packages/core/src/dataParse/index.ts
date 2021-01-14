@@ -60,4 +60,46 @@ export const initDataParse = (comproto: Comproto) => {
             return RegExp.apply(null, value);
         }
     });
+    comproto.addClassHandler<typeof Date, number>({
+        handlerObj: Date,
+        handlerName: '0x04',
+        serialize(data) {
+            return data.getTime();
+        },
+        deserialize(value) {
+            return new Date(value);
+        }
+    });
+    type errorHandlerObject = {
+        name: string,
+        message: string,
+        stack: string | undefined,
+    };
+    const addErrorHandler = <T extends ErrorConstructor>(ErrorClass: T, tag: string) => {
+        comproto.addClassHandler({
+            handlerObj: ErrorClass,
+            handlerName: tag,
+            serialize(err) {
+                return {
+                    name: err.name,
+                    message: err.message,
+                    stack: err.stack,
+                };
+            },
+            deserialize(errorObject: errorHandlerObject) {
+                const err = new ErrorClass();
+                err.name = errorObject.name;
+                err.message = errorObject.message;
+                err.stack = errorObject.stack;
+                return err;
+            },
+        });
+    };
+    addErrorHandler(Error, '0x05');
+    addErrorHandler(EvalError, '0x06');
+    addErrorHandler(RangeError, '0x07');
+    addErrorHandler(ReferenceError, '0x08');
+    addErrorHandler(SyntaxError, '0x09');
+    addErrorHandler(TypeError, '0xa0');
+    addErrorHandler(URIError, '0xa0');
 };
