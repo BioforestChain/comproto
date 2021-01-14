@@ -10,7 +10,8 @@ export default class UndefinedParseHandler implements BFChainComproto.typeTransf
     serialize() {
         return new Uint8Array([SerializationTag.kUndefined]);
     }
-    deserialize() {
+    deserialize(decoderState: BFChainComproto.decoderState) {
+        decoderState.offset ++;
         return undefined;
     }
 }

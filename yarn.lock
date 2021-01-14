@@ -95,6 +95,18 @@
     yaml "^1.10.0"
     yargs "^15.4.1"
 
+"@bfchain/util-buffer@^4.10.16":
+  version "4.10.16"
+  resolved "http://192.168.250.245:4873/@bfchain%2futil-buffer/-/util-buffer-4.10.16.tgz#e6f32cff105db0aa54d1fdf38c2f9d3f986e1a30"
+  integrity sha512-1s9a5+D2o6+k8XPT8wDcpaYspYiGZ1Hz6iLloZ+b/AWAxj/2TkeFeFiIqhIoAkW4MipMx74KlN0fNxNXDWinxg==
+  dependencies:
+    "@bfchain/util-typings" "4.10.16"
+
+"@bfchain/util-typings@4.10.16":
+  version "4.10.16"
+  resolved "http://192.168.250.245:4873/@bfchain%2futil-typings/-/util-typings-4.10.16.tgz#034a3fd88d776a3d72a5d87df7466990351aa5c9"
+  integrity sha512-Kb8Vlm5aFUOphBJY3B9xLEwOOPrvx2wDUB7twFh1HbZ3tn5rG8sDoK7d3TQYlnKZgUbcGa5xrNj1dE+kJjok5Q==
+
 "@concordance/react@^2.0.0":
   version "2.0.0"
   resolved "http://192.168.250.245:4873/@concordance%2freact/-/react-2.0.0.tgz#aef913f27474c53731f4fd79cc2f54897de90fde"

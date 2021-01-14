@@ -208,14 +208,11 @@ export class Comproto {
     if (!handler) {
       return { isSerialize: false };
     }
-    if (typeof handler.serialize === 'function') {
-      const typeHandler = this.typeHandlerMap.get(dataTypeEnum.Ext);
-      if (!typeHandler) {
-        throw 'ext handler not exitst'
-      }
-      return { isSerialize: true, data: typeHandler.serialize(value, this) };
+    const typeHandler = this.typeHandlerMap.get(dataTypeEnum.Ext);
+    if (!typeHandler) {
+      throw 'ext handler not exitst'
     }
-    return { isSerialize: true, data: new Uint8Array() };
+    return { isSerialize: true, data: typeHandler.serialize(value, this) };
   }
   /** 获取自定义handler */
   public getHandlerByhandlerName(handlerName: string) {

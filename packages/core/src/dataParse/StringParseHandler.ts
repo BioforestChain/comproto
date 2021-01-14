@@ -14,7 +14,7 @@ export default class StringParseHandler
     constructor(comproto: Comproto) {
         super();
         comproto.setTypeHandler(this);
-        for(let i = 0xa0; i < 0xbf; i++) {
+        for(let i = 0xa0; i <= 0xbf; i++) {
             comproto.setTagType(i, dataTypeEnum.String);
         }
         comproto.setTagType(0xd9, dataTypeEnum.String);
@@ -86,7 +86,7 @@ export default class StringParseHandler
     }
     getLen(decoderState: BFChainComproto.decoderState) {
         const tag = decoderState.buffer[decoderState.offset ++];
-        if (tag > 0xa0 && tag < 0xbf) {
+        if (tag >= 0xa0 && tag <= 0xbf) {
             return tag - 0xa0;
         }
         switch (tag) {

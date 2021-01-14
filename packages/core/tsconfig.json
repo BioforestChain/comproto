@@ -34,7 +34,6 @@
     "src/dataParse/NullParseHandler.ts",
     "src/dataParse/NumberParseHandler.ts",
     "src/dataParse/ObjectParseHandler.ts",
-    "src/dataParse/SetParseHandler.ts",
     "src/dataParse/StringParseHandler.ts",
     "src/dataParse/UndefinedParseHandler.ts",
     "src/index.ts"
