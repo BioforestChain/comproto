@@ -23,6 +23,7 @@
     "src/Comproto.ts",
     "src/ComprotoFactory.ts",
     "src/const.ts",
+    "src/dataParse/ArrayBufferParseHandler.ts",
     "src/dataParse/ArrayParseHandler.ts",
     "src/dataParse/BaseParseHandler.ts",
     "src/dataParse/BigIntParseHandler.ts",

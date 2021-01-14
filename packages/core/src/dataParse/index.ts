@@ -10,6 +10,7 @@ import NullParseHandler from './NullParseHandler';
 import BooleanParseHandler from './BooleanParseHandler';
 import ExtParseHandler from './ExtParseHandler';
 import BufferViewParseHandler from './BufferViewParseHandler';
+import ArrayBufferParseHandler from './ArrayBufferParseHandler';
 
 
 export const initDataParse = (comproto: Comproto) => {
@@ -100,4 +101,26 @@ export const initDataParse = (comproto: Comproto) => {
     addErrorHandler(SyntaxError, '0x09');
     addErrorHandler(TypeError, '0xa0');
     addErrorHandler(URIError, '0xa1');
+
+    const addBufferViewHandler = <T extends BFChainComproto.AnyClass>(abv: T, tag: string) => {
+        comproto.addClassHandler({
+            handlerObj: abv,
+            handlerName: tag,
+            serialize(buf) {
+                return buf;
+            },
+            deserialize(u8a: Uint8Array) {
+                return new abv([...u8a]);
+            },
+        });
+    };
+    addBufferViewHandler(Uint8Array, '0xa2');
+    addBufferViewHandler(Int8Array, '0xa3');
+    addBufferViewHandler(Int16Array, '0xa4');
+    addBufferViewHandler(Uint16Array, '0xa5');
+    addBufferViewHandler(Int32Array, '0xa6');
+    addBufferViewHandler(Uint32Array, '0xa7');
+    addBufferViewHandler(Float32Array, '0xa8');
+    addBufferViewHandler(Float64Array, '0xa9');
+    addBufferViewHandler(Uint8ClampedArray, '0xb1');
 };
