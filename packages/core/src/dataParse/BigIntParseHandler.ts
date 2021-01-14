@@ -8,7 +8,7 @@ implements BFChainComproto.typeTransferHandler<BigInt> {
     constructor(comproto: Comproto) {
         super();
         comproto.setTypeHandler(this);
-        comproto.setTagType(0xca, dataTypeEnum.BigInt);
+        comproto.setTagType(0xd4, dataTypeEnum.BigInt);
     }
     typeName = dataTypeEnum.BigInt
     serialize(data: BigInt, comproto: Comproto) {
@@ -18,7 +18,7 @@ implements BFChainComproto.typeTransferHandler<BigInt> {
         for(let i = 0; i <= dataStr.length - 1; i++) {
             dataCodeArr.push(dataStr.charCodeAt(i));
         }
-        return new Uint8Array([0xca, ...this.len2buf(len), ...dataCodeArr]);
+        return new Uint8Array([0xd4, ...this.len2buf(len), ...dataCodeArr]);
     }
     deserialize(decoderState: BFChainComproto.decoderState) {
         const tag = decoderState.buffer[decoderState.offset ++];

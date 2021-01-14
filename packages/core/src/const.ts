@@ -10,6 +10,8 @@ export enum dataTypeEnum {
     Null = 'Null',
     Boolean = 'Boolean',
     Ext = 'Ext',
+    BufferView = 'BufferView',
+    ArrayBuffer = 'ArrayBuffer',
 };
 
 export enum SerializationTag {

@@ -180,9 +180,13 @@ export class Comproto {
    * @param value 
    */
   serializeTransferType(value: unknown) {
-    // if (ArrayBuffer.isView(value)) {
-      
-    // }
+    if (ArrayBuffer.isView(value)) {
+      const typeHandler = this.typeHandlerMap.get(dataTypeEnum.BufferView);
+      if (!typeHandler) {
+        throw 'buffer handler not exitst';
+      }
+      return typeHandler.serialize(value, this);
+    }
     const valueType = getDataType(value) as dataTypeEnum;
     const typeHandler = this.typeHandlerMap.get(valueType);
     if (!typeHandler) {

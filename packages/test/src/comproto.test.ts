@@ -20,7 +20,7 @@ import { BBuffer } from '@bfchain/util-buffer';
       return { a : 1 };
     }
   })
-  const trasferData = comproto.serialize(a);
+  const trasferData = comproto.serialize(NaN);
   (globalThis as any).console.log('serialize buf', trasferData);
   const data = comproto.deserialize(trasferData);
   (globalThis as any).console.log('serialize data', data);
