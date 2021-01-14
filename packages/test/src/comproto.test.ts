@@ -3,7 +3,6 @@
 
 import { ComprotoFactroy } from "@bfchain/comproto";
 const comproto = ComprotoFactroy.getComproto();
-import { BBuffer } from '@bfchain/util-buffer';
 
 // test("test number of int", async (t) => {
   // (globalThis as any).console.log(new Uint8Array().buffer instanceof ArrayBuffer);

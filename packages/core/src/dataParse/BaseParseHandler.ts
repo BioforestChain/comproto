@@ -1,5 +1,5 @@
 
-import { BBuffer } from '@bfchain/util-buffer';
+
 
 export default class BaseParseHandler {
     readUint8(decoderState: BFChainComproto.decoderState) {
@@ -35,91 +35,91 @@ export default class BaseParseHandler {
     readUint64(decoderState: BFChainComproto.decoderState) {
         const { buffer, offset } = decoderState;
         decoderState.offset += 8;
-        return BBuffer.prototype.readBigUInt64BE.call(buffer, offset);
+        return DataView.prototype.readBigUInt64BE.call(buffer, offset);
     }
     readInt64(decoderState: BFChainComproto.decoderState) {
         const { buffer, offset } = decoderState;
         decoderState.offset += 8;
-        return BBuffer.prototype.readBigInt64BE.call(buffer, offset);
+        return DataView.prototype.readBigInt64BE.call(buffer, offset);
     }
     readFloat32(decoderState: BFChainComproto.decoderState) {
         const { buffer, offset } = decoderState;
         decoderState.offset += 4;
-        return BBuffer.prototype.readFloatBE.call(buffer, offset);
+        return DataView.prototype.readFloatBE.call(buffer, offset);
     }
     readFloat64(decoderState: BFChainComproto.decoderState) {
         const { buffer, offset } = decoderState;
         decoderState.offset += 8;
-        return BBuffer.prototype.readDoubleBE.call(buffer, offset);
+        return DataView.prototype.readDoubleBE.call(buffer, offset);
     }
     writeUint8(type: number, value: number) {
         const byteLength = 1;
         const u8a = new Uint8Array(byteLength + 1);
         u8a[0] = type;
-        BBuffer.prototype.writeUInt8.call(u8a, value, 1);
+        DataView.prototype.writeUInt8.call(u8a, value, 1);
         return u8a;
     }
     writeUint16(type: number, value: number) {
         const byteLength = 2;
         const u8a = new Uint8Array(1 + byteLength);
         u8a[0] = type;
-        BBuffer.prototype.writeUInt16BE.call(u8a, value, 1);
+        DataView.prototype.writeUInt16BE.call(u8a, value, 1);
         return u8a;
     }
     writeUint32(type: number, value: number) {
         const byteLength = 4;
         const u8a = new Uint8Array(1 + byteLength);
         u8a[0] = type;
-        BBuffer.prototype.writeUInt32BE.call(u8a, value, 1);
+        DataView.prototype.writeUInt32BE.call(u8a, value, 1);
         return u8a;
     }
     writeUint64(type: number, value: bigint) {
         const byteLength = 8;
         const u8a = new Uint8Array(1 + byteLength);
         u8a[0] = type;
-        BBuffer.prototype.writeBigUInt64BE.call(u8a, value, 1);
+        DataView.prototype.writeBigUInt64BE.call(u8a, value, 1);
         return u8a;
     }
     writeInt8(type: number, value: number) {
         const byteLength = 1;
         const u8a = new Uint8Array(byteLength + 1);
         u8a[0] = type;
-        BBuffer.prototype.writeInt8.call(u8a, value, 1);
+        DataView.prototype.writeInt8.call(u8a, value, 1);
         return u8a;
     }
     writeInt16(type: number, value: number) {
         const byteLength = 2;
         const u8a = new Uint8Array(1 + byteLength);
         u8a[0] = type;
-        BBuffer.prototype.writeInt16BE.call(u8a, value, 1);
+        DataView.prototype.writeInt16BE.call(u8a, value, 1);
         return u8a;
     }
     writeInt32(type: number, value: number) {
         const byteLength = 4;
         const u8a = new Uint8Array(1 + byteLength);
         u8a[0] = type;
-        BBuffer.prototype.writeInt32BE.call(u8a, value, 1);
+        DataView.prototype.writeInt32BE.call(u8a, value, 1);
         return u8a;
     }
     writeInt64(type: number, value: bigint) {
         const byteLength = 8;
         const u8a = new Uint8Array(1 + byteLength);
         u8a[0] = type;
-        BBuffer.prototype.writeBigInt64BE.call(u8a, value, 1);
+        DataView.prototype.writeBigInt64BE.call(u8a, value, 1);
         return u8a;
     }
     writeFloat32(type: number, value: number) {
         const byteLength = 4;
         const u8a = new Uint8Array(1 + byteLength);
         u8a[0] = type;
-        BBuffer.prototype.writeFloatBE.call(u8a, value, 1);
+        DataView.prototype.writeFloatBE.call(u8a, value, 1);
         return u8a;
     }
     writeFloat64(type: number, value: number) {
         const byteLength = 8;
         const u8a = new Uint8Array(1 + byteLength);
         u8a[0] = type;
-        BBuffer.prototype.writeDoubleBE.call(u8a, value, 1);
+        DataView.prototype.writeDoubleBE.call(u8a, value, 1);
         return u8a;
     }
 }

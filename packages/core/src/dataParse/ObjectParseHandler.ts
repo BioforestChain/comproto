@@ -1,7 +1,6 @@
 import { dataTypeEnum } from '../const';
 import type { Comproto } from '../Comproto';
 import BaseParseHandler from './BaseParseHandler';
-import { BBuffer } from '@bfchain/util-buffer';
 /**
  * fixmap -- 0x80 - 0x8f
  * map 16 -- 0xde
