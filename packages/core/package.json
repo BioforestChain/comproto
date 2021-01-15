@@ -8,7 +8,6 @@
   ],
   "dependencies": {
     "@bfchain/comproto-helps": "1.2.0",
-    "@bfchain/comproto-json-pack": "1.2.0",
     "@bfchain/comproto-typings": "1.2.0",
     "@bfchain/util-buffer": "^4.10.16"
   },
