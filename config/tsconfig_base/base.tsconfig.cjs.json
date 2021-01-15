@@ -12,7 +12,8 @@
       "es2019",
       "es2020",
       "es2015.iterable",
-      "esnext.asynciterable"
+      "esnext.asynciterable",
+      "DOM"
     ],
     "types": [],
     "declaration": true,

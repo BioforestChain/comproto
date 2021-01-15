@@ -13,6 +13,7 @@
     }
   ],
   "files": [
-    "src/comproto.test.ts"
+    "src/comproto.test.ts",
+    "src/pack.test.ts"
   ]
 }

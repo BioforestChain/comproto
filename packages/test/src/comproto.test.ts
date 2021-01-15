@@ -1,7 +1,13 @@
+
+
 import test from "ava";
 
 import { ComprotoFactroy } from "@bfchain/comproto";
 const comproto = ComprotoFactroy.getComproto();
+
+// console.log(new Set([2]))
+// console.log(comproto.serialize(new Set([2])))
+// console.log(comproto.deserialize(comproto.serialize(new Set([2]))));
 
 class A {
   constructor(a: number) {

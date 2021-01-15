@@ -83,12 +83,12 @@ export default class NumberParseHandler
         if (ivalue >= -0x80) {
             // 0xd0
             return new Uint8Array(this.writeInt8(0xd0, ivalue));
-        } else if (ivalue >= 0x8000) {
+        } else if (ivalue >= -0x8000) {
             // 0xd1
             return new Uint8Array(this.writeInt16(0xd1, ivalue));
         } else {
             // 0xd2
-            return new Uint8Array(this.writeInt32(0xd1, ivalue));
+            return new Uint8Array(this.writeInt32(0xd2, ivalue));
         }
         // return new Uint8Array();
     }

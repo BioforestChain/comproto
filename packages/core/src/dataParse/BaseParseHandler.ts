@@ -2,6 +2,30 @@ import { BBuffer } from '@bfchain/util-buffer';
 
 
 export default class BaseParseHandler {
+    len2Buf(length: number) {
+        if (length < 0xFF) {
+            return this.writeUint8(0x00, length);
+        }
+        if (length <= 0xFFFF) {
+            return this.writeUint16(0x01, length);
+        }
+        return this.writeFloat32(0x02, length);
+    }
+    getLen(decoderState: BFChainComproto.decoderState) {
+        const tag = decoderState.buffer[decoderState.offset ++];
+        switch (tag) {
+            case 0x00:
+                return this.readUint8(decoderState);
+            break;
+            case 0x01:
+                return this.readUint16(decoderState);
+            break;
+            case 0x02:
+                return this.readUint32(decoderState);
+            break;
+        }
+        throw `string handler not tag::${tag}`;
+    }
     readUint8(decoderState: BFChainComproto.decoderState) {
         return decoderState.buffer[decoderState.offset ++];
     }

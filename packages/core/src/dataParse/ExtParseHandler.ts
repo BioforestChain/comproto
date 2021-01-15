@@ -6,7 +6,7 @@ import { str2U8a, u8a2Str } from '@bfchain/comproto-helps';
 /**
  * ext  -- 0xc7
  */
-export default class BooleanParseHandler
+export default class ExtParseHandler
 extends BaseParseHandler
 implements BFChainComproto.typeTransferHandler<unknown> {
     constructor(comproto: Comproto) {
@@ -39,30 +39,6 @@ implements BFChainComproto.typeTransferHandler<unknown> {
             return handler.deserialize(data);
         }
         return data;
-    }
-    len2Buf(length: number) {
-        if (length < 0xFF) {
-            return this.writeUint8(0xc7, length);
-        }
-        if (length <= 0xFFFF) {
-            return this.writeUint16(0xc8, length);
-        }
-        return this.writeFloat32(0xc9, length);
-    }
-    getLen(decoderState: BFChainComproto.decoderState) {
-        const tag = decoderState.buffer[decoderState.offset ++];
-        switch (tag) {
-            case 0xc7:
-                return this.readUint8(decoderState);
-            break;
-            case 0xc8:
-                return this.readUint16(decoderState);
-            break;
-            case 0xc9:
-                return this.readUint32(decoderState);
-            break;
-        }
-        throw `string handler not tag::${tag}`;
     }
     /** 通过字符串占用的数据大小判断存储tag */
     strByteLen2buf(byteLen: number) {

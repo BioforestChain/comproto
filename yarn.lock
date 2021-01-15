@@ -1066,6 +1066,11 @@
   resolved "http://192.168.250.245:4873/@types%2fnode/-/node-14.6.1.tgz#fdf6f6c6c73d3d8eee9c98a9a0485bc524b048d7"
   integrity sha1-/fb2xsc9PY7unJipoEhbxSSwSNc=
 
+"@types/node@^14.14.21":
+  version "14.14.21"
+  resolved "http://192.168.250.245:4873/@types%2fnode/-/node-14.14.21.tgz#d934aacc22424fe9622ebf6857370c052eae464e"
+  integrity sha1-2TSqzCJCT+liLr9oVzcMBS6uRk4=
+
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
   resolved "http://192.168.250.245:4873/@types%2fnormalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"

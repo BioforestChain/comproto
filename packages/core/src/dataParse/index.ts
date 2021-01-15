@@ -25,16 +25,8 @@ export const initDataParse = (comproto: Comproto) => {
     new BooleanParseHandler(comproto);
     new ExtParseHandler(comproto);
     new BufferViewParseHandler(comproto);
-    comproto.addClassHandler<typeof ArrayBuffer, Uint8Array>({
-        handlerObj: ArrayBuffer,
-        handlerName: '0x00',
-        serialize(data) {
-            return new Uint8Array(data);
-        },
-        deserialize(u8a) {
-            return u8a.buffer;
-        }
-    });
+    new ArrayBufferParseHandler(comproto);
+    
     comproto.addClassHandler<typeof Set, unknown[]>({
         handlerObj: Set,
         handlerName: '0x02',
@@ -102,15 +94,18 @@ export const initDataParse = (comproto: Comproto) => {
     addErrorHandler(TypeError, '0xa0');
     addErrorHandler(URIError, '0xa1');
 
-    const addBufferViewHandler = <T extends BFChainComproto.AnyClass>(abv: T, tag: string) => {
+    interface ArrayBufferViewConstructor {
+        new(buffer: ArrayBufferLike, byteOffset?: number, byteLength?: number): ArrayBufferView;
+    }
+    const addBufferViewHandler = <T extends ArrayBufferViewConstructor>(abv: T, tag: string) => {
         comproto.addClassHandler({
             handlerObj: abv,
             handlerName: tag,
             serialize(buf) {
-                return buf;
+                return buf.buffer;
             },
-            deserialize(u8a: Uint8Array) {
-                return new abv([...u8a]);
+            deserialize(bufArr: ArrayBufferLike) {
+                return new abv(bufArr);
             },
         });
     };

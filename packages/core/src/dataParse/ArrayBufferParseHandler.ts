@@ -10,11 +10,11 @@ implements BFChainComproto.typeTransferHandler<ArrayBuffer> {
     constructor(comproto: Comproto) {
         super();
         comproto.setTypeHandler(this);
-        comproto.setTagType(0xd5, dataTypeEnum.BufferView);
-        comproto.setTagType(0xd6, dataTypeEnum.BufferView);
-        comproto.setTagType(0xd7, dataTypeEnum.BufferView);
+        comproto.setTagType(0xd5, dataTypeEnum.ArrayBuffer);
+        comproto.setTagType(0xd6, dataTypeEnum.ArrayBuffer);
+        comproto.setTagType(0xd7, dataTypeEnum.ArrayBuffer);
     }
-    typeName = dataTypeEnum.BufferView;
+    typeName = dataTypeEnum.ArrayBuffer;
     serialize(data: ArrayBuffer) {
         const byteLen = data.byteLength;
         const headBuf = this.len2Buf(byteLen);
@@ -22,8 +22,8 @@ implements BFChainComproto.typeTransferHandler<ArrayBuffer> {
     }
     deserialize(decoderState: BFChainComproto.decoderState) {
         const len = this.getLength(decoderState);
-        decoderState.offset += len;
         const buf = decoderState.buffer.buffer.slice(decoderState.offset, decoderState.offset + len);
+        decoderState.offset += len;
         return buf;
     }
     len2Buf(len: number) {
