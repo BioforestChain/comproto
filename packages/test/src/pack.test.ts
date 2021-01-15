@@ -2,7 +2,6 @@ import test from "ava";
 
 import { ComprotoFactroy } from "@bfchain/comproto";
 const comproto = ComprotoFactroy.getComproto();
-import { BBuffer } from '@bfchain/util-buffer';
 
 
 test("test number of int", async (t) => {
