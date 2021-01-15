@@ -279,10 +279,10 @@ test("test deep serialize", async (t) => {
     handlerName: 'b',
     handlerObj: B,
     serialize(b: B) {
-      return new A(1);
+      return new A(2);
     },
     deserialize(a: A) {
-      return 2;
+      return a.a;
     },
   })
   t.deepEqual(transfer(new B()), 2);
