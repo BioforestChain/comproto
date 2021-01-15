@@ -23,7 +23,7 @@ implements BFChainComproto.typeTransferHandler<unknown> {
         if (handler.serialize) {
             serializeData = handler.serialize(data);
         }
-        const dataBuf = comproto.serializeTransferType(serializeData);
+        const dataBuf = comproto.serializeTransfer(serializeData);
         const handlerNameBuf = this.len2Buf(handlerNameU8a.byteLength);
         return new Uint8Array([0xc7, ...dataBuf, ...handlerNameBuf,...handlerNameU8a,]);
     }

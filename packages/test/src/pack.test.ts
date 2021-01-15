@@ -37,6 +37,61 @@ test("test number of float", async (t) => {
     });
 });
 
+test("test serialize date", async (t) => {
+  const date = new Date();
+  t.deepEqual(transfer(date), date);
+});
+
+test("test deep object with class instance handler", async (t) => {
+  const data = {
+    a: 1,
+    b: "test string",
+    d: [1, 2, 1, { a: 1, b: 1 }],
+    e: {
+      a: 1,
+      d: { ff: 0 },
+    },
+    c: 1,
+    g: null,
+    h: NaN,
+    i: 0.1,
+    f: undefined,
+  };
+  t.deepEqual(data, transfer(data));
+});
+
+// Symbol
+test("test serialize symbol", async (t) => {
+  const symbol = Symbol("test");
+  t.is(transfer(symbol), undefined);
+
+  const data = { [symbol]: 1 };
+  t.deepEqual(transfer(data), {});
+
+  const data2 = { a: symbol };
+  t.deepEqual(transfer(data2), { a: undefined });
+
+  const data3 = [symbol];
+  t.deepEqual(transfer(data3), [undefined]);
+});
+
+// Error
+test("test serialize Error", async (t) => {
+  const error = new Error("test error");
+  const transferError = transfer(error) as Error;
+  t.is(transferError.message, error.message);
+  t.is(transferError.name, error.name);
+  t.is(transferError.stack, error.stack);
+  t.deepEqual(error, transferError);
+});
+
+// RegExp
+test("test serialize RegExp", async (t) => {
+  const reg = /abc/;
+  const regCompare = /abc/;
+  t.deepEqual(transfer(reg), regCompare);
+});
+
 test("test number of other", async (t) => {
     const testNumArr = [
         Infinity, - Infinity,
@@ -46,6 +101,23 @@ test("test number of other", async (t) => {
         const trasferData = transfer(item);
         t.is(trasferData, item);
     });
+});
+
+test("test serialize proxy", async (t) => {
+  const proxy = new Proxy(
+    { a: 1 },
+    {
+      get(target: unknown, key: string) {
+        return 2;
+      },
+    },
+  );
+  const transferProxyBuf = comproto.serialize(proxy);
+  t.deepEqual(comproto.deserialize(transferProxyBuf), { a: 2 });
+
+  const proxy2 = new Proxy({ a: 1 }, {});
+  const transferProxyBuf2 = comproto.serialize(proxy2);
+  t.deepEqual(comproto.deserialize(transferProxyBuf2), { a: 1 });
 });
 
 test("test string", async (t) => {
@@ -92,32 +164,6 @@ test("test array", async (t) => {
 test("test object", async (t) => {
     t.deepEqual(transfer({}), {});
     t.deepEqual(transfer({ a: 2, b: [34], c: { d: '' } }), { a: 2, b: [34], c: { d: '' } });
-    // long length
-    // const obj: any = {};
-    // for(let i = 0; i < 16; i++) {
-    //     obj[i] = i;
-    // }
-    // t.deepEqual(transfer(obj), obj);
-    // const obj2: any = {};
-    // for(let i = 0; i < 0xff; i++) {
-    //     obj2[i] = i;
-    // }
-    // t.deepEqual(transfer(obj2), obj2);
-    // const obj3: any = {};
-    // for(let i = 0; i < 0xffff - 1; i++) {
-    //     obj3[i] = i;
-    // }
-    // t.deepEqual(transfer(obj3), obj3);
-    // const obj4: any = {};
-    // for(let i = 0; i < 0xffff; i++) {
-    //     obj4[i] = i;
-    // }
-    // t.deepEqual(transfer(obj4), obj4);
-    // const obj5: any = {};
-    // for(let i = 0; i < 0xffff + 1; i++) {
-    //     obj5[i] = i;
-    // }
-    // t.deepEqual(transfer(obj5), obj5);
 });
 
 test("test map", async (t) => {

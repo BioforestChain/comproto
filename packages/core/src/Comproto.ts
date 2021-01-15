@@ -203,7 +203,7 @@ export class Comproto {
    * @returns isSerialize 是否可以被自定义解析
    * @returns data 被解析完之后的数据
    */
-  private serializeTransferProto(value: unknown): serializeTransferResult {
+  public serializeTransferProto(value: unknown): serializeTransferResult {
     const handler = this.getHandler(value);
     if (!handler) {
       return { isSerialize: false };
