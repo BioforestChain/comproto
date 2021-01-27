@@ -2,8 +2,8 @@
 
 import test from "ava";
 
-import { ComprotoFactroy } from "@bfchain/comproto";
-const comproto = ComprotoFactroy.getComproto();
+import { ComprotoFactory } from "@bfchain/comproto";
+const comproto = ComprotoFactory.getComproto();
 
 // console.log(new Set([2]))
 // console.log(comproto.serialize(new Set([2])))
