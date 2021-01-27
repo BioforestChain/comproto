@@ -6,8 +6,8 @@
 
 ```js
 // example class handler
-import { ComprotoFactroy } from '@bfchain/comproto';
-const comproto = ComprotoFactroy.getSingleton();
+import { ComprotoFactory } from '@bfchain/comproto';
+const comproto = ComprotoFactory.getSingleton();
 class B {
     public c: number = 0;
     constructor(c: number) {
@@ -42,8 +42,8 @@ comproto.deserialize(buffer); // { a: 1, b: B { b: 6 } }
 ```
 
 ```js
-import { ComprotoFactroy } from '@bfchain/comproto';
-const comproto = ComprotoFactroy.getSingleton();
+import { ComprotoFactory } from '@bfchain/comproto';
+const comproto = ComprotoFactory.getSingleton();
 class B {
     public c: number = 0;
     constructor(c: number) {
@@ -63,8 +63,8 @@ comproto.deserialize(buffer); // { a: 1, b: [class B] }
 ```
 
 ```js
-import { ComprotoFactroy } from '@bfchain/comproto';
-const comproto = ComprotoFactroy.getSingleton();
+import { ComprotoFactory } from '@bfchain/comproto';
+const comproto = ComprotoFactory.getSingleton();
 class B {
     public c: number = 0;
     constructor(c: number) {
@@ -93,11 +93,11 @@ $ yarn add @bfchain/comproto
 
 ## API
 
-### `ComprotoFactroy.getSingleton(): Comproto`
+### `ComprotoFactory.getSingleton(): Comproto`
 
 > 返回 Comproto 单例，全局公用一个
 
-### `ComprotoFactroy.getComproto(): Comproto`
+### `ComprotoFactory.getComproto(): Comproto`
 
 > 返回 Comproto 的一个普通实例
 

@@ -17,7 +17,7 @@ implements BFChainComproto.typeTransferHandler<unknown> {
     typeName = dataTypeEnum.Ext;
     serialize(data: unknown, comproto: Comproto) {
         const handler = comproto.getHandler(data);
-        if (!handler) throw `handler not exist`;
+        if (!handler) throw new ReferenceError(`handler not exist`);
         const handlerNameU8a = str2U8a(handler.handlerName);
         let serializeData = undefined;
         if (handler.serialize) {

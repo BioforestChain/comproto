@@ -152,7 +152,7 @@ export class Comproto {
     const handlerName = handler.handlerName;
     const mHandler = this.handlerMap.get(handlerName);
     if (mHandler) {
-      throw new Error("add a exist handler, please delete it before add");
+      throw new ReferenceError("add a exist handler, please delete it before add");
     }
   }
   /** 
@@ -180,22 +180,26 @@ export class Comproto {
    * @param value 
    */
   serializeTransferType(value: unknown) {
-    if (ArrayBuffer.isView(value)) {
-      const typeHandler = this.typeHandlerMap.get(dataTypeEnum.BufferView);
-      if (!typeHandler) {
-        throw 'buffer handler not exitst';
-      }
-      return typeHandler.serialize(value, this);
-    }
-    const valueType = getDataType(value) as dataTypeEnum;
-    const typeHandler = this.typeHandlerMap.get(valueType);
-    if (!typeHandler) {
-      return new Uint8Array();
-    }
-    if (typeHandler.typeName === valueType) {
+    const typeHandler = this.getTransferTypeHandler(value);
+    if (typeHandler) {
       return typeHandler.serialize(value, this);
     }
     return new Uint8Array();
+  }
+  getTransferTypeHandler(value: unknown) {
+    const valueType = getDataType(value) as dataTypeEnum;
+    const typeHandler = this.typeHandlerMap.get(valueType);
+    if (typeHandler) {
+      return typeHandler; 
+    }
+    if (ArrayBuffer.isView(value)) {
+      return this.typeHandlerMap.get(dataTypeEnum.BufferView);
+    }
+    return undefined;
+  }
+  /** 判断是否可以序列化类型 */
+  canTransferType(value: unknown) {
+    return !!this.getTransferTypeHandler(value);
   }
   /**
    * 尝试自定义编译
@@ -210,7 +214,7 @@ export class Comproto {
     }
     const typeHandler = this.typeHandlerMap.get(dataTypeEnum.Ext);
     if (!typeHandler) {
-      throw 'ext handler not exitst'
+      throw new ReferenceError('ext handler not exitst');
     }
     return { isSerialize: true, data: typeHandler.serialize(value, this) };
   }

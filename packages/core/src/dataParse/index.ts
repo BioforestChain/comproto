@@ -118,4 +118,6 @@ export const initDataParse = (comproto: Comproto) => {
     addBufferViewHandler(Float32Array, '0xa8');
     addBufferViewHandler(Float64Array, '0xa9');
     addBufferViewHandler(Uint8ClampedArray, '0xb1');
+    addBufferViewHandler(BigInt64Array, '0xb2');
+    addBufferViewHandler(BigUint64Array, '0xb3');
 };

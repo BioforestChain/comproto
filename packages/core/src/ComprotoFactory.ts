@@ -1,7 +1,7 @@
 import { Comproto } from "./Comproto";
 import { initDataParse } from './dataParse/index';
 
-export class ComprotoFactroy {
+export class ComprotoFactory {
   public static getComproto(): Comproto {
     const comproto = new Comproto();
     initDataParse(comproto);
