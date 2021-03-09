@@ -22,7 +22,7 @@ implements BFChainComproto.typeTransferHandler<ArrayBuffer> {
     }
     deserialize(decoderState: BFChainComproto.decoderState) {
         const len = this.getLength(decoderState);
-        const buf = decoderState.buffer.buffer.slice(decoderState.offset, decoderState.offset + len);
+        const buf = new Uint8Array(decoderState.buffer).buffer.slice(decoderState.offset, decoderState.offset + len);
         decoderState.offset += len;
         return buf;
     }
