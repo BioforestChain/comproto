@@ -102,7 +102,7 @@ export const initDataParse = (comproto: Comproto) => {
             handlerObj: abv,
             handlerName: tag,
             serialize(buf) {
-                return buf.buffer;
+                return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
             },
             deserialize(bufArr: ArrayBufferLike) {
                 return new abv(bufArr);

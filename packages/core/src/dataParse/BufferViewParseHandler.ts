@@ -18,7 +18,7 @@ implements BFChainComproto.typeTransferHandler<ArrayBufferView> {
     serialize(data: ArrayBufferView) {
         const byteLen = data.byteLength;
         const headBuf = this.len2Buf(byteLen);
-        return new Uint8Array([...headBuf, ...new Uint8Array(data.buffer)]);
+        return new Uint8Array([...headBuf, ...new Uint8Array(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength))]);
     }
     deserialize(decoderState: BFChainComproto.decoderState) {
         const len = this.getLength(decoderState);

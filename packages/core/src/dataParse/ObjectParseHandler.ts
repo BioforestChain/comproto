@@ -68,7 +68,7 @@ implements BFChainComproto.typeTransferHandler<Object> {
             return this.writeUint16(0xde, len);
         } else {
             // 0xdf
-            return this.writeUint32(0xde, len);
+            return this.writeUint32(0xdf, len);
         }
     }
 }

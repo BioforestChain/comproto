@@ -196,6 +196,13 @@ test("test array buffer", async (t) => {
     t.deepEqual(new Uint32Array(0xffff + 1), new Uint32Array(0xffff + 1));
 });
 
+test("test slice array buffer", async (t) => {
+  const a = new Uint8Array([1, 2, 3, 4, 5]);
+  const b = a.slice(2, 3);
+  console.log('b', b)
+  t.deepEqual(transfer(b), a.slice(2, 3));
+});
+
 function transfer(data: unknown) {
   return comproto.deserialize(comproto.serialize(data));
 }
