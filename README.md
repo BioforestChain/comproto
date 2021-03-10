@@ -144,3 +144,14 @@ $ yarn add @bfchain/comproto
 ### `comproto.deleteHandlerMarker(handlerObj: unknown): void`
 
 删除对象上的 handler 标记
+
+
+
+
+
+*ps:这里comproto在发布版本的时候会有一个奇怪的bug，所以推荐的发布步骤为*
+
+```bash
+lerna publish --skip-git
+等发布成功在手动 commit
+```
