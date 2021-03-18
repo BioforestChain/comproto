@@ -93,30 +93,30 @@ export const initDataParse = (comproto: Comproto) => {
   addErrorHandler(TypeError, "0xa0");
   addErrorHandler(URIError, "0xa1");
 
-  interface ArrayBufferViewConstructor {
-    new (buffer: ArrayBufferLike, byteOffset?: number, byteLength?: number): ArrayBufferView;
-  }
-  const addBufferViewHandler = <T extends ArrayBufferViewConstructor>(abv: T, tag: string) => {
-    comproto.addClassHandler({
-      handlerObj: abv,
-      handlerName: tag,
-      serialize(buf) {
-        return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
-      },
-      deserialize(bufArr: ArrayBufferLike) {
-        return new abv(bufArr);
-      },
-    });
-  };
-  addBufferViewHandler(Uint8Array, "0xa2");
-  addBufferViewHandler(Int8Array, "0xa3");
-  addBufferViewHandler(Int16Array, "0xa4");
-  addBufferViewHandler(Uint16Array, "0xa5");
-  addBufferViewHandler(Int32Array, "0xa6");
-  addBufferViewHandler(Uint32Array, "0xa7");
-  addBufferViewHandler(Float32Array, "0xa8");
-  addBufferViewHandler(Float64Array, "0xa9");
-  addBufferViewHandler(Uint8ClampedArray, "0xb1");
-  addBufferViewHandler(BigInt64Array, "0xb2");
-  addBufferViewHandler(BigUint64Array, "0xb3");
+  // interface ArrayBufferViewConstructor {
+  //   new (buffer: ArrayBufferLike, byteOffset?: number, byteLength?: number): ArrayBufferView;
+  // }
+  // const addBufferViewHandler = <T extends ArrayBufferViewConstructor>(abv: T, tag: string) => {
+  //   comproto.addClassHandler({
+  //     handlerObj: abv,
+  //     handlerName: tag,
+  //     serialize(buf) {
+  //       return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength);
+  //     },
+  //     deserialize(bufArr: ArrayBufferLike) {
+  //       return new abv(bufArr);
+  //     },
+  //   });
+  // };
+  // addBufferViewHandler(Uint8Array, "0xa2");
+  // addBufferViewHandler(Int8Array, "0xa3");
+  // addBufferViewHandler(Int16Array, "0xa4");
+  // addBufferViewHandler(Uint16Array, "0xa5");
+  // addBufferViewHandler(Int32Array, "0xa6");
+  // addBufferViewHandler(Uint32Array, "0xa7");
+  // addBufferViewHandler(Float32Array, "0xa8");
+  // addBufferViewHandler(Float64Array, "0xa9");
+  // addBufferViewHandler(Uint8ClampedArray, "0xb1");
+  // addBufferViewHandler(BigInt64Array, "0xb2");
+  // addBufferViewHandler(BigUint64Array, "0xb3");
 };
