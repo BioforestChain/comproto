@@ -31,7 +31,9 @@ export default class ExtParseHandler
     decoderState.offset++;
     const data = comproto.deserializeTransfer(decoderState);
     const handlerNameLen = this.getLen(decoderState);
-    const handlerName = u8a2Str(decoderState.buffer, decoderState.offset, handlerNameLen);
+    const handlerName = u8a2Str(
+      new Uint8Array(decoderState.buffer, decoderState.offset, handlerNameLen),
+    );
     decoderState.offset += handlerNameLen;
     const handler = comproto.getHandlerByhandlerName(handlerName);
     if (handler && handler.deserialize) {
