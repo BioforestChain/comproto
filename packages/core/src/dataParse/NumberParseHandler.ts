@@ -68,27 +68,27 @@ export default class NumberParseHandler
       // uint 32 -- 0xce
       if (ivalue <= 0xff) {
         // 0xcc
-        return new Uint8Array(this.writeUint8(0xcc, ivalue));
+        return this.writeUint8(0xcc, ivalue);
       }
       if (ivalue <= 0xffff) {
         // 0xcd
-        return new Uint8Array(this.writeUint16(0xcd, ivalue));
+        return this.writeUint16(0xcd, ivalue);
       }
       // 0xce
-      return new Uint8Array(this.writeUint32(0xce, ivalue));
+      return this.writeUint32(0xce, ivalue);
     }
     // int 8 -- 0xd0
     // int 16 -- 0xd1
     // int 32 -- 0xd2
     if (ivalue >= -0x80) {
       // 0xd0
-      return new Uint8Array(this.writeInt8(0xd0, ivalue));
+      return this.writeInt8(0xd0, ivalue);
     } else if (ivalue >= -0x8000) {
       // 0xd1
-      return new Uint8Array(this.writeInt16(0xd1, ivalue));
+      return this.writeInt16(0xd1, ivalue);
     } else {
       // 0xd2
-      return new Uint8Array(this.writeInt32(0xd2, ivalue));
+      return this.writeInt32(0xd2, ivalue);
     }
     // return new Uint8Array();
   }
