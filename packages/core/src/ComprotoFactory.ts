@@ -1,5 +1,5 @@
 import { Comproto } from "./Comproto";
-import { initDataParse } from './dataParse/index';
+import { initDataParse } from "./dataParse/index";
 
 export class ComprotoFactory {
   public static getComproto(): Comproto {

@@ -2,7 +2,7 @@ import { getDataType } from "@bfchain/comproto-helps";
 import { HANDLER_SYMBOL } from "@bfchain/comproto-typings";
 import { dataTypeEnum } from "./const";
 
-type serializeTransferResult = { isSerialize: false } | { isSerialize: true, data: Uint8Array };
+type serializeTransferResult = { isSerialize: false } | { isSerialize: true; data: Uint8Array };
 
 export class Comproto {
   protected handlerMap: Map<string, BFChainComproto.IHanlder> = new Map();
@@ -30,7 +30,7 @@ export class Comproto {
   }
   /**
    * 获取handler
-   * @param obj 
+   * @param obj
    */
   public getHandler(obj: unknown) {
     let returnHandler: BFChainComproto.Handler | undefined = undefined;
@@ -59,17 +59,17 @@ export class Comproto {
   /**
    * @name 添加自定义handler
    * @description 主要针对开发者有设置标签的对象 setHandlerMarker
-   * @param handler 
+   * @param handler
    */
-  public addCustomHandler<
-    I = unknown, O = unknown, D = I
-  >(handler: BFChainComproto.TransferCustomHandler<I, O, D>) {
+  public addCustomHandler<I = unknown, O = unknown, D = I>(
+    handler: BFChainComproto.TransferCustomHandler<I, O, D>,
+  ) {
     this.canAddHandler(handler);
     this.handlerMap.set(handler.handlerName, handler);
   }
   /**
    * @name 删除自定义handler
-   * @param handlerName 
+   * @param handlerName
    */
   public deleteCustomHandler(handlerName: string) {
     this.handlerMap.delete(handlerName);
@@ -78,13 +78,13 @@ export class Comproto {
    * @name 添加类handler
    * @description 在原型链的prototype属性添加解析标签
    *  这样基于这个类创建出来的实例会被处理
-   * @param handler 
+   * @param handler
    */
   public addClassHandler<
     H extends BFChainComproto.HandlerClass,
     O,
     D = BFChainComproto.GetTransferClassInstance<H>
-  > (handler: BFChainComproto.TransferClassHandler<H, O, D>) {
+  >(handler: BFChainComproto.TransferClassHandler<H, O, D>) {
     this.canAddHandler(handler);
     const handlerName = handler.handlerName;
     this.setHandlerMarker(handler.handlerObj.prototype, handler.handlerName);
@@ -92,7 +92,7 @@ export class Comproto {
   }
   /**
    * @name 删除类handler
-   * @param handlerName 
+   * @param handlerName
    */
   public deleteClassHandler(handlerName: string) {
     const handler = this.handlerMap.get(handlerName) as BFChainComproto.TransferClassHandler;
@@ -100,25 +100,25 @@ export class Comproto {
       return;
     }
     this.handlerMap.delete(handlerName);
-    if ('handlerObj' in handler) {
+    if ("handlerObj" in handler) {
       this.deleteHandlerMarker(handler.handlerObj);
     }
   }
   /**
    * @name 添加handler
    * @description 在 canHandler 方法判断是否可以解析对象
-   * @param handler 
+   * @param handler
    */
-  public addHandler<
-    I = unknown, O = unknown, D = I
-  >(handler: BFChainComproto.TransferHandler<I, O, D>) {
+  public addHandler<I = unknown, O = unknown, D = I>(
+    handler: BFChainComproto.TransferHandler<I, O, D>,
+  ) {
     this.canAddHandler(handler);
     this.handlerListMap.set(handler.handlerName, handler);
     this.handlerMap.set(handler.handlerName, handler);
   }
   /**
    * @name 删除handler
-   * @param handler 
+   * @param handler
    */
   public deleteHandler(handlerName: string) {
     this.handlerListMap.delete(handlerName);
@@ -126,7 +126,7 @@ export class Comproto {
   }
   /**
    * @name 删除解析标签
-   * @param handlerObj 
+   * @param handlerObj
    */
   public deleteHandlerMarker(handlerObj: BFChainComproto.HandlerObject) {
     if (HANDLER_SYMBOL in handlerObj) {
@@ -155,7 +155,7 @@ export class Comproto {
       throw new ReferenceError("add a exist handler, please delete it before add");
     }
   }
-  /** 
+  /**
    * @name 解析外部对象
    * @description 内部可以循环调用解析
    */
@@ -168,7 +168,7 @@ export class Comproto {
   }
   /**
    * 设置类型handler
-   * @param handler 
+   * @param handler
    */
   setTypeHandler<T, O = T>(handler: BFChainComproto.typeTransferHandler<T, O>) {
     if (this.typeHandlerMap.has(handler.typeName)) throw `typeName:${handler.typeName} is exsist`;
@@ -177,7 +177,7 @@ export class Comproto {
   /**
    * @name 通过判断对象类型进行解析
    * @description 主要处理一些js类型对象，转换成u8a(开发者尽量不管这层)
-   * @param value 
+   * @param value
    */
   serializeTransferType(value: unknown) {
     const typeHandler = this.getTransferTypeHandler(value);
@@ -190,7 +190,7 @@ export class Comproto {
     const valueType = getDataType(value) as dataTypeEnum;
     const typeHandler = this.typeHandlerMap.get(valueType);
     if (typeHandler) {
-      return typeHandler; 
+      return typeHandler;
     }
     if (ArrayBuffer.isView(value)) {
       return this.typeHandlerMap.get(dataTypeEnum.BufferView);
@@ -203,7 +203,7 @@ export class Comproto {
   }
   /**
    * 尝试自定义编译
-   * @param value 
+   * @param value
    * @returns isSerialize 是否可以被自定义解析
    * @returns data 被解析完之后的数据
    */
@@ -214,7 +214,7 @@ export class Comproto {
     }
     const typeHandler = this.typeHandlerMap.get(dataTypeEnum.Ext);
     if (!typeHandler) {
-      throw new ReferenceError('ext handler not exitst');
+      throw new ReferenceError("ext handler not exitst");
     }
     return { isSerialize: true, data: typeHandler.serialize(value, this) };
   }

@@ -1,5 +1,3 @@
-
-
 import test from "ava";
 
 import { ComprotoFactory } from "@bfchain/comproto";
@@ -26,7 +24,6 @@ comproto.addClassHandler({
     return new A(a);
   },
 });
-
 
 test("test serialize class instalce of handler", async (t) => {
   class B {
@@ -90,9 +87,7 @@ test("test deserialize class instace with no serialize", async (t) => {
     add() {}
   }
   const b = new C(1);
-  const cHandler: BFChainComproto.TransferClassHandler<
-    typeof C, number | undefined
-  > = {
+  const cHandler: BFChainComproto.TransferClassHandler<typeof C, number | undefined> = {
     handlerName: "CLASS_HANDLER_C",
     handlerObj: C,
     deserialize(b) {
@@ -217,9 +212,7 @@ test("test handler", async (t) => {
     public a = 1;
   }
   const b = new B();
-  const bHandler: BFChainComproto.TransferHandler<
-  B, number
-  > = {
+  const bHandler: BFChainComproto.TransferHandler<B, number> = {
     handlerName: "bHandler",
     canHandle(obj) {
       return obj instanceof B;
@@ -230,7 +223,7 @@ test("test handler", async (t) => {
     deserialize(a: number) {
       return new B();
     },
-  }
+  };
   comproto.addHandler(bHandler);
   t.deepEqual(transfer(b), b);
   comproto.deleteHandler("bHandler");
@@ -241,9 +234,7 @@ test("test set custom handler", async (t) => {
     public a = 1;
   }
   const b = new B();
-  const customHandler: BFChainComproto.TransferCustomHandler<
-  { b: B }, number, string
-  > = {
+  const customHandler: BFChainComproto.TransferCustomHandler<{ b: B }, number, string> = {
     handlerName: "customHandler",
     serialize(obj) {
       return obj.b.a;
@@ -274,9 +265,9 @@ test("test delete custom handler", async (t) => {
 
 // 递归
 test("test deep serialize", async (t) => {
-  class B {};
+  class B {}
   comproto.addClassHandler({
-    handlerName: 'b',
+    handlerName: "b",
     handlerObj: B,
     serialize(b: B) {
       return new A(2);
@@ -284,10 +275,9 @@ test("test deep serialize", async (t) => {
     deserialize(a: A) {
       return a.a;
     },
-  })
+  });
   t.deepEqual(transfer(new B()), 2);
 });
-
 
 function transfer(data: unknown) {
   return comproto.deserialize(comproto.serialize(data));

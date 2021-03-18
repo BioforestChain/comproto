@@ -1,8 +1,7 @@
 declare namespace BFChainComproto {
-
   type decoderState = {
-    buffer: Uint8Array,
-    offset: number,
+    buffer: Uint8Array;
+    offset: number;
   };
 
   interface IHanlder {
@@ -30,7 +29,11 @@ declare namespace BFChainComproto {
   }
   type HandlerTypeObject = undefined | null | BigIntConstructor;
   type HandlerClass = AnyClass;
-  type GetTransferClassInstance<T> = T extends AnyClass ? InstanceType<T> : (T extends BigIntConstructor ? bigint : T);
+  type GetTransferClassInstance<T> = T extends AnyClass
+    ? InstanceType<T>
+    : T extends BigIntConstructor
+    ? bigint
+    : T;
   interface TransferClassHandler<
     H extends HandlerClass = HandlerClass,
     O = GetTransferClassInstance<H>,
@@ -46,16 +49,16 @@ declare namespace BFChainComproto {
   type TransferType = AnyClass | HandlerTypeObject;
 
   interface typeTransferHandler<T = unknown, O = T> {
-    typeName: import('./const').dataTypeEnum,
-    serialize: (data: T, comproto: import('./Comproto').Comproto) => Uint8Array;
-    deserialize: (decoderState: decoderState, comproto: import('./Comproto').Comproto) => O;
+    typeName: import("./const").dataTypeEnum;
+    serialize: (data: T, comproto: import("./Comproto").Comproto) => Uint8Array;
+    deserialize: (decoderState: decoderState, comproto: import("./Comproto").Comproto) => O;
   }
-  
+
   type typeHandler = {
-    typeName: import('./const').dataTypeEnum,
-    serialize: (data: unknown, comproto: import('./Comproto').Comproto) => Uint8Array;
-    deserialize: (decoderState: decoderState, comproto: import('./Comproto').Comproto) => unknown;
-  }
+    typeName: import("./const").dataTypeEnum;
+    serialize: (data: unknown, comproto: import("./Comproto").Comproto) => Uint8Array;
+    deserialize: (decoderState: decoderState, comproto: import("./Comproto").Comproto) => unknown;
+  };
 
   interface CarryStorageRegister {
     carryBitOne: () => void;
