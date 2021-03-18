@@ -1,6 +1,7 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
 import BaseParseHandler from "./BaseParseHandler";
+import { u8aConcat } from "@bfchain/comproto-helps";
 /**
  * fixmap -- 0x80 - 0x8f
  * map 16 -- 0xde
@@ -25,13 +26,16 @@ export default class ObjectParseHandler
     const dataMap = Object.keys(oData);
     const dataKeyLen = dataMap.length;
     const headU8a = this.len2Buf(dataKeyLen);
-    const dataBuf: number[] = [];
+    const dataBuf = [headU8a];
+    let totalSize = headU8a.length;
     dataMap.forEach((key) => {
       const keyBuf = comproto.serializeTransfer(key);
       const valBuf = comproto.serializeTransfer(oData[key]);
-      dataBuf.push(...keyBuf, ...valBuf);
+      dataBuf.push(keyBuf, valBuf);
+      totalSize += keyBuf.length;
+      totalSize += valBuf.length;
     });
-    return new Uint8Array([...headU8a, ...dataBuf]);
+    return u8aConcat(dataBuf, totalSize);
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {
     const keyLength = this.getLength(decoderState);

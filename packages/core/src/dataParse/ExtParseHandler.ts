@@ -1,7 +1,7 @@
 import { dataTypeEnum, SerializationTag } from "../const";
 import type { Comproto } from "../Comproto";
 import BaseParseHandler from "./BaseParseHandler";
-import { str2U8a, u8a2Str } from "@bfchain/comproto-helps";
+import { str2U8a, u8a2Str, u8aConcat } from "@bfchain/comproto-helps";
 /**
  * ext  -- 0xc7
  */
@@ -24,7 +24,7 @@ export default class ExtParseHandler
     }
     const dataBuf = comproto.serializeTransfer(serializeData);
     const handlerNameBuf = this.len2Buf(handlerNameU8a.byteLength);
-    return new Uint8Array([0xc7, ...dataBuf, ...handlerNameBuf, ...handlerNameU8a]);
+    return u8aConcat([[0xc7], dataBuf, handlerNameBuf, handlerNameU8a]);
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {
     // const byteLen = this.getLen(decoderState);
@@ -32,7 +32,7 @@ export default class ExtParseHandler
     const data = comproto.deserializeTransfer(decoderState);
     const handlerNameLen = this.getLen(decoderState);
     const handlerName = u8a2Str(
-      new Uint8Array(decoderState.buffer, decoderState.offset, handlerNameLen),
+      decoderState.buffer.subarray(decoderState.offset, decoderState.offset + handlerNameLen),
     );
     decoderState.offset += handlerNameLen;
     const handler = comproto.getHandlerByhandlerName(handlerName);

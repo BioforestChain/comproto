@@ -1,6 +1,7 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
 import BaseParseHandler from "./BaseParseHandler";
+import { u8aConcat } from "@bfchain/comproto-helps";
 
 export default class BufferViewParseHandler
   extends BaseParseHandler
@@ -16,10 +17,7 @@ export default class BufferViewParseHandler
   serialize(data: ArrayBufferView) {
     const byteLen = data.byteLength;
     const headBuf = this.len2Buf(byteLen);
-    return new Uint8Array([
-      ...headBuf,
-      ...new Uint8Array(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)),
-    ]);
+    return u8aConcat([headBuf, new Uint8Array(data.buffer, data.byteOffset, data.byteLength)]);
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     const len = this.getLength(decoderState);

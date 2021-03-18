@@ -1,7 +1,7 @@
 import { dataTypeEnum, SerializationTag } from "../const";
 import type { Comproto } from "../Comproto";
 import BaseParseHandler from "./BaseParseHandler";
-import { str2U8a, u8a2Str } from "@bfchain/comproto-helps";
+import { str2U8a, u8a2Str, u8aConcat } from "@bfchain/comproto-helps";
 export default class StringParseHandler
   extends BaseParseHandler
   implements BFChainComproto.typeTransferHandler<string> {
@@ -25,7 +25,7 @@ export default class StringParseHandler
   serialize(data: string) {
     const arrayBuf = str2U8a(data);
     const headLenArr = this.strByteLen2buf(arrayBuf.byteLength);
-    return new Uint8Array([...headLenArr, ...arrayBuf]);
+    return u8aConcat([headLenArr, arrayBuf]);
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     let byteLen = this.getLen(decoderState);
