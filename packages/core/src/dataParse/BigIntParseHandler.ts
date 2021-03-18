@@ -1,7 +1,7 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
 import BaseParseHandler from "./BaseParseHandler";
-import { u8aConcat } from "@bfchain/comproto-helps";
+import { u8aConcat, str2U8a } from "@bfchain/comproto-helps";
 export default class BigIntParseHandler
   extends BaseParseHandler
   implements BFChainComproto.typeTransferHandler<BigInt> {
@@ -14,11 +14,7 @@ export default class BigIntParseHandler
   serialize(data: BigInt, comproto: Comproto) {
     const dataStr = String(data);
     const len = dataStr.length;
-    const dataCodeArr: number[] = [];
-    for (let i = 0; i <= dataStr.length - 1; i++) {
-      dataCodeArr.push(dataStr.charCodeAt(i));
-    }
-    return u8aConcat([[0xd4], this.len2Buf(len), dataCodeArr]);
+    return u8aConcat([[0xd4], this.len2Buf(len), str2U8a(dataStr)]);
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     const tag = decoderState.buffer[decoderState.offset++];

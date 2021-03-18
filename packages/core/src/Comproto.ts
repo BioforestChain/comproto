@@ -160,6 +160,11 @@ export class Comproto {
    * @description 内部可以循环调用解析
    */
   serializeTransfer(value: unknown): Uint8Array {
+    const type = typeof value;
+    // 优化性能 对于基础类型直接走系统
+    if (type !== 'object' && type !== 'function' && type !== 'symbol') {
+      return this.serializeTransferType(value);
+    }
     const serializeResult = this.serializeTransferProto(value);
     if (serializeResult.isSerialize) {
       return serializeResult.data;

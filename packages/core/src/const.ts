@@ -1,4 +1,4 @@
-export enum dataTypeEnum {
+export const enum dataTypeEnum {
   Undefined = "Undefined",
   Object = "Object",
   Array = "Array",
