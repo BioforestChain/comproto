@@ -174,7 +174,6 @@ test("test undefined boolean", async (t) => {
 });
 
 test("test bigint", async (t) => {
-  debugger;
   t.is(transfer(BigInt(Number.MAX_VALUE) + 1n), BigInt(Number.MAX_VALUE) + 1n);
   t.is(transfer(BigInt(0)), BigInt(0));
   t.is(transfer(BigInt(-1)), BigInt(-1));
@@ -208,7 +207,6 @@ test("test map", async (t) => {
 
 test("test set", async (t) => {
   t.deepEqual(transfer(new Set([1])), new Set([1]));
-  // t.is(transfer(new Set([])), new Set([]));
 });
 
 test("test array buffer", async (t) => {
@@ -228,7 +226,6 @@ test("test array buffer", async (t) => {
 test("test subarray array buffer", async (t) => {
   const a = new Uint8Array([1, 2, 3, 4, 5]);
   const b = a.subarray(2, 3);
-  debugger
   t.deepEqual(transfer(b), b);
 });
 

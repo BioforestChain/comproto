@@ -2,8 +2,6 @@ import { getDataType, u8aConcat } from "@bfchain/comproto-helps";
 import { HANDLER_SYMBOL } from "@bfchain/comproto-typings";
 import { dataTypeEnum } from "./const";
 
-type serializeTransferResult = { isSerialize: boolean }; //| { isSerialize: true;};
-
 export class Comproto {
   protected handlerMap: Map<string, BFChainComproto.IHanlder> = new Map();
   protected handlerListMap: Map<string, BFChainComproto.ITransferHandler> = new Map();

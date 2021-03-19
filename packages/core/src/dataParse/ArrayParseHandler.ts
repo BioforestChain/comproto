@@ -23,14 +23,9 @@ export default class ArrayParseHandler implements BFChainComproto.typeTransferHa
     const dataLen = dataArray.length;
     const headU8a = this.length2Buf(dataLen);
     resRef.push(headU8a);
-    // const dataBuf = [headU8a];
-    // let totalSize = headU8a.byteLength;
-    dataArray.forEach((value) => {
+    for (const value of dataArray) {
       comproto.serializeTransfer(value, resRef);
-      // dataBuf.push(chunk);
-      // totalSize += chunk.byteLength;
-    });
-    // return u8aConcat(dataBuf, totalSize);
+    }
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {
     const keyLength = this.getLength(decoderState);

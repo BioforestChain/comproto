@@ -1,7 +1,8 @@
+import { str2U8a, u8a2Str, u8aConcat } from "@bfchain/comproto-helps";
+
 const dvu8a = new Uint8Array(8);
 const dv = new DataView(dvu8a.buffer);
-
-const helper = new (class BytesHelper {
+class BytesHelper {
   len2Buf(length: number) {
     if (length < 0xff) {
       return helper.writeUint8(0x00, length);
@@ -205,6 +206,49 @@ const helper = new (class BytesHelper {
     u8a[8] = dvu8a[7];
     return u8a;
   }
-})();
 
+  str2Buf(str: string) {
+    const nameU8a = str2U8a(str);
+    const nameSizeU8a = helper.len2Buf(nameU8a.byteLength);
+    return u8aConcat([nameSizeU8a, nameU8a]);
+  }
+  readStringBuf(decoderState: BFChainComproto.decoderState) {
+    const strLen = helper.getLen(decoderState);
+    return u8a2Str(
+      decoderState.buffer.subarray(decoderState.offset, (decoderState.offset += strLen)),
+    );
+  }
+
+  private _dictBufCache = new Map<string, Uint8Array>();
+  /**字典单词转二进制 */
+  dict2Buf(word: string) {
+    let u8a = this._dictBufCache.get(word);
+    if (u8a === undefined) {
+      const nameU8a = str2U8a(word);
+      const nameSizeU8a = helper.len2Buf(nameU8a.byteLength);
+      u8a = u8aConcat([nameSizeU8a, nameU8a]);
+      this._dictBufCache.set(word, u8a);
+    }
+    return u8a;
+  }
+  private _dictTree = Object.create(null);
+  /**读取单词 */
+  readDict(decoderState: BFChainComproto.decoderState) {
+    const dictLen = helper.getLen(decoderState);
+    const start = decoderState.offset;
+    const end = (decoderState.offset += dictLen);
+    let key = "";
+    for (let offset = start; offset < end; ++offset) {
+      key += decoderState.buffer[offset] + ",";
+    }
+    let cache = this._dictTree[key];
+    if (cache === undefined) {
+      cache = u8a2Str(decoderState.buffer.subarray(start, end));
+      this._dictTree[key] = cache;
+    }
+    return cache;
+  }
+}
+
+const helper = new BytesHelper();
 export default helper;

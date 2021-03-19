@@ -11,28 +11,27 @@ export default class ExtParseHandler implements BFChainComproto.typeTransferHand
     comproto.setTagType(0xc7, dataTypeEnum.Ext);
   }
   typeName = dataTypeEnum.Ext;
+
   serialize(data: unknown, resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const handler = comproto.getHandler(data);
     if (!handler) throw new ReferenceError(`handler not exist`);
-    const handlerNameU8a = str2U8a(handler.handlerName);
-    let serializeData = undefined;
+    let serializeData: unknown = undefined;
     if (handler.serialize) {
       serializeData = handler.serialize(data);
     }
-    resRef.push([0xc7]);
+    // 写入前缀与handleName
+    resRef.push([0xc7], helper.dict2Buf(handler.handlerName));
+    // 写入自定义序列化出纳的值
     comproto.serializeTransfer(serializeData, resRef);
-    const handlerNameBuf = helper.len2Buf(handlerNameU8a.byteLength);
-    resRef.push(handlerNameBuf, handlerNameU8a);
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {
-    // const byteLen = this.getLen(decoderState);
     decoderState.offset++;
+    // 读取handleName
+    const handlerName = helper.readDict(decoderState);
+    // 去读handle对应的值
     const data = comproto.deserializeTransfer(decoderState);
-    const handlerNameLen = helper.getLen(decoderState);
-    const handlerName = u8a2Str(
-      decoderState.buffer.subarray(decoderState.offset, decoderState.offset + handlerNameLen),
-    );
-    decoderState.offset += handlerNameLen;
+
+    /// 开始自定义解析
     const handler = comproto.getHandlerByhandlerName(handlerName);
     if (handler && handler.deserialize) {
       return handler.deserialize(data);
