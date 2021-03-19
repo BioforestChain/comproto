@@ -11,10 +11,10 @@ const enum ARRAY_BUFFRE_TYPE {
   Uint16,
   Int32,
   Uint32,
-  BigInt64,
-  BigUint64,
   Float32,
   Float64,
+  BigInt64,
+  BigUint64,
 }
 
 export default class BufferViewParseHandler

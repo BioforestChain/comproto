@@ -1,17 +1,19 @@
 export const enum dataTypeEnum {
-  Undefined = "Undefined",
+  Null = "null",
+  Undefined = "undefined",
+  BigInt = "bigint",
+  Number = "number",
+  String = "string",
+  Boolean = "boolean",
+
   Object = "Object",
   Array = "Array",
-  BigInt = "BigInt",
-  Number = "Number",
-  String = "String",
   Map = "Map",
   Set = "Set",
-  Null = "Null",
-  Boolean = "Boolean",
-  Ext = "Ext",
   BufferView = "BufferView",
   ArrayBuffer = "ArrayBuffer",
+
+  Ext = "Ext",
 }
 
 export enum SerializationTag {
