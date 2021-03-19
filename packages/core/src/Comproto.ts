@@ -46,12 +46,12 @@ export class Comproto {
       return returnHandler;
     }
     // 再看看有没有可以处理此对象的handler
-    this.handlerListMap.forEach((handler) => {
+    for (const handler of this.handlerListMap.values()) {
       if (handler.canHandle(obj)) {
         returnHandler = handler;
-        return;
+        break;
       }
-    });
+    }
     return returnHandler;
   }
   public canHandle(obj: unknown) {

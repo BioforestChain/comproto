@@ -16,16 +16,10 @@ export default class MapParseHandler
     const dataKeyLen = dataMap.size;
     const headU8a = this.length2Buf(dataKeyLen);
     resRef.push(headU8a);
-    // const dataBuf = [headU8a];
-    // let totalSize = headU8a.length;
-    dataMap.forEach((value, key) => {
-      comproto.serializeTransfer(key, resRef);
-      comproto.serializeTransfer(value, resRef);
-      // dataBuf.push(keyBuf, valBuf);
-      // totalSize += keyBuf.length;
-      // totalSize += valBuf.length;
-    });
-    // return u8aConcat(dataBuf, totalSize);
+    for (const item of dataMap) {
+      comproto.serializeTransfer(item[0], resRef); // key
+      comproto.serializeTransfer(item[1], resRef); // value
+    }
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {
     const keyLength = this.getLength(decoderState);

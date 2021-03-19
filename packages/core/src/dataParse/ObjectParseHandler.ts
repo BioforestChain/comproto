@@ -20,20 +20,14 @@ export default class ObjectParseHandler implements BFChainComproto.typeTransferH
   typeName = dataTypeEnum.Object;
   serialize(data: Object, resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const oData = data as { [key: string]: unknown };
-    const dataMap = Object.keys(oData);
-    const dataKeyLen = dataMap.length;
+    const keys = Object.keys(oData);
+    const dataKeyLen = keys.length;
     const headU8a = this.length2Buf(dataKeyLen);
     resRef.push(headU8a);
-    // const dataBuf = [headU8a];
-    // let totalSize = headU8a.length;
-    dataMap.forEach((key) => {
+    for (const key of keys) {
       comproto.serializeTransfer(key, resRef);
       comproto.serializeTransfer(oData[key], resRef);
-      // dataBuf.push(keyBuf, valBuf);
-      // totalSize += keyBuf.length;
-      // totalSize += valBuf.length;
-    });
-    // return u8aConcat(dataBuf, totalSize);
+    }
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {
     const keyLength = this.getLength(decoderState);
