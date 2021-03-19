@@ -17,13 +17,12 @@ export default class BaseParseHandler {
     switch (tag) {
       case 0x00:
         return this.readUint8(decoderState);
-        break;
+
       case 0x01:
         return this.readUint16(decoderState);
-        break;
+
       case 0x02:
         return this.readUint32(decoderState);
-        break;
     }
     throw `string handler not tag::${tag}`;
   }

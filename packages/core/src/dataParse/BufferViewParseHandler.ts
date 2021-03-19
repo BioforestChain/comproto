@@ -54,17 +54,17 @@ export default class BufferViewParseHandler
       case Uint32Array:
         buffer = ARRAY_BUFFRE_TYPE.Uint32;
         break;
-      case BigInt64Array:
-        buffer = ARRAY_BUFFRE_TYPE.BigInt64;
-        break;
-      case BigUint64Array:
-        buffer = ARRAY_BUFFRE_TYPE.BigUint64;
-        break;
       case Float32Array:
         buffer = ARRAY_BUFFRE_TYPE.Float32;
         break;
       case Float64Array:
         buffer = ARRAY_BUFFRE_TYPE.Float64;
+        break;
+      case BigInt64Array:
+        buffer = ARRAY_BUFFRE_TYPE.BigInt64;
+        break;
+      case BigUint64Array:
+        buffer = ARRAY_BUFFRE_TYPE.BigUint64;
         break;
       default:
         throw new TypeError("unknown arraybufferview " + data.constructor.name);
@@ -105,17 +105,17 @@ export default class BufferViewParseHandler
       case ARRAY_BUFFRE_TYPE.Uint32:
         ctor = Uint32Array;
         break;
-      case ARRAY_BUFFRE_TYPE.BigInt64:
-        ctor = BigInt64Array;
-        break;
-      case ARRAY_BUFFRE_TYPE.BigUint64:
-        ctor = BigUint64Array;
-        break;
       case ARRAY_BUFFRE_TYPE.Float32:
         ctor = Float32Array;
         break;
       case ARRAY_BUFFRE_TYPE.Float64:
         ctor = Float64Array;
+        break;
+      case ARRAY_BUFFRE_TYPE.BigInt64:
+        ctor = BigInt64Array;
+        break;
+      case ARRAY_BUFFRE_TYPE.BigUint64:
+        ctor = BigUint64Array;
         break;
       default:
         throw new TypeError("unknown arraybufferview type" + bufferType);

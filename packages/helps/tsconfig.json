@@ -10,8 +10,10 @@
     }
   ],
   "files": [
+    "src/binary2Hex.ts",
     "src/CarryStorageRegister.ts",
     "src/getType.ts",
+    "src/hex2Binary.ts",
     "src/index.ts",
     "src/str2U8a.ts",
     "src/u8a2Str.ts",

@@ -180,8 +180,10 @@ test("test undefined boolean", async (t) => {
 });
 
 test("test bigint", async (t) => {
-  t.is(transfer(BigInt(1)), BigInt(1));
-  t.is(transfer(BigInt(Number.MAX_VALUE + 1)), BigInt(Number.MAX_VALUE + 1));
+  t.is(transfer(BigInt(Number.MAX_VALUE) + 1n), BigInt(Number.MAX_VALUE) + 1n);
+  t.is(transfer(BigInt(0)), BigInt(0));
+  t.is(transfer(BigInt(-1)), BigInt(-1));
+  t.is(transfer(-BigInt(Number.MAX_VALUE) - 1n), -BigInt(Number.MAX_VALUE) - 1n);
 });
 
 test("test array", async (t) => {
@@ -232,7 +234,6 @@ test("test subarray array buffer", async (t) => {
   const a = new Uint8Array([1, 2, 3, 4, 5]);
   const b = a.subarray(2, 3);
   console.log(comproto.serialize(b));
-  debugger
   t.deepEqual(transfer(b), b);
 });
 

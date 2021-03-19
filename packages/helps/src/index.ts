@@ -5,3 +5,5 @@ export * from "./getType";
 export * from "./str2U8a";
 export * from "./u8a2Str";
 export * from "./u8aConcat";
+export * from "./hex2Binary";
+export * from "./binary2Hex";
