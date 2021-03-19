@@ -4,48 +4,42 @@ import { ComprotoFactory } from "@bfchain/comproto";
 const comproto = ComprotoFactory.getComproto();
 
 test("test number of int", async (t) => {
-  const testNumArr = [
-    -30,
-    -31,
-    -32,
-    -33,
-    -0x80 - 1,
-    -0x80,
-    -0x80 + 1,
-    -0x8000 - 1,
-    -0x8000,
-    -0x8000 + 1,
-    -126,
-    -127,
-    -128,
-    -255,
-    -256,
-    -257,
-    0,
-    126,
-    127,
-    128,
-    255,
-    256,
-    257,
-    0xffff - 1,
-    0xffff,
-    0xffff + 1,
-    0xffffff - 1,
-    0xffffff,
-    0xffffff,
-    Number.MAX_SAFE_INTEGER,
-    Number.MIN_SAFE_INTEGER,
-    Number.NEGATIVE_INFINITY,
-    Number.POSITIVE_INFINITY,
-    Number.MAX_VALUE,
-    Number.MIN_VALUE,
-  ];
-  testNumArr.forEach((item) => {
-    const trasferData = transfer(item);
-    t.is(trasferData, item);
-  });
+  t.is(transfer(-30), -30);
+  t.is(transfer(-31), -31);
+  t.is(transfer(-32), -32);
+  t.is(transfer(-33), -33);
+  t.is(transfer(-0x80 - 1), -0x80 - 1);
+  t.is(transfer(-0x80), -0x80);
+  t.is(transfer(-0x80 + 1), -0x80 + 1);
+  t.is(transfer(-0x8000 - 1), -0x8000 - 1);
+  t.is(transfer(-0x8000), -0x8000);
+  t.is(transfer(-0x8000 + 1), -0x8000 + 1);
+  t.is(transfer(-126), -126);
+  t.is(transfer(-127), -127);
+  t.is(transfer(-128), -128);
+  t.is(transfer(-255), -255);
+  t.is(transfer(-256), -256);
+  t.is(transfer(-257), -257);
+  t.is(transfer(0), 0);
   t.is(transfer(-0), 0);
+  t.is(transfer(126), 126);
+  t.is(transfer(127), 127);
+  t.is(transfer(128), 128);
+  t.is(transfer(255), 255);
+  t.is(transfer(256), 256);
+  t.is(transfer(257), 257);
+  t.is(transfer(0xffff - 1), 0xffff - 1);
+  t.is(transfer(0xffff), 0xffff);
+  t.is(transfer(0xffff + 1), 0xffff + 1);
+  t.is(transfer(0xffffff - 1), 0xffffff - 1);
+  t.is(transfer(0xffffff), 0xffffff);
+  t.is(transfer(0xffffff), 0xffffff);
+  t.is(transfer(Number.MAX_SAFE_INTEGER), Number.MAX_SAFE_INTEGER);
+  t.is(transfer(Number.MIN_SAFE_INTEGER), Number.MIN_SAFE_INTEGER);
+  t.is(transfer(Number.NEGATIVE_INFINITY), Number.NEGATIVE_INFINITY);
+  t.is(transfer(Number.POSITIVE_INFINITY), Number.POSITIVE_INFINITY);
+  t.is(transfer(Number.MAX_VALUE), Number.MAX_VALUE);
+  t.is(transfer(Number.MIN_VALUE), Number.MIN_VALUE);
 });
 
 test("test number of float", async (t) => {
@@ -180,6 +174,7 @@ test("test undefined boolean", async (t) => {
 });
 
 test("test bigint", async (t) => {
+  debugger;
   t.is(transfer(BigInt(Number.MAX_VALUE) + 1n), BigInt(Number.MAX_VALUE) + 1n);
   t.is(transfer(BigInt(0)), BigInt(0));
   t.is(transfer(BigInt(-1)), BigInt(-1));
@@ -233,7 +228,6 @@ test("test array buffer", async (t) => {
 test("test subarray array buffer", async (t) => {
   const a = new Uint8Array([1, 2, 3, 4, 5]);
   const b = a.subarray(2, 3);
-  console.log(comproto.serialize(b));
   t.deepEqual(transfer(b), b);
 });
 

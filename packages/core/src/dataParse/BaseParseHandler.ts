@@ -1,6 +1,5 @@
-const u8a2dataView = (u8a: Uint8Array) => {
-  return new DataView(u8a.buffer);
-};
+const dvu8a = new Uint8Array(8);
+const dv = new DataView(dvu8a.buffer);
 
 export default class BaseParseHandler {
   len2Buf(length: number) {
@@ -10,7 +9,7 @@ export default class BaseParseHandler {
     if (length <= 0xffff) {
       return this.writeUint16(0x01, length);
     }
-    return this.writeFloat32(0x02, length);
+    return this.writeUint32(0x02, length);
   }
   getLen(decoderState: BFChainComproto.decoderState) {
     const tag = decoderState.buffer[decoderState.offset++];
@@ -39,116 +38,171 @@ export default class BaseParseHandler {
     return (buffer[offset++] << 8) | buffer[offset];
   }
   readInt16(decoderState: BFChainComproto.decoderState) {
-    let { buffer, offset } = decoderState;
+    const { buffer, offset } = decoderState;
     decoderState.offset += 2;
-    const value = (buffer[offset++] << 8) | buffer[offset];
+    const value = (buffer[offset] << 8) | buffer[offset + 1];
     return value & 0x8000 ? value - 0x10000 : value;
   }
   readUint32(decoderState: BFChainComproto.decoderState) {
-    let { buffer, offset } = decoderState;
+    const { buffer, offset } = decoderState;
     decoderState.offset += 4;
     return (
-      buffer[offset++] * 16777216 +
-      (buffer[offset++] << 16) +
-      (buffer[offset++] << 8) +
-      buffer[offset]
+      buffer[offset] * 16777216 +
+      (buffer[offset + 1] << 16) +
+      (buffer[offset + 2] << 8) +
+      buffer[offset + 3]
     );
   }
   readInt32(decoderState: BFChainComproto.decoderState) {
-    let { buffer, offset } = decoderState;
+    const { buffer, offset } = decoderState;
     decoderState.offset += 4;
     return (
-      (buffer[offset++] << 24) | (buffer[offset++] << 16) | (buffer[offset++] << 8) | buffer[offset]
+      (buffer[offset] << 24) |
+      (buffer[offset + 1] << 16) |
+      (buffer[offset + 2] << 8) |
+      buffer[offset + 3]
     );
   }
   readUint64(decoderState: BFChainComproto.decoderState) {
     const { buffer, offset } = decoderState;
     decoderState.offset += 8;
-    return u8a2dataView(buffer).getBigUint64(offset);
+    dvu8a[0] = buffer[offset];
+    dvu8a[1] = buffer[offset + 1];
+    dvu8a[2] = buffer[offset + 2];
+    dvu8a[3] = buffer[offset + 3];
+    dvu8a[4] = buffer[offset + 4];
+    dvu8a[5] = buffer[offset + 5];
+    dvu8a[6] = buffer[offset + 6];
+    dvu8a[7] = buffer[offset + 7];
+    return dv.getBigUint64(0);
   }
   readInt64(decoderState: BFChainComproto.decoderState) {
     const { buffer, offset } = decoderState;
     decoderState.offset += 8;
-    return u8a2dataView(buffer).getBigInt64(offset);
+    dvu8a[0] = buffer[offset];
+    dvu8a[1] = buffer[offset + 1];
+    dvu8a[2] = buffer[offset + 2];
+    dvu8a[3] = buffer[offset + 3];
+    dvu8a[4] = buffer[offset + 4];
+    dvu8a[5] = buffer[offset + 5];
+    dvu8a[6] = buffer[offset + 6];
+    dvu8a[7] = buffer[offset + 7];
+    return dv.getBigInt64(0);
   }
   readFloat32(decoderState: BFChainComproto.decoderState) {
     const { buffer, offset } = decoderState;
     decoderState.offset += 4;
-    return u8a2dataView(buffer).getFloat32(offset);
+    dvu8a[0] = buffer[offset];
+    dvu8a[1] = buffer[offset + 1];
+    dvu8a[2] = buffer[offset + 2];
+    dvu8a[3] = buffer[offset + 3];
+    return dv.getFloat32(0);
   }
   readFloat64(decoderState: BFChainComproto.decoderState) {
     const { buffer, offset } = decoderState;
     decoderState.offset += 8;
-    return u8a2dataView(buffer).getFloat64(offset);
+    dvu8a[0] = buffer[offset];
+    dvu8a[1] = buffer[offset + 1];
+    dvu8a[2] = buffer[offset + 2];
+    dvu8a[3] = buffer[offset + 3];
+    dvu8a[4] = buffer[offset + 4];
+    dvu8a[5] = buffer[offset + 5];
+    dvu8a[6] = buffer[offset + 6];
+    dvu8a[7] = buffer[offset + 7];
+    return dv.getFloat64(0);
   }
   writeUint8(type: number, value: number) {
     const byteLength = 1;
     const u8a = new Uint8Array(byteLength + 1);
     u8a[0] = type;
-    u8a2dataView(u8a).setUint8(1, value);
+    u8a[1] = value;
     return u8a;
+  }
+  get writeInt8() {
+    Object.defineProperty(this, "writeInt8", { value: this.writeUint8 });
+    return this.writeUint8;
   }
   writeUint16(type: number, value: number) {
     const byteLength = 2;
     const u8a = new Uint8Array(1 + byteLength);
     u8a[0] = type;
-    u8a2dataView(u8a).setUint16(1, value);
+    u8a[1] = value >> 8;
+    u8a[2] = value /*  % 256 */;
     return u8a;
+  }
+  get writeInt16() {
+    Object.defineProperty(this, "writeInt16", { value: this.writeUint16 });
+    return this.writeUint16;
   }
   writeUint32(type: number, value: number) {
     const byteLength = 4;
     const u8a = new Uint8Array(1 + byteLength);
     u8a[0] = type;
-    u8a2dataView(u8a).setUint32(1, value);
+    u8a[1] = value >> 24;
+    u8a[2] = value >> 16;
+    u8a[3] = value >> 8;
+    u8a[4] = value /*  % 256 */;
     return u8a;
+  }
+  get writeInt32() {
+    Object.defineProperty(this, "writeInt32", { value: this.writeUint32 });
+    return this.writeUint32;
   }
   writeUint64(type: number, value: bigint) {
     const byteLength = 8;
     const u8a = new Uint8Array(1 + byteLength);
     u8a[0] = type;
-    u8a2dataView(u8a).setBigUint64(1, value);
+    dv.setBigUint64(0, value);
+    u8a[1] = dvu8a[0];
+    u8a[2] = dvu8a[1];
+    u8a[3] = dvu8a[2];
+    u8a[4] = dvu8a[3];
+    u8a[5] = dvu8a[4];
+    u8a[6] = dvu8a[5];
+    u8a[7] = dvu8a[6];
+    u8a[8] = dvu8a[7];
     return u8a;
   }
-  writeInt8(type: number, value: number) {
-    const byteLength = 1;
-    const u8a = new Uint8Array(byteLength + 1);
-    u8a[0] = type;
-    u8a2dataView(u8a).setInt8(1, value);
-    return u8a;
-  }
-  writeInt16(type: number, value: number) {
-    const byteLength = 2;
-    const u8a = new Uint8Array(1 + byteLength);
-    u8a[0] = type;
-    u8a2dataView(u8a).setInt16(1, value);
-    return u8a;
-  }
-  writeInt32(type: number, value: number) {
-    const byteLength = 4;
-    const u8a = new Uint8Array(1 + byteLength);
-    u8a[0] = type;
-    u8a2dataView(u8a).setInt32(1, value);
-    return u8a;
-  }
+
   writeInt64(type: number, value: bigint) {
     const byteLength = 8;
     const u8a = new Uint8Array(1 + byteLength);
     u8a[0] = type;
-    u8a2dataView(u8a).setBigInt64(1, value);
+    dv.setBigInt64(0, value);
+    u8a[1] = dvu8a[0];
+    u8a[2] = dvu8a[1];
+    u8a[3] = dvu8a[2];
+    u8a[4] = dvu8a[3];
+    u8a[5] = dvu8a[4];
+    u8a[6] = dvu8a[5];
+    u8a[7] = dvu8a[6];
+    u8a[8] = dvu8a[7];
     return u8a;
   }
   writeFloat32(type: number, value: number) {
     const byteLength = 4;
     const u8a = new Uint8Array(1 + byteLength);
     u8a[0] = type;
-    u8a2dataView(u8a).setFloat32(1, value);
+    dv.setFloat32(0, value);
+    u8a[1] = dvu8a[0];
+    u8a[2] = dvu8a[1];
+    u8a[3] = dvu8a[2];
+    u8a[4] = dvu8a[3];
     return u8a;
   }
   writeFloat64(type: number, value: number) {
     const byteLength = 8;
     const u8a = new Uint8Array(1 + byteLength);
     u8a[0] = type;
-    u8a2dataView(u8a).setFloat64(1, value);
+    dv.setFloat64(0, value);
+    u8a[1] = dvu8a[0];
+    u8a[2] = dvu8a[1];
+    u8a[3] = dvu8a[2];
+    u8a[4] = dvu8a[3];
+    u8a[5] = dvu8a[4];
+    u8a[6] = dvu8a[5];
+    u8a[7] = dvu8a[6];
+    u8a[8] = dvu8a[7];
     return u8a;
   }
 }

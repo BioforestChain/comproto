@@ -1,6 +1,4 @@
 let binary2Hex: (binary: Uint8Array, offset?: number, len?: number) => string;
-declare var process: unknown;
-declare var Buffer: unknown;
 
 const num2hexHasMap: { [u8: number]: string } = Object.create(null);
 for (let i = 0; i < 256; i++) {
