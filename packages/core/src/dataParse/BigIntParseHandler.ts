@@ -27,17 +27,11 @@ export default class BigIntParseHandler
     ++decoderState.offset; // const tag = decoderState.buffer[decoderState.offset++];
     const sign = decoderState.buffer[decoderState.offset++] === 1;
     const len = this.getLen(decoderState);
-    const dataBinary = decoderState.buffer.subarray(
-      decoderState.offset,
-      (decoderState.offset += len),
-    );
-    const hex = binary2Hex(dataBinary);
-
-    const bi = BigInt("0x" + hex);
+    const hex = binary2Hex(decoderState.buffer, decoderState.offset, (decoderState.offset += len));
     if (sign) {
-      return -bi;
+      return -BigInt("0x" + hex);
     }
-    return bi;
+    return BigInt("0x" + hex);
   }
 }
 // declare var Buffer: any;

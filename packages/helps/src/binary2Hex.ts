@@ -1,4 +1,4 @@
-let binary2Hex: (binary: Uint8Array) => string;
+let binary2Hex: (binary: Uint8Array, offset?: number, len?: number) => string;
 declare var process: unknown;
 declare var Buffer: unknown;
 
@@ -8,10 +8,10 @@ for (let i = 0; i < 256; i++) {
   num2hexHasMap[i] = str.length === 1 ? "0" + str : str;
 }
 
-binary2Hex = (binary: Uint8Array) => {
+binary2Hex = (binary: Uint8Array, offset = 0, end = binary.length) => {
   let str = "";
-  for (const u8 of binary) {
-    str += num2hexHasMap[u8];
+  while (offset < end) {
+    str += num2hexHasMap[binary[offset++]];
   }
   return str;
 };
