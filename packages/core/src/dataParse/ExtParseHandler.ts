@@ -1,6 +1,6 @@
 import { dataTypeEnum, SerializationTag } from "../const";
 import type { Comproto } from "../Comproto";
-import helper from "./BaseParseHandler";
+import helper from "./bytesHelper";
 import { str2U8a, u8a2Str, u8aConcat } from "@bfchain/comproto-helps";
 /**
  * ext  -- 0xc7

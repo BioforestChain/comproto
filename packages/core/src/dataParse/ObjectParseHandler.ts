@@ -1,6 +1,6 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import helper from "./BaseParseHandler";
+import helper from "./bytesHelper";
 import { u8aConcat } from "@bfchain/comproto-helps";
 /**
  * fixmap -- 0x80 - 0x8f

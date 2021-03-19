@@ -1,6 +1,6 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import helper from "./BaseParseHandler";
+import helper from "./bytesHelper";
 
 export default class MapParseHandler
   implements BFChainComproto.typeTransferHandler<Map<unknown, unknown>> {

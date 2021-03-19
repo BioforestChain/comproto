@@ -1,6 +1,6 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import helper from "./BaseParseHandler";
+import helper from "./bytesHelper";
 import { str2U8a, u8a2Str } from "@bfchain/comproto-helps";
 export default class StringParseHandler implements BFChainComproto.typeTransferHandler<string> {
   /**

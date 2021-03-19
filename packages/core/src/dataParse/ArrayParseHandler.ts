@@ -1,6 +1,6 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import helper from "./BaseParseHandler";
+import helper from "./bytesHelper";
 import { u8aConcat } from "@bfchain/comproto-helps";
 /**
  * fixarray -- 0x90 - 0x9f

@@ -1,6 +1,6 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import helper from "./BaseParseHandler";
+import helper from "./bytesHelper";
 /**
  * positive fixint -- 0x00 - 0x7f (0 ~ 127)
  * negative fixint -- 0xe0 - 0xff (-32 ~ -1)

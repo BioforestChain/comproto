@@ -1,6 +1,6 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import helper from "./BaseParseHandler";
+import helper from "./bytesHelper";
 import { hex2Binary, binary2Hex } from "@bfchain/comproto-helps";
 export default class BigIntParseHandler implements BFChainComproto.typeTransferHandler<bigint> {
   constructor(comproto: Comproto) {

@@ -11,6 +11,8 @@ import BooleanParseHandler from "./BooleanParseHandler";
 import ExtParseHandler from "./ExtParseHandler";
 import BufferViewParseHandler from "./BufferViewParseHandler";
 import ArrayBufferParseHandler from "./ArrayBufferParseHandler";
+import bytesHelper from "./bytesHelper";
+export { bytesHelper };
 
 export const initDataParse = (comproto: Comproto) => {
   new ArrayParseHandler(comproto);
