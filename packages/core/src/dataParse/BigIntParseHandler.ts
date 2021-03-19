@@ -12,14 +12,15 @@ export default class BigIntParseHandler
   }
   typeName = dataTypeEnum.BigInt;
   serialize(data: bigint, comproto: Comproto) {
+    let hex = data.toString(16);
     /// 是否有符号
     let sign = 0;
-    if (data < 0n) {
+    if (hex[0] === "-") {
       sign = 1;
-      data = -data; ///转成正数
+      hex = hex.slice(1);
     }
 
-    const dataBinary = hex2Binary(data.toString(16));
+    const dataBinary = hex2Binary(hex);
     const len = dataBinary.length;
     return u8aConcat([[0xd4, sign], this.len2Buf(len), dataBinary]);
   }
