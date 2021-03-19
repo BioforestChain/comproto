@@ -1,6 +1,6 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import BaseParseHandler from "./BaseParseHandler";
+import helper from "./BaseParseHandler";
 import { u8aConcat } from "@bfchain/comproto-helps";
 
 const enum ARRAY_BUFFRE_TYPE {
@@ -18,19 +18,17 @@ const enum ARRAY_BUFFRE_TYPE {
 }
 
 export default class BufferViewParseHandler
-  extends BaseParseHandler
   implements BFChainComproto.typeTransferHandler<ArrayBufferView> {
   constructor(comproto: Comproto) {
-    super();
     comproto.setTypeHandler(this);
     comproto.setTagType(0xc4, dataTypeEnum.BufferView);
     comproto.setTagType(0xc5, dataTypeEnum.BufferView);
     comproto.setTagType(0xc6, dataTypeEnum.BufferView);
   }
   typeName = dataTypeEnum.BufferView;
-  serialize(data: ArrayBufferView) {
+  serialize(data: ArrayBufferView, resRef: BFChainComproto.U8AList) {
     const byteLen = data.byteLength;
-    const headBuf = this.len2Buf(byteLen);
+    const headBuf = this.length2Buf(byteLen);
     let buffer: ARRAY_BUFFRE_TYPE;
     switch (data.constructor) {
       case Int8Array:
@@ -70,11 +68,7 @@ export default class BufferViewParseHandler
         throw new TypeError("unknown arraybufferview " + data.constructor.name);
     }
 
-    return u8aConcat([
-      headBuf,
-      [buffer],
-      new Uint8Array(data.buffer, data.byteOffset, data.byteLength),
-    ]);
+    resRef.push(headBuf, [buffer], new Uint8Array(data.buffer, data.byteOffset, data.byteLength));
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     const len = this.getLength(decoderState);
@@ -126,27 +120,24 @@ export default class BufferViewParseHandler
     decoderState.offset += len;
     return new ctor(buf);
   }
-  len2Buf(len: number) {
+  private length2Buf(len: number) {
     if (len < 0xff) {
-      return this.writeUint8(0xc4, len);
+      return helper.writeUint8(0xc4, len);
     } else if (len <= 0xffff) {
-      return this.writeUint16(0xc5, len);
+      return helper.writeUint16(0xc5, len);
     } else {
-      return this.writeUint32(0xc6, len);
+      return helper.writeUint32(0xc6, len);
     }
   }
-  getLength(decoderState: BFChainComproto.decoderState) {
+  private getLength(decoderState: BFChainComproto.decoderState) {
     const tag = decoderState.buffer[decoderState.offset++];
     switch (tag) {
       case 0xc4:
-        return this.readUint8(decoderState);
-        break;
+        return helper.readUint8(decoderState);
       case 0xc5:
-        return this.readUint16(decoderState);
-        break;
+        return helper.readUint16(decoderState);
       case 0xc6:
-        return this.readUint32(decoderState);
-        break;
+        return helper.readUint32(decoderState);
     }
     throw `can not handler tag::${tag}`;
   }

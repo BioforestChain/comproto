@@ -1,6 +1,6 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import BaseParseHandler from "./BaseParseHandler";
+import helper from "./BaseParseHandler";
 /**
  * positive fixint -- 0x00 - 0x7f (0 ~ 127)
  * negative fixint -- 0xe0 - 0xff (-32 ~ -1)
@@ -20,11 +20,8 @@ import BaseParseHandler from "./BaseParseHandler";
  * uint 32 -- 0xce
  * uint 64 -- 0xcf
  */
-export default class NumberParseHandler
-  extends BaseParseHandler
-  implements BFChainComproto.typeTransferHandler<number> {
+export default class NumberParseHandler implements BFChainComproto.typeTransferHandler<number> {
   constructor(comproto: Comproto) {
-    super();
     comproto.setTypeHandler(this);
     // positive fixint -- 0x00 - 0x7f
     for (let i = 0x00; i <= 0x7f; i++) {
@@ -48,18 +45,18 @@ export default class NumberParseHandler
     comproto.setTagType(0xcb, dataTypeEnum.Number);
   }
   typeName = dataTypeEnum.Number;
-  serialize(value: number, comproto: Comproto) {
+  serialize(value: number, resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const ivalue = value | 0;
     if (value !== ivalue) {
       // float 64 -- 0xcb
-      return this.writeFloat64(0xcb, value);
+      return helper.writeFloat64(0xcb, value);
     }
     // -32 ~ -1 用 224~255 保存
     // 0 ~ 127 用 0 ~ 127 保存
     if (-0x20 <= ivalue && ivalue <= 0x7f) {
       // positive fixint -- 0x00 - 0x7f
       // negative fixint -- 0xe0 - 0xff
-      return new Uint8Array([ivalue & 0xff]);
+      return [ivalue & 0xff];
     }
     // 大于0
     if (ivalue >= 0) {
@@ -68,27 +65,27 @@ export default class NumberParseHandler
       // uint 32 -- 0xce
       if (ivalue <= 0xff) {
         // 0xcc
-        return this.writeUint8(0xcc, ivalue);
+        return helper.writeUint8(0xcc, ivalue);
       }
       if (ivalue <= 0xffff) {
         // 0xcd
-        return this.writeUint16(0xcd, ivalue);
+        return helper.writeUint16(0xcd, ivalue);
       }
       // 0xce
-      return this.writeUint32(0xce, ivalue);
+      return helper.writeUint32(0xce, ivalue);
     }
     // int 8 -- 0xd0
     // int 16 -- 0xd1
     // int 32 -- 0xd2
     if (ivalue >= -0x80) {
       // 0xd0
-      return this.writeInt8(0xd0, ivalue);
+      return helper.writeInt8(0xd0, ivalue);
     } else if (ivalue >= -0x8000) {
       // 0xd1
-      return this.writeInt16(0xd1, ivalue);
+      return helper.writeInt16(0xd1, ivalue);
     } else {
       // 0xd2
-      return this.writeInt32(0xd2, ivalue);
+      return helper.writeInt32(0xd2, ivalue);
     }
     // return new Uint8Array();
   }
@@ -106,37 +103,37 @@ export default class NumberParseHandler
     switch (tag) {
       // int8
       case 0xd0:
-        return this.readInt8(decoderState);
+        return helper.readInt8(decoderState);
       // int16
       case 0xd1:
-        return this.readInt16(decoderState);
+        return helper.readInt16(decoderState);
         break;
       // int32
       case 0xd2:
-        return this.readInt32(decoderState);
+        return helper.readInt32(decoderState);
         break;
       // int64
       case 0xd3:
-        return Number(this.readInt64(decoderState));
+        return Number(helper.readInt64(decoderState));
         break;
       // uint8
       case 0xcc:
-        return this.readUint8(decoderState);
+        return helper.readUint8(decoderState);
         break;
       // uint16
       case 0xcd:
-        return this.readUint16(decoderState);
+        return helper.readUint16(decoderState);
         break;
       // uint32
       case 0xce:
-        return this.readUint32(decoderState);
+        return helper.readUint32(decoderState);
         break;
       // uint64
       case 0xcf:
-        return Number(this.readUint64(decoderState));
+        return Number(helper.readUint64(decoderState));
         break;
       case 0xcb:
-        return this.readFloat64(decoderState);
+        return helper.readFloat64(decoderState);
         break;
     }
     throw `number handler can not handler tag::${tag}`;

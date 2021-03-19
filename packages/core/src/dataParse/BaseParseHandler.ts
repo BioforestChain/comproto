@@ -1,27 +1,27 @@
 const dvu8a = new Uint8Array(8);
 const dv = new DataView(dvu8a.buffer);
 
-export default class BaseParseHandler {
+const helper = new (class BytesHelper {
   len2Buf(length: number) {
     if (length < 0xff) {
-      return this.writeUint8(0x00, length);
+      return helper.writeUint8(0x00, length);
     }
     if (length <= 0xffff) {
-      return this.writeUint16(0x01, length);
+      return helper.writeUint16(0x01, length);
     }
-    return this.writeUint32(0x02, length);
+    return helper.writeUint32(0x02, length);
   }
   getLen(decoderState: BFChainComproto.decoderState) {
     const tag = decoderState.buffer[decoderState.offset++];
     switch (tag) {
       case 0x00:
-        return this.readUint8(decoderState);
+        return helper.readUint8(decoderState);
 
       case 0x01:
-        return this.readUint16(decoderState);
+        return helper.readUint16(decoderState);
 
       case 0x02:
-        return this.readUint32(decoderState);
+        return helper.readUint32(decoderState);
     }
     throw `string handler not tag::${tag}`;
   }
@@ -119,8 +119,8 @@ export default class BaseParseHandler {
     return u8a;
   }
   get writeInt8() {
-    Object.defineProperty(this, "writeInt8", { value: this.writeUint8 });
-    return this.writeUint8;
+    Object.defineProperty(helper, "writeInt8", { value: helper.writeUint8 });
+    return helper.writeUint8;
   }
   writeUint16(type: number, value: number) {
     const byteLength = 2;
@@ -131,8 +131,8 @@ export default class BaseParseHandler {
     return u8a;
   }
   get writeInt16() {
-    Object.defineProperty(this, "writeInt16", { value: this.writeUint16 });
-    return this.writeUint16;
+    Object.defineProperty(helper, "writeInt16", { value: helper.writeUint16 });
+    return helper.writeUint16;
   }
   writeUint32(type: number, value: number) {
     const byteLength = 4;
@@ -145,8 +145,8 @@ export default class BaseParseHandler {
     return u8a;
   }
   get writeInt32() {
-    Object.defineProperty(this, "writeInt32", { value: this.writeUint32 });
-    return this.writeUint32;
+    Object.defineProperty(helper, "writeInt32", { value: helper.writeUint32 });
+    return helper.writeUint32;
   }
   writeUint64(type: number, value: bigint) {
     const byteLength = 8;
@@ -205,4 +205,6 @@ export default class BaseParseHandler {
     u8a[8] = dvu8a[7];
     return u8a;
   }
-}
+})();
+
+export default helper;

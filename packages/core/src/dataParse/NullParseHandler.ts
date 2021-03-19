@@ -8,7 +8,7 @@ export default class NullParseHandler implements BFChainComproto.typeTransferHan
   typeName = dataTypeEnum.Null;
   typeClass = null;
   serialize() {
-    return new Uint8Array([SerializationTag.kNull]);
+    return [SerializationTag.kNull];
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     decoderState.offset++;

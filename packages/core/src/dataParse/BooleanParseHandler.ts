@@ -8,9 +8,9 @@ export default class BooleanParseHandler implements BFChainComproto.typeTransfer
     comproto.setTagType(SerializationTag.kFalse, dataTypeEnum.Boolean);
   }
   typeName = dataTypeEnum.Boolean;
-  serialize(data: boolean, comproto: Comproto) {
+  serialize(data: boolean, resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const tag = data ? SerializationTag.kTrue : SerializationTag.kFalse;
-    return new Uint8Array([tag]);
+    resRef.push([tag]);
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     const tag = decoderState.buffer[decoderState.offset++];

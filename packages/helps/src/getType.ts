@@ -41,9 +41,9 @@ defineFlag(Uint16Array, "BufferView");
 defineFlag(Int32Array, "BufferView");
 defineFlag(Uint32Array, "BufferView");
 defineFlag(Float32Array, "BufferView");
-defineFlag(Float64Array, "BufferView");
-defineFlag(BigInt64Array, "BufferView");
-defineFlag(BigUint64Array, "BufferView");
+typeof Float64Array === "function" && defineFlag(Float64Array, "BufferView");
+typeof BigInt64Array === "function" && defineFlag(BigInt64Array, "BufferView");
+typeof BigUint64Array === "function" && defineFlag(BigUint64Array, "BufferView");
 defineFlag(Array, "Array");
 defineFlag(Object, "Object");
 

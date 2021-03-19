@@ -228,6 +228,7 @@ test("test array buffer", async (t) => {
 test("test subarray array buffer", async (t) => {
   const a = new Uint8Array([1, 2, 3, 4, 5]);
   const b = a.subarray(2, 3);
+  debugger
   t.deepEqual(transfer(b), b);
 });
 

@@ -1,17 +1,14 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import BaseParseHandler from "./BaseParseHandler";
-import { u8aConcat, str2U8a, u8a2Str, hex2Binary, binary2Hex } from "@bfchain/comproto-helps";
-export default class BigIntParseHandler
-  extends BaseParseHandler
-  implements BFChainComproto.typeTransferHandler<bigint> {
+import helper from "./BaseParseHandler";
+import { hex2Binary, binary2Hex } from "@bfchain/comproto-helps";
+export default class BigIntParseHandler implements BFChainComproto.typeTransferHandler<bigint> {
   constructor(comproto: Comproto) {
-    super();
     comproto.setTypeHandler(this);
     comproto.setTagType(0xd4, dataTypeEnum.BigInt);
   }
   typeName = dataTypeEnum.BigInt;
-  serialize(data: bigint, comproto: Comproto) {
+  serialize(data: bigint, resRef: BFChainComproto.U8AList, comproto: Comproto) {
     let hex = data.toString(16);
     /// 是否有符号
     let sign = 0;
@@ -22,12 +19,12 @@ export default class BigIntParseHandler
 
     const dataBinary = hex2Binary(hex);
     const len = dataBinary.length;
-    return u8aConcat([[0xd4, sign], this.len2Buf(len), dataBinary]);
+    resRef.push([0xd4, sign], helper.len2Buf(len), dataBinary);
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     ++decoderState.offset; // const tag = decoderState.buffer[decoderState.offset++];
     const sign = decoderState.buffer[decoderState.offset++] === 1;
-    const len = this.getLen(decoderState);
+    const len = helper.getLen(decoderState);
     const hex = binary2Hex(decoderState.buffer, decoderState.offset, (decoderState.offset += len));
     if (sign) {
       return -BigInt("0x" + hex);

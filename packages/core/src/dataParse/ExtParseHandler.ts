@@ -1,20 +1,17 @@
 import { dataTypeEnum, SerializationTag } from "../const";
 import type { Comproto } from "../Comproto";
-import BaseParseHandler from "./BaseParseHandler";
+import helper from "./BaseParseHandler";
 import { str2U8a, u8a2Str, u8aConcat } from "@bfchain/comproto-helps";
 /**
  * ext  -- 0xc7
  */
-export default class ExtParseHandler
-  extends BaseParseHandler
-  implements BFChainComproto.typeTransferHandler<unknown> {
+export default class ExtParseHandler implements BFChainComproto.typeTransferHandler<unknown> {
   constructor(comproto: Comproto) {
-    super();
     comproto.setTypeHandler(this);
     comproto.setTagType(0xc7, dataTypeEnum.Ext);
   }
   typeName = dataTypeEnum.Ext;
-  serialize(data: unknown, comproto: Comproto) {
+  serialize(data: unknown, resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const handler = comproto.getHandler(data);
     if (!handler) throw new ReferenceError(`handler not exist`);
     const handlerNameU8a = str2U8a(handler.handlerName);
@@ -22,15 +19,16 @@ export default class ExtParseHandler
     if (handler.serialize) {
       serializeData = handler.serialize(data);
     }
-    const dataBuf = comproto.serializeTransfer(serializeData);
-    const handlerNameBuf = this.len2Buf(handlerNameU8a.byteLength);
-    return u8aConcat([[0xc7], dataBuf, handlerNameBuf, handlerNameU8a]);
+    resRef.push([0xc7]);
+    comproto.serializeTransfer(serializeData, resRef);
+    const handlerNameBuf = helper.len2Buf(handlerNameU8a.byteLength);
+    resRef.push(handlerNameBuf, handlerNameU8a);
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {
     // const byteLen = this.getLen(decoderState);
     decoderState.offset++;
     const data = comproto.deserializeTransfer(decoderState);
-    const handlerNameLen = this.getLen(decoderState);
+    const handlerNameLen = helper.getLen(decoderState);
     const handlerName = u8a2Str(
       decoderState.buffer.subarray(decoderState.offset, decoderState.offset + handlerNameLen),
     );
@@ -47,11 +45,11 @@ export default class ExtParseHandler
       return new Uint8Array([0xa0 + byteLen]);
     }
     if (byteLen <= 0xff) {
-      return this.writeUint8(0xd9, byteLen);
+      return helper.writeUint8(0xd9, byteLen);
     }
     if (byteLen <= 0xffff) {
-      return this.writeUint16(0xda, byteLen);
+      return helper.writeUint16(0xda, byteLen);
     }
-    return this.writeUint32(0xdb, byteLen);
+    return helper.writeUint32(0xdb, byteLen);
   }
 }

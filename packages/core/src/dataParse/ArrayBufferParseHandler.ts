@@ -1,23 +1,21 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import BaseParseHandler from "./BaseParseHandler";
+import helper from "./BaseParseHandler";
 import { u8aConcat } from "@bfchain/comproto-helps";
 
 export default class ArrayBufferParseHandler
-  extends BaseParseHandler
   implements BFChainComproto.typeTransferHandler<ArrayBuffer> {
   constructor(comproto: Comproto) {
-    super();
     comproto.setTypeHandler(this);
     comproto.setTagType(0xd5, dataTypeEnum.ArrayBuffer);
     comproto.setTagType(0xd6, dataTypeEnum.ArrayBuffer);
     comproto.setTagType(0xd7, dataTypeEnum.ArrayBuffer);
   }
   typeName = dataTypeEnum.ArrayBuffer;
-  serialize(data: ArrayBuffer) {
+  serialize(data: ArrayBuffer, resRef: BFChainComproto.U8AList) {
     const byteLen = data.byteLength;
-    const headBuf = this.len2Buf(byteLen);
-    return u8aConcat([headBuf, new Uint8Array(data)]);
+    const headBuf = this.length2Buf(byteLen);
+    resRef.push(headBuf, new Uint8Array(data));
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     const len = this.getLength(decoderState);
@@ -25,27 +23,24 @@ export default class ArrayBufferParseHandler
     decoderState.offset += len;
     return buf;
   }
-  len2Buf(len: number) {
+  private length2Buf(len: number) {
     if (len < 0xff) {
-      return this.writeUint8(0xd5, len);
+      return helper.writeUint8(0xd5, len);
     } else if (len <= 0xffff) {
-      return this.writeUint16(0xd6, len);
+      return helper.writeUint16(0xd6, len);
     } else {
-      return this.writeUint32(0xd7, len);
+      return helper.writeUint32(0xd7, len);
     }
   }
-  getLength(decoderState: BFChainComproto.decoderState) {
+  private getLength(decoderState: BFChainComproto.decoderState) {
     const tag = decoderState.buffer[decoderState.offset++];
     switch (tag) {
       case 0xd5:
-        return this.readUint8(decoderState);
-        break;
+        return helper.readUint8(decoderState);
       case 0xd6:
-        return this.readUint16(decoderState);
-        break;
+        return helper.readUint16(decoderState);
       case 0xd7:
-        return this.readUint32(decoderState);
-        break;
+        return helper.readUint32(decoderState);
     }
     throw `can not handler tag::${tag}`;
   }

@@ -1,17 +1,14 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
-import BaseParseHandler from "./BaseParseHandler";
+import helper from "./BaseParseHandler";
 import { u8aConcat } from "@bfchain/comproto-helps";
 /**
  * fixarray -- 0x90 - 0x9f
  * array 16 -- 0xdc
  * array 32 -- 0xdd
  */
-export default class ArrayParseHandler
-  extends BaseParseHandler
-  implements BFChainComproto.typeTransferHandler<unknown[]> {
+export default class ArrayParseHandler implements BFChainComproto.typeTransferHandler<unknown[]> {
   constructor(comproto: Comproto) {
-    super();
     comproto.setTypeHandler(this);
     // fixarray -- 0x90 - 0x9f
     for (let i = 0x90; i <= 0x9f; i++) {
@@ -22,17 +19,18 @@ export default class ArrayParseHandler
   }
   typeName = dataTypeEnum.Array;
   typeClass = Array;
-  serialize(dataArray: unknown[], comproto: Comproto) {
+  serialize(dataArray: unknown[], resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const dataLen = dataArray.length;
-    const headU8a = this.len2Buf(dataLen);
-    const dataBuf = [headU8a];
-    let totalSize = headU8a.byteLength;
+    const headU8a = this.length2Buf(dataLen);
+    resRef.push(headU8a);
+    // const dataBuf = [headU8a];
+    // let totalSize = headU8a.byteLength;
     dataArray.forEach((value) => {
-      const chunk = comproto.serializeTransfer(value);
-      dataBuf.push(chunk);
-      totalSize += chunk.byteLength;
+      comproto.serializeTransfer(value, resRef);
+      // dataBuf.push(chunk);
+      // totalSize += chunk.byteLength;
     });
-    return u8aConcat(dataBuf, totalSize);
+    // return u8aConcat(dataBuf, totalSize);
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {
     const keyLength = this.getLength(decoderState);
@@ -43,32 +41,30 @@ export default class ArrayParseHandler
     }
     return dataArray;
   }
-  getLength(decoderState: BFChainComproto.decoderState) {
+  private getLength(decoderState: BFChainComproto.decoderState) {
     const tag = decoderState.buffer[decoderState.offset++];
     if (tag >= 0x90 && tag <= 0x9f) {
       return tag - 0x90;
     }
     switch (tag) {
       case 0xdc:
-        return this.readUint16(decoderState);
-        break;
+        return helper.readUint16(decoderState);
       case 0xdd:
-        return this.readUint32(decoderState);
-        break;
+        return helper.readUint32(decoderState);
     }
     throw `can not handler tag::${tag}`;
   }
-  len2Buf(len: number) {
+  private length2Buf(len: number) {
     if (len < 16) {
       // 0x90 + len
       const tag = len + 0x90;
       return new Uint8Array([tag]);
     } else if (len <= 0xffff) {
       // 0xdc
-      return this.writeUint16(0xdc, len);
+      return helper.writeUint16(0xdc, len);
     } else {
       // 0xdd
-      return this.writeUint32(0xdd, len);
+      return helper.writeUint32(0xdd, len);
     }
   }
 }

@@ -50,15 +50,24 @@ declare namespace BFChainComproto {
 
   interface typeTransferHandler<T = unknown, O = T> {
     typeName: import("./const").dataTypeEnum;
-    serialize: (data: T, comproto: import("./Comproto").Comproto) => Uint8Array;
+    serialize: (
+      data: T,
+      resRef: U8AList,
+      comproto: import("./Comproto").Comproto,
+    ) => ArrayLike<number> | void;
     deserialize: (decoderState: decoderState, comproto: import("./Comproto").Comproto) => O;
   }
 
   type typeHandler = {
     typeName: import("./const").dataTypeEnum;
-    serialize: (data: unknown, comproto: import("./Comproto").Comproto) => Uint8Array;
+    serialize: (
+      data: unknown,
+      resRef: U8AList,
+      comproto: import("./Comproto").Comproto,
+    ) => ArrayLike<number> | void;
     deserialize: (decoderState: decoderState, comproto: import("./Comproto").Comproto) => unknown;
   };
+  type U8AList = ArrayLike<number>[];
 
   interface CarryStorageRegister {
     carryBitOne: () => void;

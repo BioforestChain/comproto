@@ -1,8 +1,8 @@
-import { getDataType } from "@bfchain/comproto-helps";
+import { getDataType, u8aConcat } from "@bfchain/comproto-helps";
 import { HANDLER_SYMBOL } from "@bfchain/comproto-typings";
 import { dataTypeEnum } from "./const";
 
-type serializeTransferResult = { isSerialize: false } | { isSerialize: true; data: Uint8Array };
+type serializeTransferResult = { isSerialize: boolean }; //| { isSerialize: true;};
 
 export class Comproto {
   protected handlerMap: Map<string, BFChainComproto.IHanlder> = new Map();
@@ -13,8 +13,9 @@ export class Comproto {
     return HANDLER_SYMBOL;
   }
   public serialize(value: unknown): Uint8Array {
-    const transferValue = this.serializeTransfer(value);
-    return transferValue;
+    const u8aList: BFChainComproto.U8AList = [];
+    this.serializeTransfer(value, u8aList);
+    return u8aConcat(u8aList);
   }
   public deserialize<T = unknown>(buffer: Uint8Array) {
     const decoderState: BFChainComproto.decoderState = {
@@ -159,17 +160,17 @@ export class Comproto {
    * @name 解析外部对象
    * @description 内部可以循环调用解析
    */
-  serializeTransfer(value: unknown): Uint8Array {
+  serializeTransfer(value: unknown, u8aListRef: BFChainComproto.U8AList): void {
+    // const u8aListRef: BFChainComproto.U8AList = [];
     const type = typeof value;
     // 优化性能 对于基础类型直接走系统
-    if (type !== 'object' && type !== 'function' && type !== 'symbol') {
-      return this.serializeTransferType(value);
+    if (type !== "object" && type !== "function" && type !== "symbol") {
+      return this.serializeInternal(value, u8aListRef);
     }
-    const serializeResult = this.serializeTransferProto(value);
-    if (serializeResult.isSerialize) {
-      return serializeResult.data;
+    const isSerialize = this.serializeCustom(value, u8aListRef);
+    if (isSerialize === false) {
+      this.serializeInternal(value, u8aListRef);
     }
-    return this.serializeTransferType(value);
   }
   /**
    * 设置类型handler
@@ -184,21 +185,21 @@ export class Comproto {
    * @description 主要处理一些js类型对象，转换成u8a(开发者尽量不管这层)
    * @param value
    */
-  serializeTransferType(value: unknown) {
+  serializeInternal(value: unknown, u8aListRef: BFChainComproto.U8AList) {
     const typeHandler = this.getTransferTypeHandler(value);
     if (typeHandler) {
-      return typeHandler.serialize(value, this);
+      const u8a = typeHandler.serialize(value, u8aListRef, this);
+      if (u8a !== undefined) {
+        u8aListRef.push(u8a);
+      }
     }
-    return new Uint8Array();
+    // return u8aConcat(u8aListRef);
   }
   getTransferTypeHandler(value: unknown) {
     const valueType = getDataType(value) as dataTypeEnum;
     const typeHandler = this.typeHandlerMap.get(valueType);
     if (typeHandler) {
       return typeHandler;
-    }
-    if (ArrayBuffer.isView(value)) {
-      return this.typeHandlerMap.get(dataTypeEnum.BufferView);
     }
     return undefined;
   }
@@ -212,16 +213,20 @@ export class Comproto {
    * @returns isSerialize 是否可以被自定义解析
    * @returns data 被解析完之后的数据
    */
-  public serializeTransferProto(value: unknown): serializeTransferResult {
+  public serializeCustom(value: unknown, u8aListRef: BFChainComproto.U8AList): boolean {
     const handler = this.getHandler(value);
     if (!handler) {
-      return { isSerialize: false };
+      return false;
     }
     const typeHandler = this.typeHandlerMap.get(dataTypeEnum.Ext);
     if (!typeHandler) {
       throw new ReferenceError("ext handler not exitst");
     }
-    return { isSerialize: true, data: typeHandler.serialize(value, this) };
+    const u8a = typeHandler.serialize(value, u8aListRef, this);
+    if (u8a !== undefined) {
+      u8aListRef.push(u8a);
+    }
+    return true;
   }
   /** 获取自定义handler */
   public getHandlerByhandlerName(handlerName: string) {

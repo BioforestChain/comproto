@@ -9,7 +9,7 @@ export default class UndefinedParseHandler
   typeName = dataTypeEnum.Undefined;
   typeClass = undefined;
   serialize() {
-    return new Uint8Array([SerializationTag.kUndefined]);
+    return [SerializationTag.kUndefined];
   }
   deserialize(decoderState: BFChainComproto.decoderState) {
     decoderState.offset++;
