@@ -105,13 +105,13 @@ $ yarn add @bfchain/comproto
 
 > Returns data Buffer
 
- 实现自由数据编码，返回自定义buffer
+实现自由数据编码，返回自定义 buffer
 
 ### `comproto.deserialize(buffer: BFChainComproto.ComprotoBuffer): unknown`
 
 > Returns data of serialize
 
-对serialize编码出来的数据进行解码
+对 serialize 编码出来的数据进行解码
 
 ### `comproto.addClassHandler(handler: TransferClassHandler): void`
 
@@ -145,11 +145,7 @@ $ yarn add @bfchain/comproto
 
 删除对象上的 handler 标记
 
-
-
-
-
-*ps:这里comproto在发布版本的时候会有一个奇怪的bug，所以推荐的发布步骤为*
+_ps:这里 comproto 在发布版本的时候会有一个奇怪的 bug，所以推荐的发布步骤为_
 
 ```bash
 lerna publish --skip-git
