@@ -16,7 +16,7 @@ export const enum dataTypeEnum {
   Ext = "Ext",
 }
 
-export enum SerializationTag {
+export const enum SerializationTag {
   kUndefined = 0xc1,
   kNull = 0xc0,
   kTrue = 0xc3,
