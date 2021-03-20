@@ -6,7 +6,7 @@ import { u8aConcat } from "@bfchain/comproto-helps";
 const enum ARRAY_BUFFRE_TYPE {
   Int8,
   Uint8,
-  Uint8C,
+  Uint8Clamped,
   Int16,
   Uint16,
   Int32,
@@ -38,7 +38,7 @@ export default class BufferViewParseHandler
         buffer = ARRAY_BUFFRE_TYPE.Uint8;
         break;
       case Uint8ClampedArray:
-        buffer = ARRAY_BUFFRE_TYPE.Uint8C;
+        buffer = ARRAY_BUFFRE_TYPE.Uint8Clamped;
         break;
       case Int16Array:
         buffer = ARRAY_BUFFRE_TYPE.Int16;
@@ -84,7 +84,7 @@ export default class BufferViewParseHandler
       case ARRAY_BUFFRE_TYPE.Uint8:
         ctor = Uint8Array;
         break;
-      case ARRAY_BUFFRE_TYPE.Uint8C:
+      case ARRAY_BUFFRE_TYPE.Uint8Clamped:
         ctor = Uint8ClampedArray;
         break;
       case ARRAY_BUFFRE_TYPE.Int16:
@@ -142,3 +142,112 @@ export default class BufferViewParseHandler
     throw `can not handler tag::${tag}`;
   }
 }
+
+// const TIMES = 1e7;
+
+// let buffer: ARRAY_BUFFRE_TYPE | undefined;
+// let ctor: any = Int8Array;
+// {
+//   console.time("if-else");
+//   for (let i = 0; i < TIMES; i++) {
+//     if (ctor === Int8Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.Int8;
+//     } else if (ctor === Uint8Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.Uint8;
+//     } else if (ctor === Uint8ClampedArray) {
+//       buffer = ARRAY_BUFFRE_TYPE.Uint8Clamped;
+//     } else if (ctor === Int16Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.Int16;
+//     } else if (ctor === Uint16Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.Uint16;
+//     } else if (ctor === Int32Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.Int32;
+//     } else if (ctor === Uint32Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.Uint32;
+//     } else if (ctor === Float32Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.Float32;
+//     } else if (ctor === Float64Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.Float64;
+//     } else if (ctor === BigInt64Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.BigInt64;
+//     } else if (ctor === BigUint64Array) {
+//       buffer = ARRAY_BUFFRE_TYPE.BigUint64;
+//     } else {
+//       throw new TypeError("unknown arraybufferview " + ctor.name);
+//     }
+//   }
+//   console.timeEnd("if-else");
+//   console.log(buffer);
+// }
+// {
+//   console.time("switch");
+//   for (let i = 0; i < TIMES; i++) {
+//     switch (ctor) {
+//       case Int8Array:
+//         buffer = ARRAY_BUFFRE_TYPE.Int8;
+//         break;
+//       case Uint8Array:
+//         buffer = ARRAY_BUFFRE_TYPE.Uint8;
+//         break;
+//       case Uint8ClampedArray:
+//         buffer = ARRAY_BUFFRE_TYPE.Uint8Clamped;
+//         break;
+//       case Int16Array:
+//         buffer = ARRAY_BUFFRE_TYPE.Int16;
+//         break;
+//       case Uint16Array:
+//         buffer = ARRAY_BUFFRE_TYPE.Uint16;
+//         break;
+//       case Int32Array:
+//         buffer = ARRAY_BUFFRE_TYPE.Int32;
+//         break;
+//       case Uint32Array:
+//         buffer = ARRAY_BUFFRE_TYPE.Uint32;
+//         break;
+//       case Float32Array:
+//         buffer = ARRAY_BUFFRE_TYPE.Float32;
+//         break;
+//       case Float64Array:
+//         buffer = ARRAY_BUFFRE_TYPE.Float64;
+//         break;
+//       case BigInt64Array:
+//         buffer = ARRAY_BUFFRE_TYPE.BigInt64;
+//         break;
+//       case BigUint64Array:
+//         buffer = ARRAY_BUFFRE_TYPE.BigUint64;
+//         break;
+//       default:
+//         throw new TypeError("unknown arraybufferview " + ctor.name);
+//     }
+//   }
+//   console.timeEnd("switch");
+//   console.log(buffer);
+// }
+
+// {
+//   const _ctorNameTypeHashMap = (() => {
+//     const hm: { [name: string]: ARRAY_BUFFRE_TYPE } = Object.create(null);
+//     hm["Int8Array"] = ARRAY_BUFFRE_TYPE.Int8;
+//     hm["Uint8Array"] = ARRAY_BUFFRE_TYPE.Uint8;
+//     hm["Uint8ClampedArray"] = ARRAY_BUFFRE_TYPE.Uint8Clamped;
+//     hm["Int16Array"] = ARRAY_BUFFRE_TYPE.Int16;
+//     hm["Uint16Array"] = ARRAY_BUFFRE_TYPE.Uint16;
+//     hm["Int32Array"] = ARRAY_BUFFRE_TYPE.Int32;
+//     hm["Uint32Array"] = ARRAY_BUFFRE_TYPE.Uint32;
+//     hm["Float32Array"] = ARRAY_BUFFRE_TYPE.Float32;
+//     hm["Float64Array"] = ARRAY_BUFFRE_TYPE.Float64;
+//     hm["BigInt64Array"] = ARRAY_BUFFRE_TYPE.BigInt64;
+//     hm["BigUint64Array"] = ARRAY_BUFFRE_TYPE.BigUint64;
+//     return hm;
+//   })();
+//   let ctor: any = BigUint64Array;
+//   console.time("hashmap");
+//   for (let i = 0; i < TIMES; i++) {
+//     const buffer = _ctorNameTypeHashMap[ctor.name];
+//     if (buffer === undefined) {
+//       throw new TypeError("unknown arraybufferview " + ctor.name);
+//     }
+//   }
+//   console.timeEnd("hashmap");
+//   console.log(buffer);
+// }
