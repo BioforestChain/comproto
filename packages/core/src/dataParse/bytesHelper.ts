@@ -42,8 +42,8 @@ class BytesHelper {
     buf[pos] = val;
   }
 
-  len2Buf(length: number, buf: number[] = []) {
-    this.writeVarInt(length, buf, 0);
+  len2Buf(length: number, buf: number[] = [], offset = 0) {
+    this.writeVarInt(length, buf, offset);
     return buf;
   }
   get getLen() {

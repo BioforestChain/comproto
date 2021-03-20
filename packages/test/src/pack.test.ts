@@ -192,6 +192,9 @@ test("test array", async (t) => {
 test("test object", async (t) => {
   t.deepEqual(transfer({}), {});
   t.deepEqual(transfer({ a: 2, b: [34], c: { d: "" } }), { a: 2, b: [34], c: { d: "" } });
+
+  const bigObj = Array.from({ length: 1000 }).reduce((obj: any, _, i) => ((obj[i] = i), obj), {});
+  t.deepEqual(transfer(bigObj), bigObj);
 });
 
 test("test map", async (t) => {
