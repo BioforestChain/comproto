@@ -28,23 +28,17 @@ class BytesHelper {
       return value;
     };
   })();
-  writeVarInt(
-    val: number,
-    buf: {
-      [index: number]: number;
-    },
-    pos: number,
-  ) {
+  writeVarInt<T extends { [index: number]: number }>(val: number, buf: T, pos: number) {
     while (val > 127) {
       buf[pos++] = (val & 127) | 128;
       val >>>= 7;
     }
     buf[pos] = val;
+    return buf;
   }
 
   len2Buf(length: number, buf: number[] = [], offset = 0) {
-    this.writeVarInt(length, buf, offset);
-    return buf;
+    return this.writeVarInt(length, buf, offset) as number[];
   }
   get getLen() {
     Object.defineProperty(helper, "getLen", { value: this.readVarInt });

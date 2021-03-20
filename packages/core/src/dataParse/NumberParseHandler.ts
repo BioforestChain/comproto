@@ -1,6 +1,7 @@
 import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
 import helper from "./bytesHelper";
+import { bytesHelper } from ".";
 /**
  * positive fixint -- 0x00 - 0x7f (0 ~ 127)
  * negative fixint -- 0xe0 - 0xff (-32 ~ -1)
@@ -32,19 +33,15 @@ export default class NumberParseHandler implements BFChainComproto.typeTransferH
       comproto.setTagType(i, dataTypeEnum.Number);
     }
     // uint 8 16 32 64
-    comproto.setTagType(0xcc, dataTypeEnum.Number);
-    comproto.setTagType(0xcd, dataTypeEnum.Number);
-    comproto.setTagType(0xce, dataTypeEnum.Number);
-    comproto.setTagType(0xcf, dataTypeEnum.Number);
-    // int 8 16 32 64
-    comproto.setTagType(0xd0, dataTypeEnum.Number);
-    comproto.setTagType(0xd1, dataTypeEnum.Number);
-    comproto.setTagType(0xd2, dataTypeEnum.Number);
-    comproto.setTagType(0xd3, dataTypeEnum.Number);
     // float 64
     comproto.setTagType(0xcb, dataTypeEnum.Number);
+    // positive varint
+    comproto.setTagType(0xcc, dataTypeEnum.Number);
+    // negative varint
+    comproto.setTagType(0xcd, dataTypeEnum.Number);
   }
   typeName = dataTypeEnum.Number;
+  private _arrCache: Array<Int8Array> = [];
   serialize(value: number, resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const ivalue = value | 0;
     if (value !== ivalue) {
@@ -56,86 +53,103 @@ export default class NumberParseHandler implements BFChainComproto.typeTransferH
     if (-0x20 <= ivalue && ivalue <= 0x7f) {
       // positive fixint -- 0x00 - 0x7f
       // negative fixint -- 0xe0 - 0xff
-      return [ivalue & 0xff];
+      return this._arrCache[ivalue] || (this._arrCache[ivalue] = new Int8Array([ivalue & 0xff]));
     }
     // 大于0
     if (ivalue >= 0) {
-      // uint 8 -- 0xcc
-      // uint 16 -- 0xcd
-      // uint 32 -- 0xce
-      if (ivalue <= 0xff) {
-        // 0xcc
-        return helper.writeUint8(0xcc, ivalue);
-      }
-      if (ivalue <= 0xffff) {
-        // 0xcd
-        return helper.writeUint16(0xcd, ivalue);
-      }
-      // 0xce
-      return helper.writeUint32(0xce, ivalue);
-    }
-    // int 8 -- 0xd0
-    // int 16 -- 0xd1
-    // int 32 -- 0xd2
-    if (ivalue >= -0x80) {
-      // 0xd0
-      return helper.writeInt8(0xd0, ivalue);
-    } else if (ivalue >= -0x8000) {
-      // 0xd1
-      return helper.writeInt16(0xd1, ivalue);
+      return helper.writeVarInt(ivalue, [0xcc], 1);
     } else {
-      // 0xd2
-      return helper.writeInt32(0xd2, ivalue);
+      return helper.writeVarInt(-ivalue, [0xcd], 1);
     }
-    // return new Uint8Array();
   }
+  private _numCache: { [tag: number]: number } = Object.create(null);
   deserialize(decoderState: BFChainComproto.decoderState) {
     const tag = decoderState.buffer[decoderState.offset++];
-    // positive fixint -- 0x00 - 0x7f
-    if (tag >= 0x00 && tag <= 0x7f) {
-      return tag;
-    }
-    // negative fixint -- 0xe0 - 0xff
-    if (tag >= 0xe0 && tag <= 0xff) {
-      return tag - 0x100;
-    }
-
     switch (tag) {
-      // int8
-      case 0xd0:
-        return helper.readInt8(decoderState);
-      // int16
-      case 0xd1:
-        return helper.readInt16(decoderState);
-        break;
-      // int32
-      case 0xd2:
-        return helper.readInt32(decoderState);
-        break;
-      // int64
-      case 0xd3:
-        return Number(helper.readInt64(decoderState));
-        break;
-      // uint8
-      case 0xcc:
-        return helper.readUint8(decoderState);
-        break;
-      // uint16
-      case 0xcd:
-        return helper.readUint16(decoderState);
-        break;
-      // uint32
-      case 0xce:
-        return helper.readUint32(decoderState);
-        break;
-      // uint64
-      case 0xcf:
-        return Number(helper.readUint64(decoderState));
-        break;
       case 0xcb:
         return helper.readFloat64(decoderState);
-        break;
+      case 0xcc:
+        return helper.readVarInt(decoderState);
+      case 0xcd:
+        return -helper.readVarInt(decoderState);
+      default:
+        return this._numCache[tag] || (this._numCache[tag] = tag >= 0xe0 ? tag - 256 : tag);
     }
-    throw `number handler can not handler tag::${tag}`;
   }
 }
+
+// const TIMES = 1e7;
+// {
+//   let res: any;
+//   console.time("create varint8");
+//   for (let i = 0; i < TIMES; i++) {
+//     res = bytesHelper.writeVarInt(1, [], 0);
+//   }
+//   console.timeEnd("create varint8");
+//   console.log(res);
+// }
+// {
+//   let res: any;
+//   console.time("create uint8");
+//   for (let i = 0; i < TIMES; i++) {
+//     res = bytesHelper.writeUint8(0, 1);
+//   }
+//   console.timeEnd("create uint8");
+//   console.log(res);
+// }
+// {
+//   let res: any;
+//   console.time("create varint16");
+//   for (let i = 0; i < TIMES; i++) {
+//     res = bytesHelper.writeVarInt(65535, [], 0);
+//   }
+//   console.timeEnd("create varint16");
+//   console.log(res);
+// }
+// {
+//   let res: any;
+//   console.time("create uint16");
+//   for (let i = 0; i < TIMES; i++) {
+//     res = bytesHelper.writeInt16(0, 65535);
+//   }
+//   console.timeEnd("create uint16");
+//   console.log(res);
+// }
+// {
+//   let res: any;
+//   console.time("create varint32");
+//   for (let i = 0; i < TIMES; i++) {
+//     res = bytesHelper.writeVarInt(1294967295, [], 0);
+//   }
+//   console.timeEnd("create varint32");
+//   console.log(res);
+// }
+// {
+//   let res: any;
+//   console.time("create uint32");
+//   for (let i = 0; i < TIMES; i++) {
+//     res = bytesHelper.writeInt16(0, 4294967295);
+//   }
+//   console.timeEnd("create uint32");
+//   console.log(res);
+// }
+// {
+//   let res: any;
+//   console.time("create array");
+//   for (let i = 0; i < TIMES; i++) {
+//     res = [1];
+//   }
+//   console.timeEnd("create array");
+//   console.log(res);
+// }
+// {
+//   console.time("create buffer");
+//   const cache: any = []; //Object.create(null);
+//   let res: any;
+//   console.time("create array");
+//   for (let i = 0; i < TIMES; i++) {
+//     res = cache[1] || (cache[1] = new Uint8Array([1]));
+//   }
+//   console.timeEnd("create buffer");
+//   console.log(res);
+// }
