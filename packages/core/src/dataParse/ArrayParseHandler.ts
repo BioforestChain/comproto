@@ -9,6 +9,22 @@ const enum ARRAY_TAGS {
   MANY_EMPTY = 0xdd,
 }
 
+const _ONE_EMPTY = new Uint8Array([ARRAY_TAGS.ONE_EMPTY]);
+const _LEN_CACHE_0 = new Uint8Array([ARRAY_TAGS.START]);
+const _LEN_CACHE_1 = new Uint8Array([ARRAY_TAGS.START + 1]);
+const _LEN_CACHE_2 = new Uint8Array([ARRAY_TAGS.START + 2]);
+const _LEN_CACHE_3 = new Uint8Array([ARRAY_TAGS.START + 3]);
+const _LEN_CACHE_4 = new Uint8Array([ARRAY_TAGS.START + 4]);
+const _LEN_CACHE_5 = new Uint8Array([ARRAY_TAGS.START + 5]);
+const _LEN_CACHE_6 = new Uint8Array([ARRAY_TAGS.START + 6]);
+const _LEN_CACHE_7 = new Uint8Array([ARRAY_TAGS.START + 7]);
+const _LEN_CACHE_8 = new Uint8Array([ARRAY_TAGS.START + 8]);
+const _LEN_CACHE_9 = new Uint8Array([ARRAY_TAGS.START + 9]);
+const _LEN_CACHE_10 = new Uint8Array([ARRAY_TAGS.START + 10]);
+const _LEN_CACHE_11 = new Uint8Array([ARRAY_TAGS.START + 11]);
+const _LEN_CACHE_12 = new Uint8Array([ARRAY_TAGS.START + 12]);
+const _LEN_CACHE_13 = new Uint8Array([ARRAY_TAGS.START + 13]);
+const _LEN_CACHE_14 = new Uint8Array([ARRAY_TAGS.START + 14]);
 /**
  * fixarray -- 0x90 - 0x9f
  * array 16 -- 0xdc
@@ -25,21 +41,59 @@ export default class ArrayParseHandler implements BFChainComproto.typeTransferHa
     comproto.setTagType(0xdd, dataTypeEnum.Array);
   }
   typeName = dataTypeEnum.Array;
-  private _ONE_EMPTY = new Uint8Array([ARRAY_TAGS.ONE_EMPTY]);
-  private _LEN_CACHE = [new Uint8Array([ARRAY_TAGS.START])];
   serialize(dataArray: unknown[], resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const arrLen = dataArray.length;
     /// length2Buf
-    // 0~14 这14中可能直接使用tag
-    if (arrLen <= 14) {
-      resRef.push(
-        this._LEN_CACHE[arrLen] ||
-          (this._LEN_CACHE[arrLen] = new Uint8Array([ARRAY_TAGS.START | arrLen])),
-      );
-    } else {
-      const lenBytes = [ARRAY_TAGS.END];
-      helper.len2Buf(arrLen, lenBytes, 1);
-      resRef.push(lenBytes);
+    switch (arrLen) {
+      case 0:
+        resRef.push(_LEN_CACHE_0);
+        break;
+      case 1:
+        resRef.push(_LEN_CACHE_1);
+        break;
+      case 2:
+        resRef.push(_LEN_CACHE_2);
+        break;
+      case 3:
+        resRef.push(_LEN_CACHE_3);
+        break;
+      case 4:
+        resRef.push(_LEN_CACHE_4);
+        break;
+      case 5:
+        resRef.push(_LEN_CACHE_5);
+        break;
+      case 6:
+        resRef.push(_LEN_CACHE_6);
+        break;
+      case 7:
+        resRef.push(_LEN_CACHE_7);
+        break;
+      case 8:
+        resRef.push(_LEN_CACHE_8);
+        break;
+      case 9:
+        resRef.push(_LEN_CACHE_9);
+        break;
+      case 10:
+        resRef.push(_LEN_CACHE_10);
+        break;
+      case 11:
+        resRef.push(_LEN_CACHE_11);
+        break;
+      case 12:
+        resRef.push(_LEN_CACHE_12);
+        break;
+      case 13:
+        resRef.push(_LEN_CACHE_13);
+        break;
+      case 14:
+        resRef.push(_LEN_CACHE_14);
+        break;
+      default:
+        const lenBytes = [ARRAY_TAGS.END];
+        helper.len2Buf(arrLen, lenBytes, 1);
+        resRef.push(lenBytes);
     }
 
     /// 这种 for of 是会遍历出稀疏数组的每一个元素
@@ -53,7 +107,7 @@ export default class ArrayParseHandler implements BFChainComproto.typeTransferHa
         /// 是否有多个 empty
         resRef.push(
           manyEmptyCount === 1
-            ? this._ONE_EMPTY
+            ? _ONE_EMPTY
             : helper.len2Buf(manyEmptyCount, [ARRAY_TAGS.MANY_EMPTY], 1),
         );
       }
@@ -66,7 +120,7 @@ export default class ArrayParseHandler implements BFChainComproto.typeTransferHa
       /// 是否有多个 empty
       resRef.push(
         manyEmptyCount === 0
-          ? this._ONE_EMPTY
+          ? _ONE_EMPTY
           : helper.len2Buf(manyEmptyCount, [ARRAY_TAGS.MANY_EMPTY], 1),
       );
     }
