@@ -1,6 +1,6 @@
 {
   "name": "@bfchain/comproto-test",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "private": true,
   "main": "build/cjs/index.js",
   "type": "build/cjs/index.d.ts",
