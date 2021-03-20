@@ -3,28 +3,52 @@ import { str2U8a, u8a2Str, u8aConcat } from "@bfchain/comproto-helps";
 const dvu8a = new Uint8Array(8);
 const dv = new DataView(dvu8a.buffer);
 class BytesHelper {
-  len2Buf(length: number) {
-    if (length < 0xff) {
-      return helper.writeUint8(0x00, length);
+  /**可变长度的int */
+  readVarInt = (function readVarIntSetup() {
+    let value = 4294967295; // optimizer type-hint, tends to deopt otherwise (?!)
+    return function readVarInt(ds: BFChainComproto.decoderState) {
+      value = (ds.buffer[ds.offset] & 127) >>> 0;
+      if (ds.buffer[ds.offset++] < 128) return value;
+      value = (value | ((ds.buffer[ds.offset] & 127) << 7)) >>> 0;
+      if (ds.buffer[ds.offset++] < 128) return value;
+      value = (value | ((ds.buffer[ds.offset] & 127) << 14)) >>> 0;
+      if (ds.buffer[ds.offset++] < 128) return value;
+      value = (value | ((ds.buffer[ds.offset] & 127) << 21)) >>> 0;
+      if (ds.buffer[ds.offset++] < 128) return value;
+      value = (value | ((ds.buffer[ds.offset] & 15) << 28)) >>> 0;
+      if (ds.buffer[ds.offset++] < 128) return value;
+
+      /* istanbul ignore if */
+      if ((ds.offset += 5) > ds.buffer.length) {
+        ds.offset = ds.buffer.length;
+        throw new RangeError(
+          `fail to read VarInt, Index out of range: ${ds.offset} + 10 > ${ds.buffer.length}`,
+        );
+      }
+      return value;
+    };
+  })();
+  writeVarInt(
+    val: number,
+    buf: {
+      [index: number]: number;
+    },
+    pos: number,
+  ) {
+    while (val > 127) {
+      buf[pos++] = (val & 127) | 128;
+      val >>>= 7;
     }
-    if (length <= 0xffff) {
-      return helper.writeUint16(0x01, length);
-    }
-    return helper.writeUint32(0x02, length);
+    buf[pos] = val;
   }
-  getLen(decoderState: BFChainComproto.decoderState) {
-    const tag = decoderState.buffer[decoderState.offset++];
-    switch (tag) {
-      case 0x00:
-        return helper.readUint8(decoderState);
 
-      case 0x01:
-        return helper.readUint16(decoderState);
-
-      case 0x02:
-        return helper.readUint32(decoderState);
-    }
-    throw `string handler not tag::${tag}`;
+  len2Buf(length: number, buf: number[] = []) {
+    this.writeVarInt(length, buf, 0);
+    return buf;
+  }
+  get getLen() {
+    Object.defineProperty(helper, "getLen", { value: this.readVarInt });
+    return this.readVarInt;
   }
   readUint8(decoderState: BFChainComproto.decoderState) {
     return decoderState.buffer[decoderState.offset++];
