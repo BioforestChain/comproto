@@ -11,7 +11,6 @@ export default class MapParseHandler
     comproto.setTagType(0xca, dataTypeEnum.Map);
   }
   typeName = dataTypeEnum.Map;
-  typeClass = Map;
   serialize(dataMap: Map<unknown, unknown>, resRef: BFChainComproto.U8AList, comproto: Comproto) {
     const dataKeyLen = dataMap.size;
     const headU8a = this.length2Buf(dataKeyLen);

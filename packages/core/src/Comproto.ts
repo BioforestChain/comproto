@@ -195,11 +195,7 @@ export class Comproto {
   }
   getTransferTypeHandler(value: unknown) {
     const valueType = getDataType(value) as dataTypeEnum;
-    const typeHandler = this.typeHandlerMap.get(valueType);
-    if (typeHandler) {
-      return typeHandler;
-    }
-    return undefined;
+    return this.typeHandlerMap.get(valueType);
   }
   /** 判断是否可以序列化类型 */
   canTransferType(value: unknown) {

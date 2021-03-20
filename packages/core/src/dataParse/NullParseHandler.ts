@@ -7,7 +7,6 @@ export default class NullParseHandler implements BFChainComproto.typeTransferHan
     comproto.setTagType(SerializationTag.kNull, dataTypeEnum.Null);
   }
   typeName = dataTypeEnum.Null;
-  typeClass = null;
   serialize() {
     return this.TAG;
   }

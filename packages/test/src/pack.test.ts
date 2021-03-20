@@ -89,13 +89,13 @@ test("test serialize symbol", async (t) => {
   t.is(transfer(symbol), undefined);
 
   const data = { [symbol]: 1 };
-  t.deepEqual(transfer(data), {});
+  t.deepEqual(transfer(data), {} as any);
 
   const data2 = { a: symbol };
-  t.deepEqual(transfer(data2), { a: undefined });
+  t.deepEqual(transfer(data2), { a: undefined } as any);
 
   const data3 = [symbol];
-  t.deepEqual(transfer(data3), [undefined]);
+  t.deepEqual(transfer(data3), [undefined] as any);
 });
 
 // Error
@@ -183,6 +183,16 @@ test("test bigint", async (t) => {
 test("test array", async (t) => {
   t.deepEqual(transfer([]), []);
   t.deepEqual(transfer([1]), [1]);
+
+  const sparseArray = [];
+  sparseArray.length = 3;
+  sparseArray[1] = true;
+  debugger
+  t.deepEqual(
+    transfer(sparseArray).map((v, i) => [v, i]),
+    sparseArray.map((v, i) => [v, i]),
+  );
+
   t.deepEqual(transfer(["", { a: "ss" }]), ["", { a: "ss" }]);
   t.deepEqual(transfer([{ a: 1, b: "3", c: { e: [1, { b: BigInt(1) }] } }]), [
     { a: 1, b: "3", c: { e: [1, { b: BigInt(1) }] } },
@@ -232,6 +242,6 @@ test("test subarray array buffer", async (t) => {
   t.deepEqual(transfer(b), b);
 });
 
-function transfer(data: unknown) {
-  return comproto.deserialize(comproto.serialize(data));
+function transfer<T>(data: T) {
+  return comproto.deserialize<T>(comproto.serialize(data));
 }
