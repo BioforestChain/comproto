@@ -11,6 +11,7 @@
     "mono": "bdk-mono ./",
     "dev": "bdk-tsc --build -w",
     "dev:all": "bdk-tsc --build tsconfig.all.json -w",
+    "bench": "node ./packages/test/build/cjs/benchmark.js",
     "test": "node ./node_modules/ava/cli.js",
     "test:debug": "ndb ./node_modules/ava/cli.js",
     "format":"bdk-format",

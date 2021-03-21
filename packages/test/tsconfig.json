@@ -2,7 +2,10 @@
   "extends": "../../config/tsconfig_base/base.tsconfig.cjs",
   "compilerOptions": {
     "outDir": "./build/cjs",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": [
+      "node"
+    ]
   },
   "references": [
     {
@@ -13,6 +16,7 @@
     }
   ],
   "files": [
+    "src/benchmark.ts",
     "src/comproto.test.ts",
     "src/pack.test.ts"
   ]

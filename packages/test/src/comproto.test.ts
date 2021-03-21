@@ -14,7 +14,7 @@ class A {
   public a = 0;
 }
 
-comproto.addClassHandler({
+comproto.addClassHandler<A, number>({
   handlerName: "CLASS_HANDLER_A",
   classCtor: A,
   serialize(obj: A) {
