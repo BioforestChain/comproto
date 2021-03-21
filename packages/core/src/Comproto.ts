@@ -84,19 +84,15 @@ export class Comproto {
    *  这样基于这个类创建出来的实例会被处理
    * @param handler
    */
-  addClassHandler<
-    C extends BFChainComproto.HandlerClass = BFChainComproto.HandlerClass,
-    O = unknown,
-    N extends string = string
-  >(
+  addClassHandler<I, O = unknown, N extends string = string>(
     handler: {
-      classCtor: C;
+      classCtor: BFChainComproto.AnyClass<I>;
       handlerName: N;
-      serialize?: BFChainComproto.Handler.Serialize<BFChainComproto.GetClassInstance<C>, O>;
-      deserialize?: BFChainComproto.Handler.Deserialize<O, BFChainComproto.GetClassInstance<C>>;
+      serialize?: BFChainComproto.Handler.Serialize<I, O>;
+      deserialize?: BFChainComproto.Handler.Deserialize<O, I>;
     },
-    serialize?: BFChainComproto.Handler.Serialize<BFChainComproto.GetClassInstance<C>, O>,
-    deserialize?: BFChainComproto.Handler.Deserialize<O, BFChainComproto.GetClassInstance<C>>,
+    serialize?: BFChainComproto.Handler.Serialize<I, O>,
+    deserialize?: BFChainComproto.Handler.Deserialize<O, I>,
   ) {
     const handlerName = handler.handlerName;
     this.$confirmCanAddHandler(handlerName);
