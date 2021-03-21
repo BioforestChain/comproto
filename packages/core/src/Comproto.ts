@@ -172,7 +172,7 @@ export class Comproto {
    * @name 是否可以添加handler
    */
   protected $confirmCanAddHandler(handlerName: string) {
-    if (!this.protorHandlerMap.has(handlerName)) {
+    if (this.protorHandlerMap.has(handlerName)) {
       throw new ReferenceError("add a exist handler, please delete it before add");
     }
   }
