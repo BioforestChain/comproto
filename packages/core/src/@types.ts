@@ -19,8 +19,7 @@ declare namespace BFChainComproto {
 
   type HandlerProtor = { [HANDLER_SYMBOL]?: string };
 
-  interface Handler<I = unknown, O = unknown, D = I, N extends string = string>
-    extends IProtorHanlder {
+  interface Handler<I = unknown, O = unknown, D = I, N extends string = string> extends IProtorHanlder {
     handlerName: N;
     serialize?: Handler.Serialize<I, O>;
     deserialize?: Handler.Deserialize<O, D>;
@@ -34,39 +33,26 @@ declare namespace BFChainComproto {
     }
   }
   /** 基于原型链的handler */
-  interface TransferByProtoHandler<I = unknown, O = unknown, D = I, N extends string = string>
-    extends Handler<I, O, D, N> {}
+  interface TransferByProtoHandler<I = unknown, O = unknown, D = I, N extends string = string> extends Handler<I, O, D, N> {}
 
   /** 基于检测器的handler */
-  interface TransferByCheckerHandler<I = unknown, O = unknown, D = I, N extends string = string>
-    extends Handler<I, O, D, N> {
+  interface TransferByCheckerHandler<I = unknown, O = unknown, D = I, N extends string = string> extends Handler<I, O, D, N> {
     canHandle: (obj: I) => boolean;
   }
 
   type HandlerClass = AnyClass;
-  type GetClassInstance<T> = T extends AnyClass
-    ? InstanceType<T>
-    : T extends BigIntConstructor
-    ? bigint
-    : T;
+  type GetClassInstance<T> = T extends AnyClass ? InstanceType<T> : T extends BigIntConstructor ? bigint : T;
 
   /** 基于构造函数的handler */
-  interface TransferByClassHandler<
-    C extends HandlerClass = HandlerClass,
-    O = unknown,
-    N extends string = string
-  > extends Handler<GetClassInstance<C>, O, GetClassInstance<C>, N> {
+  interface TransferByClassHandler<C extends HandlerClass = HandlerClass, O = unknown, N extends string = string>
+    extends Handler<GetClassInstance<C>, O, GetClassInstance<C>, N> {
     classCtor: C;
   }
   //#endregion
 
   interface TypeTransferHandler<T = unknown, O = T> {
     typeName: import("./const").dataTypeEnum;
-    serialize: (
-      data: T,
-      resRef: U8AList,
-      comproto: import("./Comproto").Comproto,
-    ) => ArrayLike<number> | void;
+    serialize: (data: T, resRef: U8AList, comproto: import("./Comproto").Comproto) => ArrayLike<number> | void;
     deserialize: (decoderState: decoderState, comproto: import("./Comproto").Comproto) => O;
   }
 

@@ -12,8 +12,7 @@ export class CarryStorageRegister {
     this.curCount++;
     const arrayPointer = Math.floor(this.curCount / CarryStorageRegister.STATE_NUMBER_DIGIT_HEX);
     const curCarryNumber = this.stateNumberArray[arrayPointer] | 0;
-    this.stateNumberArray[arrayPointer] =
-      curCarryNumber | (1 << this.curCount % CarryStorageRegister.STATE_NUMBER_DIGIT_HEX);
+    this.stateNumberArray[arrayPointer] = curCarryNumber | (1 << this.curCount % CarryStorageRegister.STATE_NUMBER_DIGIT_HEX);
   }
   public carryBitZero() {
     this.curCount++;

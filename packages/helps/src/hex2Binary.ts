@@ -15,9 +15,7 @@ if (typeof Buffer === "function" && typeof process === "object") {
   Object.freeze(hex2numHasMap);
 
   hex2Binary = (hex: string) => {
-    const res = new Uint8Array(
-      (hex.length + /**一定要是个偶数，可能会少一位，这里+1不会影响结果 */ 1) >> 1,
-    );
+    const res = new Uint8Array((hex.length + /**一定要是个偶数，可能会少一位，这里+1不会影响结果 */ 1) >> 1);
     const len2 = hex.length + 2;
     for (let i = res.length - 1, start = -2; i >= 0; i--, start -= 2) {
       res[i] = hex2numHasMap[hex.slice(start, len2 + start)];

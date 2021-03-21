@@ -21,9 +21,7 @@ class BytesHelper {
       /* istanbul ignore if */
       if ((ds.offset += 5) > ds.buffer.length) {
         ds.offset = ds.buffer.length;
-        throw new RangeError(
-          `fail to read VarInt, Index out of range: ${ds.offset} + 10 > ${ds.buffer.length}`,
-        );
+        throw new RangeError(`fail to read VarInt, Index out of range: ${ds.offset} + 10 > ${ds.buffer.length}`);
       }
       return value;
     };
@@ -65,22 +63,12 @@ class BytesHelper {
   readUint32(decoderState: BFChainComproto.decoderState) {
     const { buffer, offset } = decoderState;
     decoderState.offset += 4;
-    return (
-      buffer[offset] * 16777216 +
-      (buffer[offset + 1] << 16) +
-      (buffer[offset + 2] << 8) +
-      buffer[offset + 3]
-    );
+    return buffer[offset] * 16777216 + (buffer[offset + 1] << 16) + (buffer[offset + 2] << 8) + buffer[offset + 3];
   }
   readInt32(decoderState: BFChainComproto.decoderState) {
     const { buffer, offset } = decoderState;
     decoderState.offset += 4;
-    return (
-      (buffer[offset] << 24) |
-      (buffer[offset + 1] << 16) |
-      (buffer[offset + 2] << 8) |
-      buffer[offset + 3]
-    );
+    return (buffer[offset] << 24) | (buffer[offset + 1] << 16) | (buffer[offset + 2] << 8) | buffer[offset + 3];
   }
   readUint64(decoderState: BFChainComproto.decoderState) {
     const { buffer, offset } = decoderState;
@@ -232,9 +220,7 @@ class BytesHelper {
   }
   readStringBuf(decoderState: BFChainComproto.decoderState) {
     const strLen = helper.getLen(decoderState);
-    return u8a2Str(
-      decoderState.buffer.subarray(decoderState.offset, (decoderState.offset += strLen)),
-    );
+    return u8a2Str(decoderState.buffer.subarray(decoderState.offset, (decoderState.offset += strLen)));
   }
 
   private _dictBufCache = new Map<string, Uint8Array>();

@@ -2,8 +2,7 @@ import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
 import helper from "./bytesHelper";
 
-export default class MapParseHandler
-  implements BFChainComproto.TypeTransferHandler<Map<unknown, unknown>> {
+export default class MapParseHandler implements BFChainComproto.TypeTransferHandler<Map<unknown, unknown>> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     comproto.setTagType(0xc8, dataTypeEnum.Map);

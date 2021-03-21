@@ -17,8 +17,7 @@ const enum ARRAY_BUFFRE_TYPE {
   BigUint64,
 }
 
-export default class BufferViewParseHandler
-  implements BFChainComproto.TypeTransferHandler<ArrayBufferView> {
+export default class BufferViewParseHandler implements BFChainComproto.TypeTransferHandler<ArrayBufferView> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     comproto.setTagType(0xc4, dataTypeEnum.BufferView);

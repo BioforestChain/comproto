@@ -3,8 +3,7 @@ import type { Comproto } from "../Comproto";
 import helper from "./bytesHelper";
 import { u8aConcat } from "@bfchain/comproto-helps";
 
-export default class ArrayBufferParseHandler
-  implements BFChainComproto.TypeTransferHandler<ArrayBuffer> {
+export default class ArrayBufferParseHandler implements BFChainComproto.TypeTransferHandler<ArrayBuffer> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     comproto.setTagType(0xd5, dataTypeEnum.ArrayBuffer);

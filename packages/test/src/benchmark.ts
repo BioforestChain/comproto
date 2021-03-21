@@ -77,16 +77,40 @@ const obj3 = Array.from({ length: 20 }, () => new O2());
   const buf6 = encoder.encode(JSON.stringify(obj));
   const benchList = [
     { group: "comproto", title: "comproto.serialize object", fn: () => comproto.serialize(obj) },
-    { group: "comproto", title: "comproto.deserialize object", fn: () => comproto.deserialize(buf1) },
-    { group: "comproto", title: "comproto.serialize custom-object", fn: () => comproto.serialize(obj2) },
-    { group: "comproto", title: "comproto.deserialize custom-object", fn: () => comproto.deserialize(buf2) },
-    { group: "comproto", title: "comproto.serialize custom-flat-object", fn: () => comproto.serialize(obj3) },
-    { group: "comproto", title: "comproto.deserialize custom-flat-object", fn: () => comproto.deserialize(buf3) },
+    {
+      group: "comproto",
+      title: "comproto.deserialize object",
+      fn: () => comproto.deserialize(buf1),
+    },
+    {
+      group: "comproto",
+      title: "comproto.serialize custom-object",
+      fn: () => comproto.serialize(obj2),
+    },
+    {
+      group: "comproto",
+      title: "comproto.deserialize custom-object",
+      fn: () => comproto.deserialize(buf2),
+    },
+    {
+      group: "comproto",
+      title: "comproto.serialize custom-flat-object",
+      fn: () => comproto.serialize(obj3),
+    },
+    {
+      group: "comproto",
+      title: "comproto.deserialize custom-flat-object",
+      fn: () => comproto.deserialize(buf3),
+    },
     { group: "v8", title: "v8.serialize object", fn: () => v8.serialize(obj) },
     { group: "v8", title: "v8.deserialize object", fn: () => v8.deserialize(buf4) },
     { group: "json", title: "json.stringify object", fn: () => JSON.stringify(obj) },
     { group: "json", title: "json.parse object", fn: () => JSON.parse(json5) },
-    { group: "comproto", title: "buf.stringify object", fn: () => encoder.encode(JSON.stringify(obj)) },
+    {
+      group: "comproto",
+      title: "buf.stringify object",
+      fn: () => encoder.encode(JSON.stringify(obj)),
+    },
     { group: "comproto", title: "buf.parse object", fn: () => JSON.parse(decoder.decode(buf6)) },
   ];
   //   suite(benchList, {

@@ -23,11 +23,7 @@ if (typeof TextDecoder === "function") {
         chr = ((chr & 0x0f) << 12) | ((buffer[index++] & 0x3f) << 6) | (buffer[index++] & 0x3f);
       } else if ((chr & 0xf8) === 0xf0) {
         // 4 bytes
-        chr =
-          ((chr & 0x07) << 18) |
-          ((buffer[index++] & 0x3f) << 12) |
-          ((buffer[index++] & 0x3f) << 6) |
-          (buffer[index++] & 0x3f);
+        chr = ((chr & 0x07) << 18) | ((buffer[index++] & 0x3f) << 12) | ((buffer[index++] & 0x3f) << 6) | (buffer[index++] & 0x3f);
       }
       if (chr >= 0x010000) {
         // A surrogate pair

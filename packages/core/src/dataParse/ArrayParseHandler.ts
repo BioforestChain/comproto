@@ -105,11 +105,7 @@ export default class ArrayParseHandler implements BFChainComproto.TypeTransferHa
         const manyEmptyCount = index - preIndex;
         preIndex = index;
         /// 是否有多个 empty
-        resRef.push(
-          manyEmptyCount === 1
-            ? _ONE_EMPTY
-            : helper.len2Buf(manyEmptyCount, [ARRAY_TAGS.MANY_EMPTY], 1),
-        );
+        resRef.push(manyEmptyCount === 1 ? _ONE_EMPTY : helper.len2Buf(manyEmptyCount, [ARRAY_TAGS.MANY_EMPTY], 1));
       }
       /// 写入值
       comproto.serializeTransfer(value, resRef);
@@ -118,11 +114,7 @@ export default class ArrayParseHandler implements BFChainComproto.TypeTransferHa
     if (arrLen !== ++preIndex) {
       const manyEmptyCount = arrLen - preIndex;
       /// 是否有多个 empty
-      resRef.push(
-        manyEmptyCount === 0
-          ? _ONE_EMPTY
-          : helper.len2Buf(manyEmptyCount, [ARRAY_TAGS.MANY_EMPTY], 1),
-      );
+      resRef.push(manyEmptyCount === 0 ? _ONE_EMPTY : helper.len2Buf(manyEmptyCount, [ARRAY_TAGS.MANY_EMPTY], 1));
     }
   }
   deserialize(decoderState: BFChainComproto.decoderState, comproto: Comproto) {

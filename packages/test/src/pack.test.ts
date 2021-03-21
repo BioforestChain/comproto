@@ -43,17 +43,7 @@ test("test number of int", async (t) => {
 });
 
 test("test number of float", async (t) => {
-  const testNumArr = [
-    -0.1,
-    -0.2,
-    -0.00000000001,
-    -3.222222223,
-    0.1,
-    0.2,
-    0.00000000001,
-    3.222222223,
-    Number.EPSILON,
-  ];
+  const testNumArr = [-0.1, -0.2, -0.00000000001, -3.222222223, 0.1, 0.2, 0.00000000001, 3.222222223, Number.EPSILON];
   testNumArr.forEach((item) => {
     const trasferData = transfer(item);
     t.is(trasferData, item);
@@ -187,16 +177,14 @@ test("test array", async (t) => {
   const sparseArray = [];
   sparseArray.length = 3;
   sparseArray[1] = true;
-  debugger
+  debugger;
   t.deepEqual(
     transfer(sparseArray).map((v, i) => [v, i]),
     sparseArray.map((v, i) => [v, i]),
   );
 
   t.deepEqual(transfer(["", { a: "ss" }]), ["", { a: "ss" }]);
-  t.deepEqual(transfer([{ a: 1, b: "3", c: { e: [1, { b: BigInt(1) }] } }]), [
-    { a: 1, b: "3", c: { e: [1, { b: BigInt(1) }] } },
-  ]);
+  t.deepEqual(transfer([{ a: 1, b: "3", c: { e: [1, { b: BigInt(1) }] } }]), [{ a: 1, b: "3", c: { e: [1, { b: BigInt(1) }] } }]);
 });
 
 test("test object", async (t) => {
