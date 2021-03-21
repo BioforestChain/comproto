@@ -1,7 +1,7 @@
 import { dataTypeEnum, SerializationTag } from "../const";
 import type { Comproto } from "../Comproto";
 
-export default class BooleanParseHandler implements BFChainComproto.typeTransferHandler<boolean> {
+export default class BooleanParseHandler implements BFChainComproto.TypeTransferHandler<boolean> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     comproto.setTagType(SerializationTag.kTrue, dataTypeEnum.Boolean);

@@ -3,10 +3,12 @@ import { HANDLER_SYMBOL } from "@bfchain/comproto-typings";
 import { dataTypeEnum } from "./const";
 
 export class Comproto {
-  protected handlerMap: Map<string, BFChainComproto.IHanlder> = new Map();
-  protected handlerListMap: Map<string, BFChainComproto.ITransferHandler> = new Map();
+  /**基于原型链的检测 */
+  protected protorHandlerMap: Map<string, BFChainComproto.IProtorHanlder> = new Map();
+  /**基于函数的检测 */
+  protected checkerHandlerMap: Map<string, BFChainComproto.ICheckerHandler> = new Map();
   protected tagTypeMap: Map<number, dataTypeEnum> = new Map();
-  protected typeHandlerMap: Map<dataTypeEnum, BFChainComproto.typeHandler> = new Map();
+  protected typeHandlerMap: Map<dataTypeEnum, BFChainComproto.TypeTransferHandler> = new Map();
   get handlerMarker(): BFChainComproto.HandlerSymbol {
     return HANDLER_SYMBOL;
   }
@@ -32,22 +34,21 @@ export class Comproto {
    * @param obj
    */
   public getHandler(obj: unknown) {
-    let returnHandler: BFChainComproto.Handler | undefined = undefined;
+    let returnHandler: BFChainComproto.Handler | undefined;
     // 先尝试查看属性是否有解析标签
     try {
-      const handlerName = (obj as BFChainComproto.HandlerObject)[HANDLER_SYMBOL];
+      const handlerName = (obj as BFChainComproto.HandlerProtor)[HANDLER_SYMBOL];
       if (typeof handlerName === "string") {
         returnHandler = this.getHandlerByhandlerName(handlerName);
       }
     } catch (err) {}
-    if (returnHandler) {
-      return returnHandler;
-    }
-    // 再看看有没有可以处理此对象的handler
-    for (const handler of this.handlerListMap.values()) {
-      if (handler.canHandle(obj)) {
-        returnHandler = handler;
-        break;
+    if (returnHandler === undefined && this.checkerHandlerMap.size > 0) {
+      // 再看看有没有可以处理此对象的handler
+      for (const handler of this.checkerHandlerMap.values()) {
+        if (handler.canHandle(obj)) {
+          returnHandler = handler;
+          break;
+        }
       }
     }
     return returnHandler;
@@ -58,20 +59,24 @@ export class Comproto {
   /**
    * @name 添加自定义handler
    * @description 主要针对开发者有设置标签的对象 setHandlerMarker
-   * @param handler
+   * @param handlerInfo
    */
-  public addCustomHandler<I = unknown, O = unknown, D = I>(
-    handler: BFChainComproto.TransferCustomHandler<I, O, D>,
+  public addCustomHandler<I = unknown, O = unknown, D = I, N extends string = string>(
+    handlerInfo: {
+      handlerName: N;
+      serialize?: BFChainComproto.Handler.Serialize<I, O>;
+      deserialize?: BFChainComproto.Handler.Deserialize<O, D>;
+    },
+    serialize?: BFChainComproto.Handler.Serialize<I, O>,
+    deserialize?: BFChainComproto.Handler.Deserialize<O, D>,
   ) {
-    this.canAddHandler(handler);
-    this.handlerMap.set(handler.handlerName, handler);
-  }
-  /**
-   * @name 删除自定义handler
-   * @param handlerName
-   */
-  public deleteCustomHandler(handlerName: string) {
-    this.handlerMap.delete(handlerName);
+    const { handlerName } = handlerInfo;
+    this.$confirmCanAddHandler(handlerName);
+    this.protorHandlerMap.set(handlerName, {
+      handlerName,
+      serialize: serialize || handlerInfo.serialize,
+      deserialize: deserialize || handlerInfo.deserialize,
+    });
   }
   /**
    * @name 添加类handler
@@ -79,55 +84,74 @@ export class Comproto {
    *  这样基于这个类创建出来的实例会被处理
    * @param handler
    */
-  public addClassHandler<
-    H extends BFChainComproto.HandlerClass,
-    O,
-    D = BFChainComproto.GetTransferClassInstance<H>
-  >(handler: BFChainComproto.TransferClassHandler<H, O, D>) {
-    this.canAddHandler(handler);
+  addClassHandler<
+    C extends BFChainComproto.HandlerClass = BFChainComproto.HandlerClass,
+    O = unknown,
+    N extends string = string
+  >(
+    handler: {
+      classCtor: C;
+      handlerName: N;
+      serialize?: BFChainComproto.Handler.Serialize<BFChainComproto.GetClassInstance<C>, O>;
+      deserialize?: BFChainComproto.Handler.Deserialize<O, BFChainComproto.GetClassInstance<C>>;
+    },
+    serialize?: BFChainComproto.Handler.Serialize<BFChainComproto.GetClassInstance<C>, O>,
+    deserialize?: BFChainComproto.Handler.Deserialize<O, BFChainComproto.GetClassInstance<C>>,
+  ) {
     const handlerName = handler.handlerName;
-    this.setHandlerMarker(handler.handlerObj.prototype, handler.handlerName);
-    this.handlerMap.set(handlerName, handler);
-  }
-  /**
-   * @name 删除类handler
-   * @param handlerName
-   */
-  public deleteClassHandler(handlerName: string) {
-    const handler = this.handlerMap.get(handlerName) as BFChainComproto.TransferClassHandler;
-    if (handler == undefined) {
-      return;
-    }
-    this.handlerMap.delete(handlerName);
-    if ("handlerObj" in handler) {
-      this.deleteHandlerMarker(handler.handlerObj);
-    }
+    this.$confirmCanAddHandler(handlerName);
+    this.setHandlerMarker(handler.classCtor.prototype, handler.handlerName);
+    this.protorHandlerMap.set(handlerName, {
+      handlerName,
+      serialize: serialize || handler.serialize,
+      deserialize: deserialize || handler.deserialize,
+    });
   }
   /**
    * @name 添加handler
    * @description 在 canHandler 方法判断是否可以解析对象
    * @param handler
    */
-  public addHandler<I = unknown, O = unknown, D = I>(
-    handler: BFChainComproto.TransferHandler<I, O, D>,
+  addCheckerHandler<I = unknown, O = unknown, D = I, N extends string = string>(
+    handlerInfo: {
+      handlerName: N;
+      canHandle: BFChainComproto.Handler.CanHandle<I>;
+      serialize?: BFChainComproto.Handler.Serialize<I, O>;
+      deserialize?: BFChainComproto.Handler.Deserialize<O, D>;
+    },
+    serialize?: BFChainComproto.Handler.Serialize<I, O>,
+    deserialize?: BFChainComproto.Handler.Deserialize<O, D>,
   ) {
-    this.canAddHandler(handler);
-    this.handlerListMap.set(handler.handlerName, handler);
-    this.handlerMap.set(handler.handlerName, handler);
+    const { handlerName, canHandle } = handlerInfo;
+    this.$confirmCanAddHandler(handlerName);
+    // this.handlerListMap.set(handler.handlerName, handler);
+    this.checkerHandlerMap.set(handlerName, {
+      handlerName,
+      canHandle,
+      serialize: serialize || handlerInfo.serialize,
+      deserialize: deserialize || handlerInfo.deserialize,
+    });
   }
   /**
    * @name 删除handler
    * @param handler
    */
-  public deleteHandler(handlerName: string) {
-    this.handlerListMap.delete(handlerName);
-    this.handlerMap.delete(handlerName);
+  deleteHandler(handlerName: string) {
+    const handler = this.protorHandlerMap.get(handlerName); //|| this.checkerHandlerMap.get(handlerName);
+    if (handler === undefined) {
+      return this.checkerHandlerMap.delete(handlerName);
+    }
+    if (handler.classCtor) {
+      this.protorHandlerMap.delete(handlerName);
+      this.deleteHandlerMarker(handler.classCtor.prototype);
+    }
+    return true;
   }
   /**
    * @name 删除解析标签
    * @param handlerObj
    */
-  public deleteHandlerMarker(handlerObj: BFChainComproto.HandlerObject) {
+  public deleteHandlerMarker(handlerObj: BFChainComproto.HandlerProtor) {
     if (HANDLER_SYMBOL in handlerObj) {
       delete handlerObj[HANDLER_SYMBOL];
     }
@@ -147,10 +171,8 @@ export class Comproto {
   /**
    * @name 是否可以添加handler
    */
-  protected canAddHandler(handler: BFChainComproto.IHanlder) {
-    const handlerName = handler.handlerName;
-    const mHandler = this.handlerMap.get(handlerName);
-    if (mHandler) {
+  protected $confirmCanAddHandler(handlerName: string) {
+    if (!this.protorHandlerMap.has(handlerName)) {
       throw new ReferenceError("add a exist handler, please delete it before add");
     }
   }
@@ -174,9 +196,9 @@ export class Comproto {
    * 设置类型handler
    * @param handler
    */
-  setTypeHandler<T, O = T>(handler: BFChainComproto.typeTransferHandler<T, O>) {
+  setTypeHandler<T, O = T>(handler: BFChainComproto.TypeTransferHandler<T, O>) {
     if (this.typeHandlerMap.has(handler.typeName)) throw `typeName:${handler.typeName} is exsist`;
-    this.typeHandlerMap.set(handler.typeName, handler as BFChainComproto.typeHandler);
+    this.typeHandlerMap.set(handler.typeName, handler as BFChainComproto.TypeTransferHandler);
   }
   /**
    * @name 通过判断对象类型进行解析
@@ -224,7 +246,7 @@ export class Comproto {
   }
   /** 获取自定义handler */
   public getHandlerByhandlerName(handlerName: string) {
-    return this.handlerMap.get(handlerName);
+    return this.protorHandlerMap.get(handlerName);
   }
   /** 解析buffer */
   public deserializeTransfer(decoderState: BFChainComproto.decoderState) {

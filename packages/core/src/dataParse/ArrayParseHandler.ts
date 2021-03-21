@@ -30,7 +30,7 @@ const _LEN_CACHE_14 = new Uint8Array([ARRAY_TAGS.START + 14]);
  * array 16 -- 0xdc
  * array 32 -- 0xdd
  */
-export default class ArrayParseHandler implements BFChainComproto.typeTransferHandler<unknown[]> {
+export default class ArrayParseHandler implements BFChainComproto.TypeTransferHandler<unknown[]> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     // fixarray -- 0x90 - 0x9f

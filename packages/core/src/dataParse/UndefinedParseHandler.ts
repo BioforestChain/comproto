@@ -1,7 +1,7 @@
 import { dataTypeEnum, SerializationTag } from "../const";
 import type { Comproto } from "../Comproto";
 export default class UndefinedParseHandler
-  implements BFChainComproto.typeTransferHandler<undefined> {
+  implements BFChainComproto.TypeTransferHandler<undefined> {
   private TAG = new Uint8Array([SerializationTag.kUndefined]);
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);

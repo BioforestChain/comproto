@@ -5,7 +5,7 @@ import { str2U8a, u8a2Str, u8aConcat } from "@bfchain/comproto-helps";
 /**
  * ext  -- 0xc7
  */
-export default class ExtParseHandler implements BFChainComproto.typeTransferHandler<unknown> {
+export default class ExtParseHandler implements BFChainComproto.TypeTransferHandler<unknown> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     comproto.setTagType(0xc7, dataTypeEnum.Ext);

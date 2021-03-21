@@ -28,64 +28,68 @@ export const initDataParse = (comproto: Comproto) => {
   new BufferViewParseHandler(comproto);
   new ArrayBufferParseHandler(comproto);
 
-  comproto.addClassHandler<typeof Set, unknown[]>({
-    handlerObj: Set,
-    handlerName: "0x02",
-    serialize(data) {
+  comproto.addClassHandler(
+    {
+      classCtor: Set,
+      handlerName: "0x02",
+    },
+    (data) => {
       return [...data];
     },
-    deserialize(dataArray) {
+    (dataArray) => {
       return new Set(dataArray);
     },
-  });
-  comproto.addClassHandler<typeof RegExp, [string, (string | undefined)?]>({
-    handlerObj: RegExp,
-    handlerName: "0x03",
-    serialize(data) {
+  );
+  comproto.addClassHandler(
+    {
+      classCtor: RegExp,
+      handlerName: "0x03",
+    },
+    (data) => {
       const value = RegExp.prototype.toString.call(data).split("/");
       value.shift();
       const out: [string, (string | undefined)?] = [value.pop() as string];
       out.unshift(value.join("/"));
       return out;
     },
-    deserialize(value) {
+    (value) => {
       return RegExp.apply(null, value);
     },
-  });
-  comproto.addClassHandler<typeof Date, number>({
-    handlerObj: Date,
-    handlerName: "0x04",
-    serialize(data) {
+  );
+  comproto.addClassHandler(
+    {
+      classCtor: Date,
+      handlerName: "0x04",
+    },
+    (data) => {
       return data.getTime();
     },
-    deserialize(value) {
+    (value) => {
       return new Date(value);
     },
-  });
-  type errorHandlerObject = {
-    name: string;
-    message: string;
-    stack: string | undefined;
-  };
+  );
+
   const addErrorHandler = <T extends ErrorConstructor>(ErrorClass: T, tag: string) => {
-    comproto.addClassHandler({
-      handlerObj: ErrorClass,
-      handlerName: tag,
-      serialize(err) {
+    comproto.addClassHandler(
+      {
+        classCtor: ErrorClass,
+        handlerName: tag,
+      },
+      (err) => {
         return {
           name: err.name,
           message: err.message,
           stack: err.stack,
         };
       },
-      deserialize(errorObject: errorHandlerObject) {
+      (errorObject) => {
         const err = new ErrorClass();
         err.name = errorObject.name;
         err.message = errorObject.message;
         err.stack = errorObject.stack;
-        return err;
+        return err as BFChainComproto.GetClassInstance<T>;
       },
-    });
+    );
   };
   addErrorHandler(Error, "0x05");
   addErrorHandler(EvalError, "0x06");

@@ -16,7 +16,7 @@ class A {
 
 comproto.addClassHandler({
   handlerName: "CLASS_HANDLER_A",
-  handlerObj: A,
+  classCtor: A,
   serialize(obj: A) {
     return obj.a;
   },
@@ -34,13 +34,13 @@ test("test serialize class instalce of handler", async (t) => {
   t.deepEqual(transfer(b), { b: 1 });
   comproto.addClassHandler({
     handlerName: "CLASS_HANDLER_B",
-    handlerObj: B,
+    classCtor: B,
     deserialize() {
       return new B();
     },
   });
   t.deepEqual(transfer(b), b);
-  comproto.deleteClassHandler("CLASS_HANDLER_B");
+  comproto.deleteHandler("CLASS_HANDLER_B");
 });
 
 test("test serialize promise with custom handler", async (t) => {
@@ -55,7 +55,7 @@ test("test serialize promise with custom handler", async (t) => {
   t.is(promise, transfer(promise));
   const a = { a: 1, pro: promise };
   t.deepEqual(a, transfer(a));
-  comproto.deleteCustomHandler("promise_a");
+  comproto.deleteHandler("promise_a");
 });
 
 test("test serialize class instace with no deserialize", async (t) => {
@@ -69,13 +69,13 @@ test("test serialize class instace with no deserialize", async (t) => {
   const b = new B(1);
   comproto.addClassHandler({
     handlerName: "CLASS_HANDLER_B",
-    handlerObj: B,
+    classCtor: B,
     serialize(b: B) {
       return b.b;
     },
   });
   t.is(transfer(b), 1);
-  comproto.deleteClassHandler("CLASS_HANDLER_B");
+  comproto.deleteHandler("CLASS_HANDLER_B");
 });
 
 test("test deserialize class instace with no serialize", async (t) => {
@@ -87,16 +87,16 @@ test("test deserialize class instace with no serialize", async (t) => {
     add() {}
   }
   const b = new C(1);
-  const cHandler: BFChainComproto.TransferClassHandler<typeof C, number | undefined> = {
+  const cHandler: BFChainComproto.TransferByClassHandler<typeof C, number | undefined> = {
     handlerName: "CLASS_HANDLER_C",
-    handlerObj: C,
+    classCtor: C,
     deserialize(b) {
       return new C(b);
     },
   };
   comproto.addClassHandler(cHandler);
   t.deepEqual(transfer(b), new C());
-  comproto.deleteClassHandler("CLASS_HANDLER_C");
+  comproto.deleteHandler("CLASS_HANDLER_C");
 });
 
 test("test deserialize same name class instace handler", async (t) => {
@@ -104,28 +104,28 @@ test("test deserialize same name class instace handler", async (t) => {
   t.throws(() => {
     comproto.addClassHandler({
       handlerName: "CLASS_HANDLER_A",
-      handlerObj: B,
+      classCtor: B,
     });
   });
   comproto.addClassHandler({
     handlerName: "CLASS_HANDLER_SAME_NAME",
-    handlerObj: B,
+    classCtor: B,
     deserialize() {
       return 1;
     },
   });
   const addFun = comproto.addClassHandler.bind(comproto, {
     handlerName: "CLASS_HANDLER_SAME_NAME",
-    handlerObj: B,
+    classCtor: B,
     deserialize() {
       return 2;
     },
   });
   t.throws(addFun);
-  comproto.deleteClassHandler("CLASS_HANDLER_SAME_NAME");
+  comproto.deleteHandler("CLASS_HANDLER_SAME_NAME");
   t.notThrows(addFun);
   t.is(2, transfer(new B()));
-  comproto.deleteClassHandler("CLASS_HANDLER_SAME_NAME");
+  comproto.deleteHandler("CLASS_HANDLER_SAME_NAME");
 });
 
 test("test deserialize same name custom handler", async (t) => {
@@ -148,25 +148,25 @@ test("test deserialize same name custom handler", async (t) => {
     },
   });
   t.throws(addFun);
-  comproto.deleteCustomHandler("CUSTOM_HANDLER_SAME_NAME");
+  comproto.deleteHandler("CUSTOM_HANDLER_SAME_NAME");
   t.notThrows(addFun);
   t.is(transfer(B), undefined);
   comproto.setHandlerMarker(B, "CUSTOM_HANDLER_SAME_NAME");
   t.is(transfer(B), 2);
-  comproto.deleteCustomHandler("CUSTOM_HANDLER_SAME_NAME");
+  comproto.deleteHandler("CUSTOM_HANDLER_SAME_NAME");
 });
 
 test("test deserialize same name handler", async (t) => {
   class B {}
   t.throws(() => {
-    comproto.addHandler({
+    comproto.addCheckerHandler({
       handlerName: "CLASS_HANDLER_A",
       canHandle(b) {
         return b === B;
       },
     });
   });
-  comproto.addHandler({
+  comproto.addCheckerHandler({
     handlerName: "HANDLER_SAME_NAME",
     canHandle(b) {
       return b === B;
@@ -175,7 +175,7 @@ test("test deserialize same name handler", async (t) => {
       return 1;
     },
   });
-  const addFun = comproto.addHandler.bind(comproto, {
+  const addFun = comproto.addCheckerHandler.bind(comproto, {
     handlerName: "HANDLER_SAME_NAME",
     canHandle(b) {
       return b === B;
@@ -212,7 +212,7 @@ test("test handler", async (t) => {
     public a = 1;
   }
   const b = new B();
-  const bHandler: BFChainComproto.TransferHandler<B, number> = {
+  const bHandler: BFChainComproto.TransferByCheckerHandler<B, number> = {
     handlerName: "bHandler",
     canHandle(obj) {
       return obj instanceof B;
@@ -224,7 +224,7 @@ test("test handler", async (t) => {
       return new B();
     },
   };
-  comproto.addHandler(bHandler);
+  comproto.addCheckerHandler(bHandler);
   t.deepEqual(transfer(b), b);
   comproto.deleteHandler("bHandler");
 });
@@ -234,16 +234,17 @@ test("test set custom handler", async (t) => {
     public a = 1;
   }
   const b = new B();
-  const customHandler: BFChainComproto.TransferCustomHandler<{ b: B }, number, string> = {
-    handlerName: "customHandler",
-    serialize(obj) {
+  comproto.addCustomHandler(
+    {
+      handlerName: "customHandler",
+    },
+    (obj: { b: B }) => {
       return obj.b.a;
     },
-    deserialize(a: number) {
+    (a) => {
       return "customHandler deserialize" + a;
     },
-  };
-  comproto.addCustomHandler(customHandler);
+  );
   const a = { b };
   comproto.setHandlerMarker(a, "customHandler");
   const compareObj = transfer(a);
@@ -260,22 +261,24 @@ test("test delete custom handler", async (t) => {
   t.is(comproto.canHandle(a), true);
   comproto.deleteHandlerMarker(a);
   t.is(comproto.canHandle(a), false);
-  comproto.deleteCustomHandler("customHandler1");
+  comproto.deleteHandler("customHandler1");
 });
 
 // 递归
 test("test deep serialize", async (t) => {
   class B {}
-  comproto.addClassHandler({
-    handlerName: "b",
-    handlerObj: B,
-    serialize(b: B) {
+  comproto.addClassHandler(
+    {
+      handlerName: "b",
+      classCtor: B,
+    },
+    (b) => {
       return new A(2);
     },
-    deserialize(a: A) {
+    (a) => {
       return a.a;
     },
-  });
+  );
   t.deepEqual(transfer(new B()), 2);
 });
 

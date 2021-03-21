@@ -2,7 +2,7 @@ import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
 import helper from "./bytesHelper";
 import { hex2Binary, binary2Hex } from "@bfchain/comproto-helps";
-export default class BigIntParseHandler implements BFChainComproto.typeTransferHandler<bigint> {
+export default class BigIntParseHandler implements BFChainComproto.TypeTransferHandler<bigint> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     comproto.setTagType(0xd4, dataTypeEnum.BigInt);

@@ -4,7 +4,7 @@ import helper from "./bytesHelper";
 /**
  * 0x80
  */
-export default class ObjectParseHandler implements BFChainComproto.typeTransferHandler<Object> {
+export default class ObjectParseHandler implements BFChainComproto.TypeTransferHandler<Object> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     for (let i = 0x80; i <= 0x8f; i++) {

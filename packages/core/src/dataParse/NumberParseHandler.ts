@@ -21,7 +21,7 @@ import { bytesHelper } from ".";
  * uint 32 -- 0xce
  * uint 64 -- 0xcf
  */
-export default class NumberParseHandler implements BFChainComproto.typeTransferHandler<number> {
+export default class NumberParseHandler implements BFChainComproto.TypeTransferHandler<number> {
   constructor(comproto: Comproto) {
     comproto.setTypeHandler(this);
     // positive fixint -- 0x00 - 0x7f

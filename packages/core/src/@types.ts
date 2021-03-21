@@ -3,52 +3,64 @@ declare namespace BFChainComproto {
     buffer: Uint8Array;
     offset: number;
   };
+  //#region 内部存储使用的类型
 
-  interface IHanlder {
+  interface IProtorHanlder {
     handlerName: string;
+    classCtor?: HandlerClass;
     serialize?: (...arg: any[]) => unknown;
     deserialize?: (...arg: any[]) => unknown;
   }
-  type ITransferHandler = IHanlder & {
-    canHandle: (...arg: any[]) => boolean;
-  };
-
-  type HandlerObject = unknown & { [HANDLER_SYMBOL]?: string };
-
-  interface Handler<I = unknown, O = unknown, D = I> extends IHanlder {
-    handlerName: string;
-    serialize?: (value: I) => O;
-    deserialize?: (value: O) => D;
+  interface ICheckerHandler extends IProtorHanlder {
+    canHandle: (...arg: any[]) => boolean | void;
   }
-  /** 自定义handler */
-  interface TransferCustomHandler<I = unknown, O = unknown, D = I> extends Handler<I, O, D> {}
+  //#endregion
+  //#region Handler相关的核心定义
 
-  /** canHandler 的handler */
-  interface TransferHandler<I = unknown, O = unknown, D = I> extends Handler<I, O, D> {
+  type HandlerProtor = { [HANDLER_SYMBOL]?: string };
+
+  interface Handler<I = unknown, O = unknown, D = I, N extends string = string>
+    extends IProtorHanlder {
+    handlerName: N;
+    serialize?: Handler.Serialize<I, O>;
+    deserialize?: Handler.Deserialize<O, D>;
+  }
+  namespace Handler {
+    type CanHandle<I = unknown> = (value: I) => boolean | void;
+    type Serialize<I = unknown, O extends any = unknown> = (value: I) => O;
+    type Deserialize<O = unknown, D = unknown> = (value: O) => D;
+    namespace Serialize {
+      type GetOut<T> = T extends Serialize<infer _, infer O> ? O : never;
+    }
+  }
+  /** 基于原型链的handler */
+  interface TransferByProtoHandler<I = unknown, O = unknown, D = I, N extends string = string>
+    extends Handler<I, O, D, N> {}
+
+  /** 基于检测器的handler */
+  interface TransferByCheckerHandler<I = unknown, O = unknown, D = I, N extends string = string>
+    extends Handler<I, O, D, N> {
     canHandle: (obj: I) => boolean;
   }
-  type HandlerTypeObject = undefined | null | BigIntConstructor;
+
   type HandlerClass = AnyClass;
-  type GetTransferClassInstance<T> = T extends AnyClass
+  type GetClassInstance<T> = T extends AnyClass
     ? InstanceType<T>
     : T extends BigIntConstructor
     ? bigint
     : T;
-  interface TransferClassHandler<
-    H extends HandlerClass = HandlerClass,
-    O = GetTransferClassInstance<H>,
-    D = GetTransferClassInstance<H>
-  > extends Handler<GetTransferClassInstance<H>, O, D> {
-    handlerObj: H & { [HANDLER_SYMBOL]?: string };
-  }
-  interface TransferProtoHandler extends Handler {
-    handlerObj: unknown;
-  }
-  type TransferDataArray = [unknown, number[], string[]];
 
-  type TransferType = AnyClass | HandlerTypeObject;
+  /** 基于构造函数的handler */
+  interface TransferByClassHandler<
+    C extends HandlerClass = HandlerClass,
+    O = unknown,
+    N extends string = string
+  > extends Handler<GetClassInstance<C>, O, GetClassInstance<C>, N> {
+    classCtor: C;
+  }
+  //#endregion
 
-  interface typeTransferHandler<T = unknown, O = T> {
+  interface TypeTransferHandler<T = unknown, O = T> {
     typeName: import("./const").dataTypeEnum;
     serialize: (
       data: T,
@@ -58,15 +70,6 @@ declare namespace BFChainComproto {
     deserialize: (decoderState: decoderState, comproto: import("./Comproto").Comproto) => O;
   }
 
-  type typeHandler = {
-    typeName: import("./const").dataTypeEnum;
-    serialize: (
-      data: unknown,
-      resRef: U8AList,
-      comproto: import("./Comproto").Comproto,
-    ) => ArrayLike<number> | void;
-    deserialize: (decoderState: decoderState, comproto: import("./Comproto").Comproto) => unknown;
-  };
   type U8AList = ArrayLike<number>[];
 
   interface CarryStorageRegister {

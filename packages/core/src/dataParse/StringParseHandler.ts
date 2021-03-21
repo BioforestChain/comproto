@@ -2,7 +2,7 @@ import { dataTypeEnum } from "../const";
 import type { Comproto } from "../Comproto";
 import helper from "./bytesHelper";
 import { str2U8a, u8a2Str } from "@bfchain/comproto-helps";
-export default class StringParseHandler implements BFChainComproto.typeTransferHandler<string> {
+export default class StringParseHandler implements BFChainComproto.TypeTransferHandler<string> {
   /**
    *  fixstr -- 0xa0 - 0xbf
    *  str 8 -- 0xd9
