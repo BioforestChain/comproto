@@ -1,13 +1,13 @@
 {
   "name": "@bfchain/comproto",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "main": "build/cjs/index.js",
   "type": "build/cjs/index.d.ts",
   "files": [
     "build"
   ],
   "dependencies": {
-    "@bfchain/comproto-core": "1.5.0",
+    "@bfchain/comproto-core": "1.5.1",
     "@bfchain/comproto-helps": "1.4.2",
     "@bfchain/comproto-typings": "1.4.2"
   },
