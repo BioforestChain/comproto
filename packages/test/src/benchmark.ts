@@ -1,14 +1,17 @@
 /// TEST
 
 import { ComprotoFactory, bytesHelper } from "@bfchain/comproto";
-import { benchmark, suite, FORMAT_MD, FORMAT_CSV } from "@thi.ng/bench";
+import * as path from "path";
+import * as fs from "fs";
+import { add, complete, cycle, suite, save } from "benny";
 const comproto = ComprotoFactory.getComproto();
 
 // import x from 'ins'
 import v8 from "v8";
 import inspector from "inspector";
 import util from "util";
-import { writeFileSync } from "fs";
+import { fstat, writeFileSync } from "fs";
+
 const session = new inspector.Session();
 const profilerEnable = util.promisify((cb: (err: Error | null) => void) => {
   session.post("Profiler.enable", cb);
@@ -16,11 +19,9 @@ const profilerEnable = util.promisify((cb: (err: Error | null) => void) => {
 const profilerStart = util.promisify((cb: (err: Error | null) => void) => {
   session.post("Profiler.start", cb);
 });
-const profilerStop = util.promisify(
-  (cb: (err: Error | null, params: inspector.Profiler.StopReturnType) => void) => {
-    session.post("Profiler.stop", cb);
-  },
-);
+const profilerStop = util.promisify((cb: (err: Error | null, params: inspector.Profiler.StopReturnType) => void) => {
+  session.post("Profiler.stop", cb);
+});
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 const enableProfile = !!process.env.PROFILE;
@@ -67,12 +68,6 @@ const obj3 = Array.from({ length: 20 }, () => new O2());
 
 (async function test() {
   enableProfile && session.connect();
-  enableProfile && (await profilerEnable());
-
-  const TIMES = 1e4;
-  const WARMUP = 10;
-
-  enableProfile && (await profilerStart());
 
   const buf1 = comproto.serialize(obj);
   const buf2 = comproto.serialize(obj2);
@@ -80,26 +75,55 @@ const obj3 = Array.from({ length: 20 }, () => new O2());
   const buf4 = v8.serialize(obj);
   const json5 = JSON.stringify(obj);
   const buf6 = encoder.encode(JSON.stringify(obj));
-  suite(
-    [
-      { title: "cp.se object", fn: () => comproto.serialize(obj) },
-      { title: "cp.de object", fn: () => comproto.deserialize(buf1) },
-      { title: "cp.se custom-object", fn: () => comproto.serialize(obj2) },
-      { title: "cp.de custom-object", fn: () => comproto.deserialize(buf2) },
-      { title: "cp.se custom-flat-object", fn: () => comproto.serialize(obj3) },
-      { title: "cp.de custom-flat-object", fn: () => comproto.deserialize(buf3) },
-      { title: "v8.serialize object", fn: () => v8.serialize(obj) },
-      { title: "v8.deserialize object", fn: () => v8.deserialize(buf4) },
-      { title: "json.stringify object", fn: () => JSON.stringify(obj) },
-      { title: "json.parse object", fn: () => JSON.parse(json5) },
-      { title: "json+buf object", fn: () => encoder.encode(JSON.stringify(obj)) },
-      { title: " object object", fn: () => JSON.parse(decoder.decode(buf6)) },
-    ],
-    {
-      iter: TIMES,
-      warmup: WARMUP,
-      format: FORMAT_MD,
-      //   size: 1,
-    },
+  const benchList = [
+    { group: "comproto", title: "comproto.serialize object", fn: () => comproto.serialize(obj) },
+    { group: "comproto", title: "comproto.deserialize object", fn: () => comproto.deserialize(buf1) },
+    { group: "comproto", title: "comproto.serialize custom-object", fn: () => comproto.serialize(obj2) },
+    { group: "comproto", title: "comproto.deserialize custom-object", fn: () => comproto.deserialize(buf2) },
+    { group: "comproto", title: "comproto.serialize custom-flat-object", fn: () => comproto.serialize(obj3) },
+    { group: "comproto", title: "comproto.deserialize custom-flat-object", fn: () => comproto.deserialize(buf3) },
+    { group: "v8", title: "v8.serialize object", fn: () => v8.serialize(obj) },
+    { group: "v8", title: "v8.deserialize object", fn: () => v8.deserialize(buf4) },
+    { group: "json", title: "json.stringify object", fn: () => JSON.stringify(obj) },
+    { group: "json", title: "json.parse object", fn: () => JSON.parse(json5) },
+    { group: "comproto", title: "buf.stringify object", fn: () => encoder.encode(JSON.stringify(obj)) },
+    { group: "comproto", title: "buf.parse object", fn: () => JSON.parse(decoder.decode(buf6)) },
+  ];
+  //   suite(benchList, {
+  //     iter: TIMES,
+  //     warmup: WARMUP,
+  //     format: FORMAT_MD,
+  //     //   size: 1,
+  //   });
+
+  //   const bench = new Bench().group("xxx");
+  //   for (const item of benchList) {
+  //     bench.add(item.title, item.fn);
+  //   }
+  //   bench.run();
+
+  const benchmarkResultFolder = path.resolve(__dirname, "../../../../benchmark");
+  const benchmarkResultFile = "serialize-deserialize";
+
+  enableProfile && (await profilerEnable());
+
+  enableProfile && (await profilerStart());
+
+  await suite(
+    "Serialize and Deserialize",
+    ...benchList.map((item) => add(item.title, item.fn)),
+    ///
+    cycle(),
+    complete(),
+    save({ file: benchmarkResultFile, folder: benchmarkResultFolder, format: "chart.html" }),
   );
+
+  if (enableProfile) {
+    const { profile } = await profilerStop();
+    fs.writeFileSync(path.join(benchmarkResultFolder, `profile-${new Date().toISOString()}.json`), JSON.stringify(profile));
+  }
+  enableProfile && (await profilerStop());
+
+  const chartFilepath = path.join(benchmarkResultFolder, benchmarkResultFile + ".chart.html");
+  fs.writeFileSync(chartFilepath, fs.readFileSync(chartFilepath, "utf-8").replace("https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist", "lib"));
 })();

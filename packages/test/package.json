@@ -10,8 +10,8 @@
   "dependencies": {
     "@bfchain/comproto": "1.5.2",
     "@bfchain/comproto-typings": "1.4.2",
-    "@thi.ng/bench": "^2.1.0",
     "@types/node": "^14.14.35",
+    "benny": "^3.6.15",
     "conditional-type-checks": "^1.0.5"
   },
   "devDependencies": {
